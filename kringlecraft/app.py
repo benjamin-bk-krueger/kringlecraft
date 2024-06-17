@@ -7,6 +7,7 @@ from utils import config_tools
 folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, folder)
 
+import kringlecraft.data.db_session as db_session
 
 app = flask.Flask(__name__)
 
@@ -14,7 +15,8 @@ app = flask.Flask(__name__)
 def main():
     configure_defaults()
     register_blueprints()
-    app.run(debug=True)
+    setup_db()
+    app.run(debug=True, port=5006)
 
 
 def configure_defaults():
@@ -28,6 +30,12 @@ def register_blueprints():
     from kringlecraft.views import home_views
 
     app.register_blueprint(home_views.blueprint)
+
+
+def setup_db():
+    db_file = os.path.join(os.path.dirname(__file__), 'db', 'kringlecraft.sqlite')
+
+    db_session.global_init(db_file)
 
 
 if __name__ == '__main__':
