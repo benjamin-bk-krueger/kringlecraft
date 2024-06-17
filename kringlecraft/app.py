@@ -1,11 +1,24 @@
+import os
+import sys
 import flask
+
+folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, folder)
+
 
 app = flask.Flask(__name__)
 
 
-@app.route('/')
-def index():
-    return 'Hello world'
+def main():
+    register_blueprints()
+    app.run(debug=True)
 
 
-app.run()
+def register_blueprints():
+    from kringlecraft.views import home_views
+
+    app.register_blueprint(home_views.blueprint)
+
+
+if __name__ == '__main__':
+    main()

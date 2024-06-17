@@ -1,0 +1,22 @@
+/*
+    Adds page margin and padding for all pages. Displays a PNG wallpaper in parallax mode.
+ */
+body {
+    padding: 10px;
+    margin: 10px;
+    background: url('/static/img/background_para.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+}
+
+/*
+    Parallax mode does not seem to be fully compatible on iOS devices.
+    Just use a very large static image instead.
+ */
+@media (pointer:none), (pointer:coarse) {
+    body {
+        background: url('/static/img/background.jpg') center center scroll;
+    }
+}
