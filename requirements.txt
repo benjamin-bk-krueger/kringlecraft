@@ -3,3 +3,8 @@
 Flask
 SQLAlchemy
 passlib
+WTForms
+Flask-WTF
+Flask-Login
+MarkupSafe
+email-validator

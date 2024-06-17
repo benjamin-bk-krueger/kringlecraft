@@ -1,0 +1,40 @@
+{# /web/login #}
+{% extends 'shared/_layout.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <div class="container-fluid c-restricted-md c-header rounded bg-light mt-4 pt-4 pb-4">
+        <div class="container-fluid c-restricted-sm">
+            {# Display form and possible error message - log in user #}
+            <div class="mb-3 fs-4">Enter your login data</div>
+            <form action="{{ url_for('home.login_post') }}" method="POST">
+                {{ login_form.csrf_token }}
+                <div class="form-group mt-2 mb-2">
+                    <label for="email">{{ login_form.email.label }}</label>
+                    {{ login_form.email(size=20, class="form-control", onkeypress="return event.charCode != 32") }}
+                </div>
+                {% for error in login_form.email.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+                <div class="form-group mt-2 mb-2">
+                    <label for="password">{{ login_form.password.label }}</label>
+                    {{ login_form.password(size=20, class="form-control") }}
+                </div>
+                {% for error in login_form.password.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+                <div class="form-check mt-2 mb-2">
+                    <label class="form-check-label" for="remember">{{ login_form.remember.label }}</label>
+                    {{ login_form.remember(class="form-check-input") }}
+                </div>
+                {% if login_form.remember.errors %}
+                    {% for error in login_form.remember.errors %}
+                        <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+                <button type="submit" class="btn btn-primary mt-4"><i class="bi bi-box-arrow-right"></i> Log In</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

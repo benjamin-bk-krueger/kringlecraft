@@ -46,7 +46,11 @@
                     </ul>
 
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        Placeholder
+                        {% if current_user.is_authenticated %}
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('home.login_get') }}"><i class="bi bi-door-open-fill"></i> Logout</a></li>
+                        {% else %}
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('home.login_get') }}"><i class="bi bi-door-open"></i> Login</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -65,7 +69,12 @@
                     <div class="col-lg-8 col-md-8 col-sm-12">
                         <h6 class="font-weight-bold">
                             <a class="link-dark" href="https://www.blk8.de/">Created by Ben K.</a><br>
-                            Placeholder<br>
+                            {% if current_user.is_authenticated %}
+                                Logged in as {{ current_user.student_name }}.
+                            {% else %}
+                                Not logged in.
+                            {% endif %}
+                            <br>
                             Placeholder<br>
                             <a class="link-dark" href="{{ url_for('home.release')}}">Version: {{ config['version'] }} (Mode: {{ config['mode'] }})</a>
                         </h6>
