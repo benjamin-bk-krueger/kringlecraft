@@ -13,3 +13,9 @@ def index():
 @blueprint.route('/privacy')
 def privacy():
     return flask.render_template('home/privacy.html')
+
+
+# Show information about all major releases
+@blueprint.route('/release')
+def release():
+    return flask.render_template('home/release.html')

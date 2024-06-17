@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "app": {
+    "mode": "standalone",
+    "version": "1.0.0"
+  }
+}
