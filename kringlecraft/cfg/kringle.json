@@ -2,6 +2,10 @@
   "version": 1,
   "app": {
     "mode": "standalone",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "mail_sender": "mail@localhost"
+  },
+  "secret": {
+    "key": "secret-key-goes-here"
   }
 }

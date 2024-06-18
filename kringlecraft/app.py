@@ -27,8 +27,11 @@ def main():
 def configure_defaults():
     cfg = config_tools.parse_config('cfg/kringle.json')
     for key in cfg['app']:
-        app.config[key] = cfg['app'][key]
+        app.config[f"app.{key}"] = cfg['app'][key]
         print(f"Config key: {key}, value: {cfg['app'][key]}")
+    for key in cfg['secret']:
+        app.config[f"secret.{key}"] = cfg['secret'][key]
+        print(f"Secret key: {key}, value: ********")
 
 
 def register_blueprints():
@@ -44,7 +47,7 @@ def setup_db():
 
 def setup_csrf():
     # Enable CSRF protection for the app
-    app.config['SECRET_KEY'] = 'your_secret_key'  # Replace with an actual secret key
+    app.config['SECRET_KEY'] = app.config["secret.key"]  # Replace with an actual secret key
     csrf = CSRFProtect(app)
 
 
