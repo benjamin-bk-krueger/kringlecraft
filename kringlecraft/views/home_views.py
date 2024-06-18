@@ -1,5 +1,5 @@
 import flask
-from markupsafe import escape  # to safely escape form data
+from flask_login import (login_user, logout_user, login_required)  # to manage user sessions
 
 blueprint = flask.Blueprint('home', __name__, template_folder='templates')
 
@@ -19,7 +19,6 @@ def login_get():
     login_form = LoginForm()
     login_form.process()
 
-    # show page again and print possible errors in form
     return flask.render_template('home/login.html', login_form=login_form)
 
 
@@ -30,26 +29,42 @@ def login_post():
 
     # initialize form data
     login_form = LoginForm()
+    login_form.escape_fields()
 
-    # in case of login request
+    # check valid student account and password match
     if login_form.validate_on_submit():
-        # read form and find matching student for login request
-        user_mail = escape(login_form.email.data)
-        user_password = login_form.password.data
-        user_remember = bool(escape(login_form.remember.data))
-        user = user_services.login_user(user_mail, user_password)
-
-        # check valid student account and password match
+        user = user_services.login_user(login_form.email.data, login_form.password.data)
         if not user:
-            print("Login Failure")
+            print(f"Login Failure for user {login_form.email.data}")
 
-            # redirect to login page after unsuccessful login
-            return flask.redirect(flask.url_for('home.index'))
+            return flask.redirect(flask.url_for('home.login_get'))
         else:
-            print("Login Successful")
+            login_user(user, remember=login_form.remember.data)
+            print(f"Login Successful for user {login_form.email.data}")
 
-            # redirect to index page after successful login
             return flask.redirect(flask.url_for('home.index'))
+    else:
+        # preset form with existing data
+        login_form.set_field_defaults()
+        login_form.process()
+
+        # show page again and print possible errors in form
+        return flask.render_template('home/login.html', login_form=login_form)
+
+
+# Log out user and return to the site index afterward
+@blueprint.route('/logout')
+def logout():
+    logout_user()
+
+    return flask.redirect(flask.url_for('home.index'))
+
+
+# Force user log-in and return to the site index afterward
+@blueprint.route('/logged')
+@login_required
+def logged():
+    return flask.redirect(flask.url_for('home.index'))
 
 
 # Show privacy policy

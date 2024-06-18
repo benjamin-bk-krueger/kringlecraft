@@ -1,9 +1,10 @@
 import datetime
 import sqlalchemy
+from flask_login import UserMixin  # to manage user sessions
 from kringlecraft.data.modelbase import SqlAlchemyBase
 
 
-class User(SqlAlchemyBase):
+class User(UserMixin, SqlAlchemyBase):
     __tablename__ = 'users'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)

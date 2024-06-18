@@ -2,8 +2,7 @@ import os
 import sys
 import flask
 
-from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, \
-    current_user  # to manage user sessions
+from flask_login import LoginManager  # to manage user sessions
 from flask_wtf.csrf import CSRFProtect  # CSRF protection
 
 import kringlecraft.data.db_session as db_session
@@ -54,7 +53,7 @@ def setup_login_manager():
 
     # Login Manager configuration
     login_manager = LoginManager()
-    login_manager.login_view = 'home.login'  # show this page if a login is required
+    login_manager.login_view = 'home.login_get'  # show this page if a login is required
     login_manager.init_app(app)
 
     # link the Login Manager to the correct user entry

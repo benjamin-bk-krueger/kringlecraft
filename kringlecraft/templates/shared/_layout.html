@@ -47,9 +47,9 @@
 
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         {% if current_user.is_authenticated %}
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('home.login_get') }}"><i class="bi bi-door-open-fill"></i> Logout</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('home.logout') }}"><i class="bi bi-door-open-fill"></i> Logout</a></li>
                         {% else %}
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('home.login_get') }}"><i class="bi bi-door-open"></i> Login</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('home.logged') }}"><i class="bi bi-door-open"></i> Login</a></li>
                         {% endif %}
                     </ul>
                 </div>
@@ -70,7 +70,7 @@
                         <h6 class="font-weight-bold">
                             <a class="link-dark" href="https://www.blk8.de/">Created by Ben K.</a><br>
                             {% if current_user.is_authenticated %}
-                                Logged in as {{ current_user.student_name }}.
+                                Logged in as {{ current_user.name }} ({{ current_user.email }}).
                             {% else %}
                                 Not logged in.
                             {% endif %}
