@@ -1,0 +1,10 @@
+site_name: KringleCraft.com
+site_url: https://www.kringlecraft.com/static/doc/
+site_dir: ./kringlecraft/static/doc
+use_directory_urls: false
+nav:
+    - Home: index.md
+    - Exit Help: 'https://www.kringlecraft.com/'
+theme: readthedocs
+markdown_extensions:
+  - tables

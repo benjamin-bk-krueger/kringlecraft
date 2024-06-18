@@ -8,3 +8,4 @@ Flask-WTF
 Flask-Login
 MarkupSafe
 email-validator
+mkdocs
