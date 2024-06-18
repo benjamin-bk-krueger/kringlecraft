@@ -6,7 +6,8 @@
     "mail_enable": "false",
     "mail_sender": "mail@localhost",
     "mail_admin": "admin@localhost",
-    "mail_server": "localhost"
+    "mail_server": "localhost",
+    "www_server": "http://127.0.0.1:5006"
   },
   "secret": {
     "key": "secret-key-goes-here"

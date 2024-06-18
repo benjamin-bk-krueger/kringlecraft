@@ -1,0 +1,28 @@
+{# /reset #}
+{% extends 'shared/_layout.html' %}
+
+{% block title %}Set new password{% endblock %}
+
+{% block content %}
+    <div class="container-fluid c-restricted-md c-header rounded bg-light mt-4 pt-4 pb-4">
+        <div class="container-fluid c-restricted-sm">
+            {# Display form and possible error message - reset password #}
+            <div class="mb-3 fs-4">Set new password</div>
+            <form action="{{ url_for('home.reset_post', random_hash=random_hash) }}" method="POST">
+                {{ reset_form.csrf_token }}
+                <div class="form-group mt-2 mb-2">
+                    <label for="password">{{ reset_form.password.label }}</label>
+                    {{ reset_form.password(size=20, class="form-control") }}
+                </div>
+                {% for error in reset_form.password.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+                <div class="form-group mt-2 mb-2">
+                    <label for="password2">{{ reset_form.password2.label }}</label>
+                    {{ reset_form.password2(size=20, class="form-control") }}
+                </div>
+                <button type="submit" class="btn btn-primary mt-4"><i class="bi bi-save"></i> Set Password</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

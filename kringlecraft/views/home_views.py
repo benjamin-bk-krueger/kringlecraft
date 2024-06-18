@@ -26,11 +26,10 @@ def contact_post():
 
     # initialize form data
     contact_form = ContactForm()
-    contact_form.escape_fields()
 
     # check valid contact data
     if contact_form.validate_on_submit():
-        send_admin_mail(f"{contact_form.contact_name.data} - {contact_form.email.data}", f"{contact_form.message.data}")
+        send_admin_mail(f"{contact_form.contact_content} - {contact_form.email_content}", f"{contact_form.message_content}")
 
         return flask.redirect(flask.url_for('home.index'))
     else:
@@ -75,15 +74,14 @@ def login_post():
 
     # initialize form data
     login_form = LoginForm()
-    login_form.escape_fields()
 
     # check valid student account and password match
     if login_form.validate_on_submit():
-        user = user_services.login_user(login_form.email.data, login_form.password.data)
+        user = user_services.login_user(login_form.email_content, login_form.password_content)
         if not user:
             return flask.redirect(flask.url_for('home.login_get'))
         else:
-            login_user(user, remember=login_form.remember.data)
+            login_user(user, remember=login_form.remember_content)
 
             return flask.redirect(flask.url_for('home.index'))
     else:
@@ -108,6 +106,73 @@ def logout():
 @login_required
 def logged():
     return flask.redirect(flask.url_for('home.index'))
+
+
+# Show user password reset page
+@blueprint.route('/password', methods=['GET'])
+def password_get():
+    from kringlecraft.viewmodels.home_forms import PasswordForm
+
+    # initialize form data
+    password_form = PasswordForm()
+    password_form.process()
+
+    return flask.render_template('home/password.html', password_form=password_form)
+
+
+@blueprint.route('/password', methods=['POST'])
+def password_post():
+    from kringlecraft.viewmodels.home_forms import PasswordForm
+    import kringlecraft.services.user_services as user_services
+
+    # initialize form data
+    password_form = PasswordForm()
+
+    # in case of password reset request and enabled e-mail account
+    if password_form.validate_on_submit():
+        user_services.prepare_user(password_form.email_content, flask.current_app.config["app.www_server"])
+
+        return flask.redirect(flask.url_for('home.index'))
+    else:
+        # preset form with existing data
+        password_form.set_field_defaults()
+        password_form.process()
+
+        # show page again and print possible errors in form
+        return flask.render_template('home/password.html', password_form=password_form)
+
+
+# Show user password reset page
+@blueprint.route('/reset/<string:random_hash>', methods=['GET'])
+def reset_get(random_hash):
+    from kringlecraft.viewmodels.home_forms import ResetForm
+
+    # initialize form data
+    reset_form = ResetForm()
+    reset_form.process()
+
+    return flask.render_template('home/reset.html', reset_form=reset_form, random_hash=random_hash)
+
+
+@blueprint.route('/reset/<string:random_hash>', methods=['POST'])
+def reset_post(random_hash):
+    from kringlecraft.viewmodels.home_forms import ResetForm
+    import kringlecraft.services.user_services as user_services
+
+    # initialize form data
+    reset_form = ResetForm()
+
+    # in case of password reset request follow-up
+    if reset_form.validate_on_submit() and len(random_hash) > 30:
+        user_services.reset_user(random_hash, reset_form.password_content)
+
+        return flask.redirect(flask.url_for('home.index'))
+    else:
+        # preset form with existing data
+        reset_form.process()
+
+        # show page again and print possible errors in form
+        return flask.render_template('home/reset.html', reset_form=reset_form, random_hash=random_hash)
 
 
 # Show privacy policy

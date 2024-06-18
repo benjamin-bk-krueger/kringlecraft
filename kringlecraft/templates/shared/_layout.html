@@ -75,16 +75,16 @@
                                 Not logged in.
                             {% endif %}
                             <br>
-                            Placeholder<br>
-                            <a class="link-dark" href="{{ url_for('home.release')}}">Version: {{ config['app.version'] }} (Mode: {{ config['app.mode'] }})</a>
+                            <a class="link-dark" href="{{ url_for('home.password_get')}}">Reset password</a><br>
+                            <a class="link-dark" href="{{ url_for('home.contact_get')}}">Send a Message</a>
                         </h6>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-12">
                         <h6 class="font-weight-bold">
-                            <a class="link-dark" href="{{ url_for('home.privacy')}}">Privacy Policy</a><br>
                             <a class="link-dark" href="{{ url_for('static', filename='doc/index.html') }}">Open Help</a><br>
-                            Placeholder<br>
-                            <a class="link-dark" href="{{ url_for('home.contact_get')}}">Send a Message</a>
+                            Mode: {{ config['app.mode'] }}<br>
+                            <a class="link-dark" href="{{ url_for('home.release')}}">Version: {{ config['app.version'] }}</a><br>
+                            <a class="link-dark" href="{{ url_for('home.privacy')}}">Privacy Policy</a>
                         </h6>
                     </div>
                 </div>

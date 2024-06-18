@@ -1,6 +1,19 @@
+import random
+import string
 from passlib.handlers.sha2_crypt import sha512_crypt as crypto
 import kringlecraft.data.db_session as db_session
+from kringlecraft.utils.mail_tools import send_mail
 from kringlecraft.data.users import User
+
+
+def random_hash() -> str:
+    """
+    Generate a random hash.
+
+    :return: A randomly generated hash string.
+    :rtype: str
+    """
+    return ''.join(random.sample(string.ascii_letters + string.digits, 32))
 
 
 def hash_text(text: str) -> str:
@@ -22,27 +35,27 @@ def verify_hash(hashed_text: str, plain_text: str) -> bool:
     return crypto.verify(plain_text, hashed_text)
 
 
-def login_user(email: str, password: str) -> User | None:
+def login_user(user_email: str, user_password: str) -> User | None:
     """
     Login User
 
-    :param email: The email address of the user.
-    :param password: The password of the user.
+    :param user_email: The email address of the user.
+    :param user_password: The password of the user.
     :return: The logged-in user object of type `User` if successful, otherwise `None`.
 
     """
     session = db_session.create_session()
     try:
-        user = session.query(User).filter(User.email == email).first()
+        user = session.query(User).filter(User.email == user_email).first()
         if not user:
-            print(f"Login Failure for user {email}")
+            print(f"Login Failure for user {user_email}")
             return None
 
-        if not verify_hash(user.hashed_password, password):
-            print(f"Login Failure for user {email}")
+        if not verify_hash(user.hashed_password, user_password):
+            print(f"Login Failure for user {user_email}")
             return None
 
-        print(f"Login Successful for user {email}")
+        print(f"Login Successful for user {user_email}")
         return user
     finally:
         session.close()
@@ -57,5 +70,66 @@ def find_user_by_id(user_id: int) -> User | None:
     try:
         user = session.query(User).filter(User.id == user_id).first()
         return user
+    finally:
+        session.close()
+
+
+def prepare_user(user_email: str, www_link: str) -> User | None:
+    """
+    :param user_email: The email of the user for whom to prepare the password reset.
+    :param www_link: The base URL of the website where the password reset link will be sent.
+    :return: The prepared User object if valid student account and password reset mail sent successfully, otherwise None.
+
+    This method prepares the user for password reset by performing the following steps:
+    1. Create a database session using db_session.create_session().
+    2. Query the User table in the database to find a user that is currently active and has the specified user_email.
+    3. If a user with the specified email is found, generate a random password reset hash and update the user's reset_password field with it.
+       Then, commit the changes to the database.
+    4. Create a list of recipients with the user's email.
+    5. Prepare the body text of the password reset email containing the reset link by appending the reset_password hash to the www_link.
+    6. Send the password reset email to the user's email address using the send_mail() function with the subject "Password Reset Link" and the prepared body text.
+    7. Return the prepared User object if the user is found and the email is successfully sent, otherwise return None.
+
+    Note: This method ensures that the database session is properly closed in a finally block to prevent resource leaks.
+    """
+    # check valid student account and sent out password reset mail
+    session = db_session.create_session()
+    try:
+        user = session.query(User).filter(User.active == 1).filter(User.email == user_email).first()
+        if user:
+            user.reset_password = random_hash()
+            session.commit()
+
+            recipients = list()
+            recipients.append(user_email)
+            body_text = f"Reset your password here: {www_link}/reset/{user.reset_password}"
+            send_mail("Password Reset Link", body_text, recipients)
+
+            return user
+    finally:
+        session.close()
+
+
+def reset_user(user_hash: str, user_password: str) -> User | None:
+    """
+    Reset the password of a user.
+
+    :param user_hash: The reset password hash.
+    :param user_password: The new password for the user.
+    :return: The User object if successful, None if the password reset failed.
+    """
+    # check valid student account and valid password reset link
+    session = db_session.create_session()
+    try:
+        user = session.query(User).filter(User.active == 1).filter(User.reset_password == user_hash).first()
+        if user:
+            user.hashed_password = hash_text(user_password)
+            user.reset_password = ""
+            session.commit()
+
+            print(f"Password Reset for user {user.email}")
+            recipients = list()
+            recipients.append(user.email)
+            send_mail(f"{user.name} - Password Reset", "Your password has been reset.", recipients)
     finally:
         session.close()
