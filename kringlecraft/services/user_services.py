@@ -35,11 +35,14 @@ def login_user(email: str, password: str) -> User | None:
     try:
         user = session.query(User).filter(User.email == email).first()
         if not user:
+            print(f"Login Failure for user {email}")
             return None
 
         if not verify_hash(user.hashed_password, password):
+            print(f"Login Failure for user {email}")
             return None
 
+        print(f"Login Successful for user {email}")
         return user
     finally:
         session.close()

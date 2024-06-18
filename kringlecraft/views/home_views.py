@@ -81,12 +81,9 @@ def login_post():
     if login_form.validate_on_submit():
         user = user_services.login_user(login_form.email.data, login_form.password.data)
         if not user:
-            print(f"Login Failure for user {login_form.email.data}")
-
             return flask.redirect(flask.url_for('home.login_get'))
         else:
             login_user(user, remember=login_form.remember.data)
-            print(f"Login Successful for user {login_form.email.data}")
 
             return flask.redirect(flask.url_for('home.index'))
     else:

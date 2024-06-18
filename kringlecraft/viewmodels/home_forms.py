@@ -3,7 +3,7 @@ from wtforms import (StringField, PasswordField, BooleanField, TextAreaField, Hi
 from wtforms.validators import (InputRequired, Email, Length, EqualTo)
 from markupsafe import escape  # to safely escape form data
 
-from kringlecraft.viewmodels._validators import full_ascii_validator
+from kringlecraft.viewmodels.__validators import full_ascii_validator
 
 # Every form used both in the Flask/Jinja templates as well the main Python app is defined here.
 # Not all fields have full validators as they are used in modal windows.
