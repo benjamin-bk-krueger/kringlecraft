@@ -23,6 +23,14 @@ def verify_hash(hashed_text: str, plain_text: str) -> bool:
 
 
 def login_user(email: str, password: str) -> User | None:
+    """
+    Login User
+
+    :param email: The email address of the user.
+    :param password: The password of the user.
+    :return: The logged-in user object of type `User` if successful, otherwise `None`.
+
+    """
     session = db_session.create_session()
     try:
         user = session.query(User).filter(User.email == email).first()
