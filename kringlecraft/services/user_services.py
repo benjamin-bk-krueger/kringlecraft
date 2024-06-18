@@ -76,21 +76,11 @@ def find_user_by_id(user_id: int) -> User | None:
 
 def prepare_user(user_email: str, www_link: str) -> User | None:
     """
-    :param user_email: The email of the user for whom to prepare the password reset.
-    :param www_link: The base URL of the website where the password reset link will be sent.
-    :return: The prepared User object if valid student account and password reset mail sent successfully, otherwise None.
+    :param user_email: The email of the user for whom the password reset is being prepared.
+    :param www_link: The base URL of the website to which the password reset link will be appended.
+    :return: The User object representing the user for whom the password reset is being prepared. Returns None if no active user with the given email is found.
 
-    This method prepares the user for password reset by performing the following steps:
-    1. Create a database session using db_session.create_session().
-    2. Query the User table in the database to find a user that is currently active and has the specified user_email.
-    3. If a user with the specified email is found, generate a random password reset hash and update the user's reset_password field with it.
-       Then, commit the changes to the database.
-    4. Create a list of recipients with the user's email.
-    5. Prepare the body text of the password reset email containing the reset link by appending the reset_password hash to the www_link.
-    6. Send the password reset email to the user's email address using the send_mail() function with the subject "Password Reset Link" and the prepared body text.
-    7. Return the prepared User object if the user is found and the email is successfully sent, otherwise return None.
-
-    Note: This method ensures that the database session is properly closed in a finally block to prevent resource leaks.
+    Prepares a user for password reset by generating a random password reset hash, updating the user's reset_password field, and sending a password reset email with the password reset link.
     """
     # check valid student account and sent out password reset mail
     session = db_session.create_session()
@@ -131,5 +121,7 @@ def reset_user(user_hash: str, user_password: str) -> User | None:
             recipients = list()
             recipients.append(user.email)
             send_mail(f"{user.name} - Password Reset", "Your password has been reset.", recipients)
+
+            return user
     finally:
         session.close()
