@@ -4,6 +4,7 @@ import flask
 
 from flask_login import LoginManager  # to manage user sessions
 from flask_wtf.csrf import CSRFProtect  # CSRF protection
+from flask_mail import Mail  # to send mails
 
 import kringlecraft.data.db_session as db_session
 from utils import config_tools
@@ -20,6 +21,7 @@ def main():
     register_blueprints()
     setup_db()
     setup_csrf()
+    setup_mail()
     setup_login_manager()
     app.run(debug=True, port=5006)
 
@@ -49,6 +51,13 @@ def setup_csrf():
     # Enable CSRF protection for the app
     app.config['SECRET_KEY'] = app.config["secret.key"]  # Replace with an actual secret key
     csrf = CSRFProtect(app)
+
+
+def setup_mail():
+    # E-Mail configuration
+    app.config['MAIL_SERVER'] = app.config["app.mail_server"]
+    mail = Mail(app)
+    app.config["mail.send"] = mail.send
 
 
 def setup_login_manager():

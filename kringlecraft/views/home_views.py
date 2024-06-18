@@ -1,5 +1,6 @@
 import flask
 from flask_login import (login_user, logout_user, login_required)  # to manage user sessions
+from kringlecraft.utils.mail_tools import send_admin_mail
 
 blueprint = flask.Blueprint('home', __name__, template_folder='templates')
 
@@ -29,8 +30,7 @@ def contact_post():
 
     # check valid contact data
     if contact_form.validate_on_submit():
-        # send_mail([MAIL_ADMIN], f"{contact_name} - {email}", f"{message}")
-        print(f"Sending mail to {contact_form.contact_name.data} - {contact_form.email.data}")
+        send_admin_mail(f"{contact_form.contact_name.data} - {contact_form.email.data}", f"{contact_form.message.data}")
 
         return flask.redirect(flask.url_for('home.index'))
     else:

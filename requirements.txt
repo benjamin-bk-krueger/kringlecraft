@@ -6,6 +6,7 @@ passlib
 WTForms
 Flask-WTF
 Flask-Login
+flask-mail
 MarkupSafe
 email-validator
 mkdocs

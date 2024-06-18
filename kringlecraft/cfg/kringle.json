@@ -3,7 +3,10 @@
   "app": {
     "mode": "standalone",
     "version": "1.0.0",
-    "mail_sender": "mail@localhost"
+    "mail_enable": "false",
+    "mail_sender": "mail@localhost",
+    "mail_admin": "admin@localhost",
+    "mail_server": "localhost"
   },
   "secret": {
     "key": "secret-key-goes-here"
