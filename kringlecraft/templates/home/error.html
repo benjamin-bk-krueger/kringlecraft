@@ -1,0 +1,20 @@
+{# /error #}
+{% extends 'shared/_layout.html' %}
+
+{% block title %}Error{% endblock %}
+
+{% block content %}
+    <div class="container-fluid c-restricted-xxl c-header rounded bg-light mt-4 pt-4 pb-4">
+        {#  Show error message #}
+        <div class="rounded border mt-4 mb-4 c-color p-2">
+            <div class="fs-3">Error</div>
+            <div class="underline"><span><i class="bi bi-bug" aria-hidden="true"></i></span></div>
+
+            <div class="fs-5"><b>Oops</b>, you have found a crack in the matrix.</div>
+            <div class="fs-6">{{ 'Victor says: ' + error_message if error_message else 'Victor says oink.' }}</div>
+        </div>
+
+        {# Show fullscreen wallpaper #}
+        <img src="{{ url_for('static', filename='img/victor.jpg') }}" class="img-fluid rounded w-100" alt="Victor">
+    </div>
+{% endblock %}

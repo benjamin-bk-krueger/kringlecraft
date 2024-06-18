@@ -4,6 +4,12 @@ from flask_login import (login_user, logout_user, login_required)  # to manage u
 blueprint = flask.Blueprint('home', __name__, template_folder='templates')
 
 
+# Show error page  - for all "hard" crashes a mail is sent to the site admin
+@blueprint.route('/error')
+def error():
+    return flask.render_template('home/error.html')
+
+
 # Show index page
 @blueprint.route('/')
 def index():
