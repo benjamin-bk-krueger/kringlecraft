@@ -1,0 +1,46 @@
+{# /contact #}
+{% extends 'shared/_layout.html' %}
+
+{% block title %}Contact{% endblock %}
+
+{% block content %}
+    <div class="container-fluid c-restricted-md c-header rounded bg-light mt-4 pt-4 pb-4">
+        <div class="container-fluid c-restricted-sm">
+            {# Display form and possible error message - send a message to the page admin, includes simple captcha #}
+            <div class="mb-3 fs-4">Questions or problems?</div>
+            <form action="{{ url_for('home.contact_post') }}" method="POST">
+                {{ contact_form.csrf_token }}
+                <div class="form-group mt-2 mb-2">
+                    <label for="contact_name">{{ contact_form.contact_name.label }}</label>
+                    {{ contact_form.contact_name(size=20, class="form-control") }}
+                </div>
+                {% for error in contact_form.contact_name.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+                <div class="form-group mt-2 mb-2">
+                    <label for="email">{{ contact_form.email.label }}</label>
+                    {{ contact_form.email(size=20, class="form-control", onkeypress="return event.charCode != 32") }}
+                </div>
+                {% for error in contact_form.email.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+                <div class="form-group mt-2 mb-2">
+                    <label for="message">{{ contact_form.message.label }}</label>
+                    {{ contact_form.message(size=40, class="form-control") }}
+                </div>
+                {% for error in contact_form.message.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+                <div class="form-group mt-2 mb-2">
+                    <label for="captcha">{{ contact_form.captcha.label }} (What is {{ check_captcha["r1"]  }} + {{ check_captcha["r2"] }} ?)</label>
+                    {{ contact_form.captcha(size=20, class="form-control", onkeypress="return event.charCode != 32") }}
+                </div>
+                {{ contact_form.check_captcha }}
+                {% for error in contact_form.captcha.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary mt-4"><i class="bi bi-envelope"></i> Send Message</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
