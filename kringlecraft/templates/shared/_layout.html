@@ -49,6 +49,7 @@
                         {% if current_user.is_authenticated %}
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('home.logout') }}"><i class="bi bi-door-open-fill"></i> Logout</a></li>
                         {% else %}
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('account.create_get') }}"><i class="bi bi-person"></i> New Account</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('home.logged') }}"><i class="bi bi-door-open"></i> Login</a></li>
                         {% endif %}
                     </ul>

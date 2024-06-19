@@ -37,9 +37,10 @@ def configure_defaults():
 
 
 def register_blueprints():
-    from kringlecraft.views import home_views
+    from kringlecraft.views import (home_views, account_views)
 
     app.register_blueprint(home_views.blueprint)
+    app.register_blueprint(account_views.blueprint)
 
 
 def setup_db():
