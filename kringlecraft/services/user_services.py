@@ -12,8 +12,7 @@ def random_hash() -> str:
 
 
 def hash_text(text: str) -> str:
-    hashed_text = crypto.encrypt(text, rounds=171204)
-    return hashed_text
+    return crypto.encrypt(text, rounds=171204)
 
 
 def verify_hash(hashed_text: str, plain_text: str) -> bool:
@@ -41,10 +40,41 @@ def login_user(user_email: str, user_password: str) -> User | None:
 def find_user_by_id(user_id: int) -> User | None:
     session = db_session.create_session()
     try:
-        user = session.query(User).filter(User.id == user_id).first()
-        return user
+        return session.query(User).filter(User.id == user_id).first()
     finally:
         session.close()
+
+
+def find_user_by_email(user_email: str) -> User | None:
+    session = db_session.create_session()
+    try:
+        return session.query(User).filter(User.email == user_email).first()
+    finally:
+        session.close()
+
+
+def create_user(user_name: str, user_email: str, user_password: str) -> User | None:
+    if find_user_by_email(user_email):
+        return None
+
+    user = User()
+    user.email = user_email
+    user.name = user_name
+    user.hashed_password = hash_text(user_password)
+    user.role = 1
+    user.active = 0
+    user.notification = 0
+
+    session = db_session.create_session()
+    try:
+        session.add(user)
+        session.commit()
+
+        print(f"Register approval for user {user.email}")
+    finally:
+        session.close()
+
+    return user
 
 
 def prepare_user(user_email: str, www_link: str) -> User | None:
