@@ -22,8 +22,8 @@ def send_admin_mail(mail_header: str, mail_body: str):
     else:
         print("Sending mail disabled")
         print(f"Mail Header: {mail_header}")
-        print(f"Mail Sender: {current_app.config.get("app.mail_sender")}")
-        print(f"Mail recipients: {[current_app.config.get("app.mail_admin")]}")
+        print(f"Mail Sender: {current_app.config.get('app.mail_sender')}")
+        print(f"Mail recipients: {[current_app.config.get('app.mail_admin')]}")
         print(f"Mail Body: {mail_body}")
 
 
@@ -47,6 +47,6 @@ def send_mail(mail_header: str, mail_body: str, recipients: list):
     else:
         print("Sending mail disabled")
         print(f"Mail Header: {mail_header}")
-        print(f"Mail Sender: {current_app.config.get("app.mail_sender")}")
+        print(f"Mail Sender: {current_app.config.get('app.mail_sender')}")
         print(f"Mail recipients: {recipients}")
         print(f"Mail Body: {mail_body}")
