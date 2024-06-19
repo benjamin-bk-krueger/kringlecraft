@@ -1,5 +1,6 @@
 import random
 import string
+
 from passlib.handlers.sha2_crypt import sha512_crypt as crypto
 import kringlecraft.data.db_session as db_session
 from kringlecraft.utils.mail_tools import send_mail
@@ -7,43 +8,19 @@ from kringlecraft.data.users import User
 
 
 def random_hash() -> str:
-    """
-    Generate a random hash.
-
-    :return: A randomly generated hash string.
-    :rtype: str
-    """
     return ''.join(random.sample(string.ascii_letters + string.digits, 32))
 
 
 def hash_text(text: str) -> str:
-    """Hashes a given text using a cryptographic algorithm.
-
-    :param text: The text to be hashed.
-    :return: The hashed text as a string.
-    """
     hashed_text = crypto.encrypt(text, rounds=171204)
     return hashed_text
 
 
 def verify_hash(hashed_text: str, plain_text: str) -> bool:
-    """
-    :param hashed_text: The hashed text to be verified.
-    :param plain_text: The plain text to compare with the hashed text.
-    :return: A boolean value indicating whether the hash matches the plain text.
-    """
     return crypto.verify(plain_text, hashed_text)
 
 
 def login_user(user_email: str, user_password: str) -> User | None:
-    """
-    Login User
-
-    :param user_email: The email address of the user.
-    :param user_password: The password of the user.
-    :return: The logged-in user object of type `User` if successful, otherwise `None`.
-
-    """
     session = db_session.create_session()
     try:
         user = session.query(User).filter(User.email == user_email).first()
@@ -62,10 +39,6 @@ def login_user(user_email: str, user_password: str) -> User | None:
 
 
 def find_user_by_id(user_id: int) -> User | None:
-    """
-    :param user_id: The ID of the user to find
-    :return: The User object associated with the given ID, or None if no such user exists
-    """
     session = db_session.create_session()
     try:
         user = session.query(User).filter(User.id == user_id).first()
@@ -75,13 +48,6 @@ def find_user_by_id(user_id: int) -> User | None:
 
 
 def prepare_user(user_email: str, www_link: str) -> User | None:
-    """
-    :param user_email: The email of the user for whom the password reset is being prepared.
-    :param www_link: The base URL of the website to which the password reset link will be appended.
-    :return: The User object representing the user for whom the password reset is being prepared. Returns None if no active user with the given email is found.
-
-    Prepares a user for password reset by generating a random password reset hash, updating the user's reset_password field, and sending a password reset email with the password reset link.
-    """
     # check valid student account and sent out password reset mail
     session = db_session.create_session()
     try:
@@ -101,13 +67,6 @@ def prepare_user(user_email: str, www_link: str) -> User | None:
 
 
 def reset_user(user_hash: str, user_password: str) -> User | None:
-    """
-    Reset the password of a user.
-
-    :param user_hash: The reset password hash.
-    :param user_password: The new password for the user.
-    :return: The User object if successful, None if the password reset failed.
-    """
     # check valid student account and valid password reset link
     session = db_session.create_session()
     try:

@@ -8,6 +8,7 @@ blueprint = flask.Blueprint('home', __name__, template_folder='templates')
 # Displays a form to send a message to the site admin - implements a simple captcha as well
 @blueprint.route('/contact', methods=['GET'])
 def contact_get():
+    # import forms and utilities
     from kringlecraft.viewmodels.home_forms import ContactForm
     from kringlecraft.utils.misc_tools import create_captcha
 
@@ -16,11 +17,13 @@ def contact_get():
     contact_form = ContactForm(check_captcha["res"])
     contact_form.process()
 
+    # show rendered page
     return flask.render_template('home/contact.html', contact_form=contact_form, check_captcha=check_captcha)
 
 
 @blueprint.route('/contact', methods=['POST'])
 def contact_post():
+    # import forms and utilities
     from kringlecraft.viewmodels.home_forms import ContactForm
     from kringlecraft.utils.misc_tools import create_captcha
 
@@ -58,17 +61,20 @@ def index():
 # Show user log-in page
 @blueprint.route('/login', methods=['GET'])
 def login_get():
+    # import forms and utilities
     from kringlecraft.viewmodels.home_forms import LoginForm
 
     # initialize form data
     login_form = LoginForm()
     login_form.process()
 
+    # show rendered page
     return flask.render_template('home/login.html', login_form=login_form)
 
 
 @blueprint.route('/login', methods=['POST'])
 def login_post():
+    # import forms and utilities
     from kringlecraft.viewmodels.home_forms import LoginForm
     import kringlecraft.services.user_services as user_services
 
@@ -111,17 +117,20 @@ def logged():
 # Show user password reset page
 @blueprint.route('/password', methods=['GET'])
 def password_get():
+    # import forms and utilities
     from kringlecraft.viewmodels.home_forms import PasswordForm
 
     # initialize form data
     password_form = PasswordForm()
     password_form.process()
 
+    # show rendered page
     return flask.render_template('home/password.html', password_form=password_form)
 
 
 @blueprint.route('/password', methods=['POST'])
 def password_post():
+    # import forms and utilities
     from kringlecraft.viewmodels.home_forms import PasswordForm
     import kringlecraft.services.user_services as user_services
 
@@ -145,17 +154,20 @@ def password_post():
 # Show user password reset page
 @blueprint.route('/reset/<string:random_hash>', methods=['GET'])
 def reset_get(random_hash):
+    # import forms and utilities
     from kringlecraft.viewmodels.home_forms import ResetForm
 
     # initialize form data
     reset_form = ResetForm()
     reset_form.process()
 
+    # show rendered page
     return flask.render_template('home/reset.html', reset_form=reset_form, random_hash=random_hash)
 
 
 @blueprint.route('/reset/<string:random_hash>', methods=['POST'])
 def reset_post(random_hash):
+    # import forms and utilities
     from kringlecraft.viewmodels.home_forms import ResetForm
     import kringlecraft.services.user_services as user_services
 
