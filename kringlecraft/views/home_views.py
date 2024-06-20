@@ -32,7 +32,8 @@ def contact_post():
 
     # check valid contact data
     if contact_form.validate_on_submit():
-        send_admin_mail(f"{contact_form.contact_content} - {contact_form.email_content}", f"{contact_form.message_content}")
+        send_admin_mail(f"{contact_form.contact_content} - {contact_form.email_content}",
+                        f"{contact_form.message_content}")
 
         return flask.redirect(flask.url_for('home.index'))
     else:
@@ -141,7 +142,9 @@ def password_post():
     if password_form.validate_on_submit():
         user = user_services.prepare_user(password_form.email_content)
         if user:
-            send_mail("Password Reset Link", f"Reset your password here: {flask.current_app.config['app.www_server']}/reset/{user.reset_password}", [user.email])
+            send_mail("Password Reset Link",
+                      f"Reset your password here: {flask.current_app.config['app.www_server']}/reset/"
+                      f"{user.reset_password}", [user.email])
 
         return flask.redirect(flask.url_for('home.index'))
     else:

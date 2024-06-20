@@ -3,6 +3,16 @@
 
 {% block title %}Edit Account{% endblock %}
 
+{% block additional_css %}
+    {{ dropzone.load_css() }}
+    {{ dropzone.style('border: 2px dashed #0087F7; margin: 10%;') }}
+{% endblock %}
+
+{% block additional_js %}
+    {{ dropzone.load_js() }}
+    {{ dropzone.config(redirect_url=url_for('account.edit_get')) }}
+{% endblock %}
+
 {% block modal %}
     {# Modal dialog window - delete currently logged in user #}
     <div id="myModalDelete" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -28,6 +38,22 @@
 {% endblock %}
 
 {% block content %}
+    <div class="container-fluid c-restricted-md c-header rounded bg-light mt-4 pt-4 pb-4">
+        <div class="container-fluid c-restricted-sm">
+            {# Upload and view profile image #}
+            <div class="mb-3 fs-4">Change Account Image</div>
+            <div class="row">
+                <div class="col-sm">
+                    <img src="{{ url_for('static', filename=user_image) }}" class="img-fluid rounded img-restricted-lg" alt="User Image">
+                    <a href="{{ url_for('storage.upload_get', user_hash=user_hash) }}" title="Delete image" class="btn btn-danger mt-4"><i class="bi bi-trash"></i> Clear Image</a>
+                </div>
+                <div class="col-sm">
+                    {{ dropzone.create(action='storage.upload_post', user_hash=user_hash) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container-fluid c-restricted-md c-header rounded bg-light mt-4 pt-4 pb-4">
         <div class="container-fluid c-restricted-sm">
             {# Display form and possible error message - change user data #}

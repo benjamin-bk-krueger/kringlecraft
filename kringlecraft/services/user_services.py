@@ -1,9 +1,10 @@
+import os
 import random
 import string
+import hashlib
 
 from passlib.handlers.sha2_crypt import sha512_crypt as crypto
 import kringlecraft.data.db_session as db_session
-from kringlecraft.utils.mail_tools import send_mail
 from kringlecraft.data.users import User
 
 
@@ -17,6 +18,10 @@ def hash_text(text: str) -> str:
 
 def verify_hash(hashed_text: str, plain_text: str) -> bool:
     return crypto.verify(plain_text, hashed_text)
+
+
+def user_hash(user_email: str) -> str:
+    return hashlib.md5(user_email.encode('utf-8')).hexdigest()
 
 
 def login_user(user_email: str, user_password: str) -> User | None:
@@ -77,7 +82,8 @@ def create_user(user_name: str, user_email: str, user_password: str) -> User | N
         session.close()
 
 
-def edit_user(user_id: int, user_email: str = None, user_description: str = None, user_notification: bool = None) -> User | None:
+def edit_user(user_id: int, user_email: str = None, user_description: str = None,
+              user_notification: bool = None) -> User | None:
     session = db_session.create_session()
     try:
         user = session.query(User).filter(User.id == user_id).first()
@@ -142,17 +148,46 @@ def prepare_user(user_email: str) -> User | None:
         session.close()
 
 
-def reset_user(user_hash: str, user_password: str) -> User | None:
+def reset_user(user_hash_value: str, user_password: str) -> User | None:
     # check valid student account and valid password reset link
     session = db_session.create_session()
     try:
-        user = session.query(User).filter(User.active == 1).filter(User.reset_password == user_hash).first()
+        user = session.query(User).filter(User.active == 1).filter(User.reset_password == user_hash_value).first()
         if user:
             user.hashed_password = hash_text(user_password)
             user.reset_password = ""
             session.commit()
 
             print(f"INFO: Password reset performed for user {user.email}")
+
+            return user
+    finally:
+        session.close()
+
+
+def get_user_image(user_id: int) -> str:
+    session = db_session.create_session()
+    try:
+        user = session.query(User).filter(User.id == user_id).first()
+
+        if user.image is not None and os.path.isfile(os.path.join('static/uploads/profile/', user.image)):
+            return os.path.join('uploads/profile/', user.image)
+        else:
+            return "img/not_found.jpg"
+    finally:
+        session.close()
+
+
+def set_user_image(user_id: int, user_image: str) -> User | None:
+    session = db_session.create_session()
+    try:
+        user = session.query(User).filter(User.id == user_id).first()
+        if user:
+            user.image = user_image
+
+            session.commit()
+
+            print(f"INFO: Image changed for user {user.email}")
 
             return user
     finally:

@@ -6,6 +6,7 @@ import logging
 from flask_login import LoginManager  # to manage user sessions
 from flask_wtf.csrf import CSRFProtect  # CSRF protection
 from flask_mail import Mail  # to send mails
+from flask_dropzone import Dropzone  # to allow file upload via dropzone
 
 import kringlecraft.data.db_session as db_session
 from utils import config_tools
@@ -24,6 +25,7 @@ def main():
     setup_db()
     setup_csrf()
     setup_mail()
+    setup_dropzone()
     setup_login_manager()
     app.run(debug=True, port=5006)
 
@@ -44,10 +46,11 @@ def configure_logging():
 
 
 def register_blueprints():
-    from kringlecraft.views import (home_views, account_views)
+    from kringlecraft.views import (home_views, account_views, storage_views)
 
     app.register_blueprint(home_views.blueprint)
     app.register_blueprint(account_views.blueprint)
+    app.register_blueprint(storage_views.blueprint)
 
 
 def setup_db():
@@ -66,6 +69,18 @@ def setup_mail():
     app.config['MAIL_SERVER'] = app.config["app.mail_server"]
     mail = Mail(app)
     app.config["mail.send"] = mail.send
+
+
+def setup_dropzone():
+    # Dropzone click and drop file upload
+    dropzone = Dropzone(app)
+
+    # Dropzone settings
+    app.config['DROPZONE_UPLOAD_MULTIPLE'] = False
+    app.config['DROPZONE_ALLOWED_FILE_CUSTOM'] = True
+    app.config['DROPZONE_ALLOWED_FILE_TYPE'] = 'image/*'
+    app.config['DROPZONE_REDIRECT_VIEW'] = 'home.index'
+    app.config['DROPZONE_ENABLE_CSRF'] = True
 
 
 def setup_login_manager():
