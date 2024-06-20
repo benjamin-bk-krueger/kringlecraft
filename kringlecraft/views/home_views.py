@@ -1,6 +1,6 @@
 import flask
 from flask_login import (login_user, logout_user, login_required)  # to manage user sessions
-from kringlecraft.utils.mail_tools import send_admin_mail
+from kringlecraft.utils.mail_tools import (send_admin_mail, send_mail)
 
 blueprint = flask.Blueprint('home', __name__, template_folder='templates')
 
@@ -139,7 +139,9 @@ def password_post():
 
     # in case of password reset request and enabled e-mail account
     if password_form.validate_on_submit():
-        user_services.prepare_user(password_form.email_content, flask.current_app.config["app.www_server"])
+        user = user_services.prepare_user(password_form.email_content)
+        if user:
+            send_mail("Password Reset Link", f"Reset your password here: {flask.current_app.config['app.www_server']}/reset/{user.reset_password}", [user.email])
 
         return flask.redirect(flask.url_for('home.index'))
     else:
@@ -176,7 +178,9 @@ def reset_post(random_hash):
 
     # in case of password reset request follow-up
     if reset_form.validate_on_submit() and len(random_hash) > 30:
-        user_services.reset_user(random_hash, reset_form.password_content)
+        user = user_services.reset_user(random_hash, reset_form.password_content)
+        if user:
+            send_mail(f"{user.name} - Password Reset", "Your password has been reset.", [user.email])
 
         return flask.redirect(flask.url_for('home.index'))
     else:

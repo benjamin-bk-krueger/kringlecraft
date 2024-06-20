@@ -7,6 +7,6 @@ def parse_config(file_path: str) -> dict | None:
             data = json.load(json_file)
         return data
     except FileNotFoundError:
-        print(f"{file_path} file not found")
+        print(f"ERROR: {file_path} file not found")
     except Exception as e:
-        print(f"An error occurred when reading the {file_path} file: ", str(e))
+        print(f"ERROR: An error occurred when reading the {file_path} file: ", str(e))

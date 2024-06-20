@@ -1,6 +1,7 @@
 import os
 import sys
 import flask
+import logging
 
 from flask_login import LoginManager  # to manage user sessions
 from flask_wtf.csrf import CSRFProtect  # CSRF protection
@@ -18,6 +19,7 @@ app = flask.Flask(__name__)
 
 def main():
     configure_defaults()
+    configure_logging()
     register_blueprints()
     setup_db()
     setup_csrf()
@@ -30,10 +32,15 @@ def configure_defaults():
     cfg = config_tools.parse_config('cfg/kringle.json')
     for key in cfg['app']:
         app.config[f"app.{key}"] = cfg['app'][key]
-        print(f"Config key: {key}, value: {cfg['app'][key]}")
+        print(f"CONFIG key: {key}, value: {cfg['app'][key]}")
     for key in cfg['secret']:
         app.config[f"secret.{key}"] = cfg['secret'][key]
-        print(f"Secret key: {key}, value: ********")
+        print(f"SECRET key: {key}, value: ********")
+
+
+def configure_logging():
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
 
 
 def register_blueprints():
@@ -45,7 +52,7 @@ def register_blueprints():
 
 def setup_db():
     db_file = os.path.join(os.path.dirname(__file__), 'db', 'kringlecraft.sqlite')
-    db_session.global_init(db_file)
+    db_session.global_init(db_file, True)
 
 
 def setup_csrf():

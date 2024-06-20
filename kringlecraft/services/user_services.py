@@ -24,14 +24,14 @@ def login_user(user_email: str, user_password: str) -> User | None:
     try:
         user = session.query(User).filter(User.email == user_email).first()
         if not user:
-            print(f"Login Failure for user {user_email}")
+            print(f"INFO: Login Failure for user {user_email}")
             return None
 
         if not verify_hash(user.hashed_password, user_password):
-            print(f"Login Failure for user {user_email}")
+            print(f"INFO: Login Failure for user {user_email}")
             return None
 
-        print(f"Login Successful for user {user_email}")
+        print(f"INFO: Login Successful for user {user_email}")
         return user
     finally:
         session.close()
@@ -70,14 +70,63 @@ def create_user(user_name: str, user_email: str, user_password: str) -> User | N
         session.add(user)
         session.commit()
 
-        print(f"Register approval for user {user.email}")
+        print(f"INFO: Register approval for user {user.email}")
+
+        return user
     finally:
         session.close()
 
-    return user
+
+def edit_user(user_id: int, user_email: str = None, user_description: str = None, user_notification: bool = None) -> User | None:
+    session = db_session.create_session()
+    try:
+        user = session.query(User).filter(User.id == user_id).first()
+        if user:
+            user.email = user_email if user_email is not None else user.email
+            user.description = user_description if user_description is not None else user.description
+            user.notification = user_notification if user_notification is not None else user.notification
+
+            session.commit()
+
+            print(f"INFO: User information changed for user {user.email}")
+
+            return user
+    finally:
+        session.close()
 
 
-def prepare_user(user_email: str, www_link: str) -> User | None:
+def change_user_password(user_id: int, user_password: str) -> User | None:
+    session = db_session.create_session()
+    try:
+        user = session.query(User).filter(User.id == user_id).first()
+        if user:
+            user.hashed_password = hash_text(user_password)
+
+            session.commit()
+
+            print(f"INFO: User password changed for user {user.email}")
+
+            return user
+    finally:
+        session.close()
+
+
+def delete_user(user_id: int) -> User | None:
+    session = db_session.create_session()
+    try:
+        user = session.query(User).filter(User.id == user_id).first()
+        if user:
+            session.query(User).filter(User.id == user_id).delete()
+            session.commit()
+
+            print(f"INFO: User {user.email} deleted")
+
+            return user
+    finally:
+        session.close()
+
+
+def prepare_user(user_email: str) -> User | None:
     # check valid student account and sent out password reset mail
     session = db_session.create_session()
     try:
@@ -86,10 +135,7 @@ def prepare_user(user_email: str, www_link: str) -> User | None:
             user.reset_password = random_hash()
             session.commit()
 
-            recipients = list()
-            recipients.append(user_email)
-            body_text = f"Reset your password here: {www_link}/reset/{user.reset_password}"
-            send_mail("Password Reset Link", body_text, recipients)
+            print(f"INFO: Reset password prepared for user {user.email}")
 
             return user
     finally:
@@ -106,10 +152,7 @@ def reset_user(user_hash: str, user_password: str) -> User | None:
             user.reset_password = ""
             session.commit()
 
-            print(f"Password Reset for user {user.email}")
-            recipients = list()
-            recipients.append(user.email)
-            send_mail(f"{user.name} - Password Reset", "Your password has been reset.", recipients)
+            print(f"INFO: Password reset performed for user {user.email}")
 
             return user
     finally:
