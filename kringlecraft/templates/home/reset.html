@@ -4,10 +4,11 @@
 {% block title %}Set new password{% endblock %}
 
 {% block content %}
-    <div class="container-fluid c-restricted-md c-header rounded bg-light mt-4 pt-4 pb-4">
+    <div class="container-fluid c-restricted-md c-header c-shadow rounded bg-light mt-4 py-4">
         <div class="container-fluid c-restricted-sm">
             {# Display form and possible error message - reset password #}
-            <div class="mb-3 fs-4">Set new password</div>
+            <div class="my-2 fs-4 c-title">Set new password</div>
+            <div class="underline"><span><i class="bi bi-body-text" aria-hidden="true"></i></span></div>
             <form action="{{ url_for('home.reset_post', random_hash=random_hash) }}" method="POST">
                 {{ reset_form.csrf_token }}
                 <div class="form-group mt-2 mb-2">

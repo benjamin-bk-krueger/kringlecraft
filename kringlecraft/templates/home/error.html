@@ -4,11 +4,11 @@
 {% block title %}Error{% endblock %}
 
 {% block content %}
-    <div class="container-fluid c-restricted-xxl c-header rounded bg-light mt-4 pt-4 pb-4">
+    <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
         {#  Show error message #}
         <div class="rounded border mt-4 mb-4 c-color p-2">
-            <div class="fs-3">Error</div>
-            <div class="underline"><span><i class="bi bi-bug" aria-hidden="true"></i></span></div>
+            <div class="fs-3 c-title">Error</div>
+            <div class="underline"><span style="background: #f5f5f5;"><i class="bi bi-bug" aria-hidden="true"></i></span></div>
 
             <div class="fs-5"><b>Oops</b>, you have found a crack in the matrix.</div>
             <div class="fs-6">{{ 'Victor says: ' + error_message if error_message else 'Victor says oink.' }}</div>

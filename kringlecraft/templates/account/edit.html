@@ -38,10 +38,11 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid c-restricted-md c-header rounded bg-light mt-4 pt-4 pb-4">
+    <div class="container-fluid c-restricted-md c-header c-shadow rounded bg-light mt-4 py-4">
         <div class="container-fluid c-restricted-sm">
             {# Upload and view profile image #}
-            <div class="mb-3 fs-4">Change Account Image</div>
+            <div class="my-2 fs-4 c-title">Change Account Image</div>
+            <div class="underline"><span><i class="bi bi-body-text" aria-hidden="true"></i></span></div>
             <div class="row">
                 <div class="col-sm">
                     <img src="{{ url_for('static', filename=user_image) }}" class="img-fluid rounded img-restricted-lg" alt="User Image">
@@ -54,10 +55,11 @@
         </div>
     </div>
 
-    <div class="container-fluid c-restricted-md c-header rounded bg-light mt-4 pt-4 pb-4">
+    <div class="container-fluid c-restricted-md c-header c-shadow rounded bg-light mt-4 py-4">
         <div class="container-fluid c-restricted-sm">
             {# Display form and possible error message - change user data #}
-            <div class="mb-3 fs-4">Edit Account</div>
+            <div class="my-2 fs-4 c-title">Edit Account</div>
+            <div class="underline"><span><i class="bi bi-body-text" aria-hidden="true"></i></span></div>
             <form action="{{ url_for('account.edit_mail_post') }}" method="POST">
                 {{ mail_form.csrf_token }}
                 <div class="form-group mt-2 mb-2">
@@ -86,10 +88,11 @@
         </div>
     </div>
 
-    <div class="container-fluid c-restricted-md c-header rounded bg-light mt-4 pt-4 pb-4">
+    <div class="container-fluid c-restricted-md c-header c-shadow rounded bg-light mt-4 py-4">
         <div class="container-fluid c-restricted-sm">
             {# Display form and possible error message - set a password for currently logged in user #}
-            <div class="mb-3 fs-4">Set new password</div>
+            <div class="my-2 fs-4 c-title">Set new password</div>
+            <div class="underline"><span><i class="bi bi-body-text" aria-hidden="true"></i></span></div>
             <form action="{{ url_for('account.edit_password_post') }}" method="POST">
                 {{ password_form.csrf_token }}
                 <div class="form-group mt-2 mb-2">
@@ -108,10 +111,11 @@
         </div>
     </div>
 
-    <div class="container-fluid c-restricted-md c-header rounded bg-light mt-4 pt-4 pb-4">
+    <div class="container-fluid c-restricted-md c-header c-shadow rounded bg-light mt-4 py-4">
         <div class="container-fluid c-restricted-sm">
             {# Display simple button - show modal dialog window to delete currently logged in user #}
-            <div class="mb-3 fs-4">Delete this user account</div>
+            <div class="my-2 fs-4 c-title">Delete this user account</div>
+            <div class="underline"><span><i class="bi bi-body-text" aria-hidden="true"></i></span></div>
             <button type="button" class="btn btn-danger mt-4" data-bs-toggle="modal" data-bs-target="#myModalDelete"><i class="bi bi-trash"></i> Delete Account</button>
         </div>
     </div>

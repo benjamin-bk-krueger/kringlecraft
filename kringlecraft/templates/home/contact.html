@@ -4,10 +4,11 @@
 {% block title %}Contact{% endblock %}
 
 {% block content %}
-    <div class="container-fluid c-restricted-md c-header rounded bg-light mt-4 pt-4 pb-4">
+    <div class="container-fluid c-restricted-md c-header c-shadow rounded bg-light mt-4 py-4">
         <div class="container-fluid c-restricted-sm">
             {# Display form and possible error message - send a message to the page admin, includes simple captcha #}
-            <div class="mb-3 fs-4">Questions or problems?</div>
+            <div class="my-2 fs-4 c-title">Questions or problems?</div>
+            <div class="underline"><span><i class="bi bi-body-text" aria-hidden="true"></i></span></div>
             <form action="{{ url_for('home.contact_post') }}" method="POST">
                 {{ contact_form.csrf_token }}
                 <div class="form-group mt-2 mb-2">
