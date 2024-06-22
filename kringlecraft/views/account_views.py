@@ -175,15 +175,15 @@ def edit_deletion_post():
 
 
 # Displays all available users
-@blueprint.route('/users', methods=['GET'])
+@blueprint.route('/users')
 @login_required
 def users():
     # import forms and utilities
     import kringlecraft.services.user_services as user_services
 
     # initialize elements
-    users = user_services.find_all_users() if current_user.role == ADMIN else user_services.find_active_users()
+    all_users = user_services.find_all_users() if current_user.role == ADMIN else user_services.find_active_users()
     user_images = user_services.get_all_images()
 
     # show rendered page
-    return flask.render_template('account/users.html', users=users, user_images=user_images)
+    return flask.render_template('account/users.html', users=all_users, user_images=user_images)

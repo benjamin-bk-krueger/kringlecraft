@@ -1,0 +1,22 @@
+{# /stats #}
+{% extends 'shared/_layout.html' %}
+
+{% block title %}Stats{% endblock %}
+
+{% block content %}
+    <div class="container-fluid c-restricted-md c-header c-shadow rounded bg-light mt-4 py-4">
+        <div class="container-fluid c-restricted-sm">
+            {#  Show statistics about all stored elements in database #}
+            <div class="mb-3 fs-4 c-title">Stats</div>
+            <div class="underline"><span><i class="bi bi-body-text" aria-hidden="true"></i></span></div>
+            <div>
+                <div class="mb-2 mt-2 fs-5 c-subtitle">Elements</div>
+                <ul class="list-group">
+                    {% if current_user.is_authenticated %}
+                        <li class="list-group-item">Users <span class="badge bg-secondary">{{ counts['user'] }}</span></li>
+                    {%  endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

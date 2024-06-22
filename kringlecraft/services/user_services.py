@@ -42,6 +42,14 @@ def login_user(user_email: str, user_password: str) -> User | None:
         session.close()
 
 
+def get_user_count() -> int:
+    session = db_session.create_session()
+    try:
+        return session.query(User).count()
+    finally:
+        session.close()
+
+
 def find_all_users() -> list[User]:
     session = db_session.create_session()
     try:
