@@ -190,7 +190,7 @@ def users():
 
 
 # Shows information about a specific student
-@blueprint.route('/users/<int:user_id>')
+@blueprint.route('/user/<int:user_id>')
 @login_required
 def user(user_id):
     # import forms and utilities
@@ -202,3 +202,18 @@ def user(user_id):
 
     # show rendered page
     return flask.render_template('account/user.html', user=my_user, user_image=user_image)
+
+
+# Approve a user's registration
+@blueprint.route('/user/<int:user_id>/approve')
+@login_required
+def user_approve(user_id):
+    # import forms and utilities
+    import kringlecraft.services.user_services as user_services
+
+    # check valid contact data
+    my_user = user_services.enable_user(user_id)
+    if my_user:
+        send_mail(f"{user.name} - Registration complete", "Your registration has been approved. You can use your login now.", [user.email])
+
+    return flask.redirect(flask.url_for('account.users'))

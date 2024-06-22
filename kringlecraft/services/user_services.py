@@ -164,6 +164,22 @@ def delete_user(user_id: int) -> User | None:
         session.close()
 
 
+def enable_user(user_id: int) -> User | None:
+    # check valid student account and enable account
+    session = db_session.create_session()
+    try:
+        user = session.query(User).filter(User.active == 0).filter(User.id == user_id).first()
+        if user:
+            user.active = 1
+            session.commit()
+
+            print(f"INFO: Account enabled for user {user.email}")
+
+            return user
+    finally:
+        session.close()
+
+
 def prepare_user(user_email: str) -> User | None:
     # check valid student account and sent out password reset mail
     session = db_session.create_session()
