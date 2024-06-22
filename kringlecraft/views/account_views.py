@@ -187,3 +187,18 @@ def users():
 
     # show rendered page
     return flask.render_template('account/users.html', users=all_users, user_images=user_images)
+
+
+# Shows information about a specific student
+@blueprint.route('/users/<int:user_id>')
+@login_required
+def user(user_id):
+    # import forms and utilities
+    import kringlecraft.services.user_services as user_services
+
+    # initialize elements
+    my_user = user_services.find_user_by_id(user_id) if current_user.role == ADMIN else user_services.find_active_user_by_id(user_id)
+    user_image = user_services.get_user_image(user_id)
+
+    # show rendered page
+    return flask.render_template('account/user.html', user=my_user, user_image=user_image)

@@ -74,6 +74,14 @@ def find_user_by_id(user_id: int) -> User | None:
         session.close()
 
 
+def find_active_user_by_id(user_id: int) -> User | None:
+    session = db_session.create_session()
+    try:
+        return session.query(User).filter(User.active == True).filter(User.id == user_id).first()
+    finally:
+        session.close()
+
+
 def find_user_by_email(user_email: str) -> User | None:
     session = db_session.create_session()
     try:

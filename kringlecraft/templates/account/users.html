@@ -20,7 +20,7 @@
                     {% for user in users %}
                         <div class="col-sm">
                             <figure class="figure">
-                                <a href="#">
+                                <a href="{{ url_for('account.user', user_id=user.id) }}">
                                     <img src="{{ url_for('static', filename=user_images[user.id]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ user.name }}">
                                 </a>
                                 <figcaption class="figure-caption c-title">{{ user.name }}{% if user.role == 0 %} <i class="bi bi-mortarboard"></i>{% endif %}{% if user.active == 0 %} <i class="bi bi-star"></i>{% endif %}</figcaption>

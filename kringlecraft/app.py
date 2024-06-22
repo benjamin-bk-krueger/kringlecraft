@@ -85,7 +85,7 @@ def setup_dropzone():
 
 
 def setup_login_manager():
-    from kringlecraft.services.user_services import find_user_by_id
+    from kringlecraft.services.user_services import find_active_user_by_id
 
     # Login Manager configuration
     login_manager = LoginManager()
@@ -96,7 +96,7 @@ def setup_login_manager():
     @login_manager.user_loader
     def load_user(user_id):
         # since the student_id is just the primary key of our user table, use it in the query for the user
-        return find_user_by_id(user_id)
+        return find_active_user_by_id(user_id)
 
 
 if __name__ == '__main__':
