@@ -94,6 +94,10 @@ table .w-30 { width:30%; }
     background-color: #F5F5F5;
 }
 
+.c-border {
+    border: 1px solid black;
+}
+
 .c-restricted-sm {
     max-width: 640px;
 }
