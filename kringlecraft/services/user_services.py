@@ -42,6 +42,22 @@ def login_user(user_email: str, user_password: str) -> User | None:
         session.close()
 
 
+def find_all_users() -> list[User]:
+    session = db_session.create_session()
+    try:
+        return session.query(User).order_by(User.name.asc()).all()
+    finally:
+        session.close()
+
+
+def find_active_users() -> list[User]:
+    session = db_session.create_session()
+    try:
+        return session.query(User).filter(User.active == True).order_by(User.name.asc()).all()
+    finally:
+        session.close()
+
+
 def find_user_by_id(user_id: int) -> User | None:
     session = db_session.create_session()
     try:
@@ -161,6 +177,23 @@ def reset_user(user_hash_value: str, user_password: str) -> User | None:
             print(f"INFO: Password reset performed for user {user.email}")
 
             return user
+    finally:
+        session.close()
+
+
+def get_all_images() -> dict:
+    images = dict()
+    session = db_session.create_session()
+    try:
+        users = session.query(User).order_by(User.name.asc()).all()
+
+        for user in users:
+            if user.image is not None and os.path.isfile(os.path.join('static/uploads/profile/', user.image)):
+                images[user.id] = os.path.join('uploads/profile/', user.image)
+            else:
+                images[user.id] = "img/not_found.jpg"
+
+        return images
     finally:
         session.close()
 

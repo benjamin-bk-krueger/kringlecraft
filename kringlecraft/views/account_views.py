@@ -2,6 +2,9 @@ import flask
 from flask_login import (login_required, current_user, logout_user)  # to manage user sessions
 from kringlecraft.utils.mail_tools import (send_admin_mail, send_mail)
 
+ADMIN = 0
+USER = 1
+
 blueprint = flask.Blueprint('account', __name__, template_folder='templates')
 
 
@@ -169,3 +172,18 @@ def edit_deletion_post():
         # show page again and print possible errors in form
         return flask.render_template('account/edit.html', mail_form=mail_form,
                                      password_form=password_form, deletion_form=deletion_form)
+
+
+# Displays all available users
+@blueprint.route('/users', methods=['GET'])
+@login_required
+def users():
+    # import forms and utilities
+    import kringlecraft.services.user_services as user_services
+
+    # initialize elements
+    users = user_services.find_all_users() if current_user.role == ADMIN else user_services.find_active_users()
+    user_images = user_services.get_all_images()
+
+    # show rendered page
+    return flask.render_template('account/users.html', users=users, user_images=user_images)
