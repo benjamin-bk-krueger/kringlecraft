@@ -89,7 +89,7 @@ def setup_login_manager():
 
     # Login Manager configuration
     login_manager = LoginManager()
-    login_manager.login_view = 'home.login_get'  # show this page if a login is required
+    login_manager.login_view = 'home.login'  # show this page if a login is required
     login_manager.init_app(app)
 
     # link the Login Manager to the correct user entry

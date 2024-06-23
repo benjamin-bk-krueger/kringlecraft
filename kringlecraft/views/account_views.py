@@ -2,15 +2,12 @@ import flask
 from flask_login import (login_required, current_user, logout_user)  # to manage user sessions
 from kringlecraft.utils.mail_tools import (send_admin_mail, send_mail)
 
-ADMIN = 0
-USER = 1
-
 blueprint = flask.Blueprint('account', __name__, template_folder='templates')
 
 
 # Displays a form to create a new user
-@blueprint.route('/account/create', methods=['GET'])
-def create_get():
+@blueprint.route('/profile/create', methods=['GET'])
+def profile_create():
     # import forms and utilities
     from kringlecraft.viewmodels.account_forms import AccountForm
 
@@ -22,8 +19,8 @@ def create_get():
     return flask.render_template('account/create.html', account_form=account_form)
 
 
-@blueprint.route('/account/create', methods=['POST'])
-def create_post():
+@blueprint.route('/profile/create', methods=['POST'])
+def profile_create_post():
     # import forms and utilities
     from kringlecraft.viewmodels.account_forms import AccountForm
     import kringlecraft.services.user_services as user_services
@@ -53,9 +50,9 @@ def create_post():
 
 
 # Displays various forms to change the currently logged-in user
-@blueprint.route('/account/edit', methods=['GET'])
+@blueprint.route('/profile/edit', methods=['GET'])
 @login_required
-def edit_get():
+def profile_edit():
     # import forms and utilities
     from kringlecraft.viewmodels.account_forms import (MailForm, PasswordForm, DeletionForm)
     import kringlecraft.services.user_services as user_services
@@ -78,9 +75,9 @@ def edit_get():
                                  deletion_form=deletion_form, user_hash=user_hash, user_image=user_image)
 
 
-@blueprint.route('/account/edit/mail', methods=['POST'])
+@blueprint.route('/profile/edit/mail', methods=['POST'])
 @login_required
-def edit_mail_post():
+def profile_edit_mail_post():
     # import forms and utilities
     from kringlecraft.viewmodels.account_forms import (MailForm, PasswordForm, DeletionForm)
     import kringlecraft.services.user_services as user_services
@@ -98,7 +95,7 @@ def edit_mail_post():
             send_mail("Notification: E-Mail changed",
                       f"You have changed your e-mail address to {user.email}.", [user.email])
 
-        return flask.redirect(flask.url_for('account.edit_get'))
+        return flask.redirect(flask.url_for('account.profile_edit'))
     else:
         # preset form with existing data
         mail_form.set_field_defaults()
@@ -111,9 +108,9 @@ def edit_mail_post():
                                      password_form=password_form, deletion_form=deletion_form)
 
 
-@blueprint.route('/account/edit/password', methods=['POST'])
+@blueprint.route('/profile/edit/password', methods=['POST'])
 @login_required
-def edit_password_post():
+def profile_edit_password_post():
     # import forms and utilities
     from kringlecraft.viewmodels.account_forms import (MailForm, PasswordForm, DeletionForm)
     import kringlecraft.services.user_services as user_services
@@ -143,9 +140,9 @@ def edit_password_post():
                                      password_form=password_form, deletion_form=deletion_form)
 
 
-@blueprint.route('/account/edit/deletion', methods=['POST'])
+@blueprint.route('/profile/edit/deletion', methods=['POST'])
 @login_required
-def edit_deletion_post():
+def profile_edit_deletion_post():
     # import forms and utilities
     from kringlecraft.viewmodels.account_forms import (MailForm, PasswordForm, DeletionForm)
     import kringlecraft.services.user_services as user_services
@@ -172,48 +169,3 @@ def edit_deletion_post():
         # show page again and print possible errors in form
         return flask.render_template('account/edit.html', mail_form=mail_form,
                                      password_form=password_form, deletion_form=deletion_form)
-
-
-# Displays all available users
-@blueprint.route('/users')
-@login_required
-def users():
-    # import forms and utilities
-    import kringlecraft.services.user_services as user_services
-
-    # initialize elements
-    all_users = user_services.find_all_users() if current_user.role == ADMIN else user_services.find_active_users()
-    user_images = user_services.get_all_images()
-
-    # show rendered page
-    return flask.render_template('account/users.html', users=all_users, user_images=user_images)
-
-
-# Shows information about a specific student
-@blueprint.route('/user/<int:user_id>')
-@login_required
-def user(user_id):
-    # import forms and utilities
-    import kringlecraft.services.user_services as user_services
-
-    # initialize elements
-    my_user = user_services.find_user_by_id(user_id) if current_user.role == ADMIN else user_services.find_active_user_by_id(user_id)
-    user_image = user_services.get_user_image(user_id)
-
-    # show rendered page
-    return flask.render_template('account/user.html', user=my_user, user_image=user_image)
-
-
-# Approve a user's registration
-@blueprint.route('/user/<int:user_id>/approve')
-@login_required
-def user_approve(user_id):
-    # import forms and utilities
-    import kringlecraft.services.user_services as user_services
-
-    # check valid contact data
-    my_user = user_services.enable_user(user_id)
-    if my_user:
-        send_mail(f"{user.name} - Registration complete", "Your registration has been approved. You can use your login now.", [user.email])
-
-    return flask.redirect(flask.url_for('account.users'))

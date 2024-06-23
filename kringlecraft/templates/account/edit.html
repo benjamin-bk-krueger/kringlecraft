@@ -10,7 +10,7 @@
 
 {% block additional_js %}
     {{ dropzone.load_js() }}
-    {{ dropzone.config(redirect_url=url_for('account.edit_get')) }}
+    {{ dropzone.config(redirect_url=url_for('account.profile_edit')) }}
 {% endblock %}
 
 {% block modal %}
@@ -23,7 +23,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ url_for('account.edit_deletion_post') }}" method="POST" id="form_deletion">
+                    <form action="{{ url_for('account.profile_edit_deletion_post') }}" method="POST" id="form_deletion">
                         {{ deletion_form.csrf_token }}
                         Are you sure?
                     </form>
@@ -46,10 +46,10 @@
             <div class="row">
                 <div class="col-sm">
                     <img src="{{ url_for('static', filename=user_image) }}" class="img-fluid rounded img-restricted-lg" alt="User Image">
-                    <a href="{{ url_for('storage.upload_get', user_hash=user_hash) }}" title="Delete image" class="btn btn-danger mt-4"><i class="bi bi-trash"></i> Clear Image</a>
+                    <a href="{{ url_for('storage.profile_image_clear') }}" title="Delete image" class="btn btn-danger mt-4"><i class="bi bi-trash"></i> Clear Image</a>
                 </div>
                 <div class="col-sm">
-                    {{ dropzone.create(action='storage.upload_post', user_hash=user_hash) }}
+                    {{ dropzone.create(action='storage.profile_image_post', user_hash=user_hash) }}
                 </div>
             </div>
         </div>
@@ -60,7 +60,7 @@
             {# Display form and possible error message - change user data #}
             <div class="my-2 fs-4 c-title">Edit Account</div>
             <div class="underline"><span><i class="bi bi-body-text" aria-hidden="true"></i></span></div>
-            <form action="{{ url_for('account.edit_mail_post') }}" method="POST">
+            <form action="{{ url_for('account.profile_edit_mail_post') }}" method="POST">
                 {{ mail_form.csrf_token }}
                 <div class="form-group mt-2 mb-2">
                     <label for="email">{{ mail_form.email.label }}</label>
@@ -93,7 +93,7 @@
             {# Display form and possible error message - set a password for currently logged in user #}
             <div class="my-2 fs-4 c-title">Set new password</div>
             <div class="underline"><span><i class="bi bi-body-text" aria-hidden="true"></i></span></div>
-            <form action="{{ url_for('account.edit_password_post') }}" method="POST">
+            <form action="{{ url_for('account.profile_edit_password_post') }}" method="POST">
                 {{ password_form.csrf_token }}
                 <div class="form-group mt-2 mb-2">
                     <label for="password">{{ password_form.password.label }}</label>
