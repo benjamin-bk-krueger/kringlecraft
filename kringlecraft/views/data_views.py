@@ -11,14 +11,14 @@ blueprint = flask.Blueprint('data', __name__, template_folder='templates')
 # Show statistics regarding available elements stored in the database and on S3 storage
 @blueprint.route('/stats', methods=['GET'])
 def stats():
-    # import forms and utilities
+    # (1) import forms and utilities
     import kringlecraft.services.user_services as user_services
 
-    # initialize elements
+    # (2) initialize form data
     counts = dict()
     counts['user'] = user_services.get_user_count()
 
-    # show rendered page
+    # (6a) show rendered page
     return flask.render_template('data/stats.html', counts=counts)
 
 
@@ -26,14 +26,14 @@ def stats():
 @blueprint.route('/users', methods=['GET'])
 @login_required
 def users():
-    # import forms and utilities
+    # (1) import forms and utilities
     import kringlecraft.services.user_services as user_services
 
-    # initialize elements
+    # (2) initialize form data
     all_users = user_services.find_all_users() if current_user.role == ADMIN else user_services.find_active_users()
     user_images = user_services.get_all_images()
 
-    # show rendered page
+    # (6a) show rendered page
     return flask.render_template('account/users.html', users=all_users, user_images=user_images)
 
 
@@ -41,14 +41,15 @@ def users():
 @blueprint.route('/user/<int:user_id>', methods=['GET'])
 @login_required
 def user(user_id):
-    # import forms and utilities
+    # (1) import forms and utilities
     import kringlecraft.services.user_services as user_services
 
-    # initialize elements
-    my_user = user_services.find_user_by_id(user_id) if current_user.role == ADMIN else user_services.find_active_user_by_id(user_id)
+    # (2) initialize form data
+    my_user = user_services.find_user_by_id(user_id) if current_user.role == ADMIN else (
+        user_services.find_active_user_by_id(user_id))
     user_image = user_services.get_user_image(user_id)
 
-    # show rendered page
+    # (6a) show rendered page
     return flask.render_template('account/user.html', user=my_user, user_image=user_image)
 
 
@@ -56,12 +57,23 @@ def user(user_id):
 @blueprint.route('/user/<int:user_id>/approve', methods=['GET'])
 @login_required
 def user_approve(user_id):
-    # import forms and utilities
+    # (1) import forms and utilities
     import kringlecraft.services.user_services as user_services
 
-    # check valid contact data
-    my_user = user_services.enable_user(user_id)
-    if my_user:
-        send_mail(f"{my_user.name} - Registration complete", "Your registration has been approved. You can use your login now.", [my_user.email])
+    if current_user.role != ADMIN:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="You are not authorized to approve users.")
 
+    # (4a) perform operations
+    my_user = user_services.enable_user(user_id)
+
+    if not my_user:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="User does not exist.")
+
+    # (4b) perform closing operations
+    send_mail(f"{my_user.name} - Registration complete",
+              "Your registration has been approved. You can use your login now.", [my_user.email])
+
+    # (6b) redirect to new page after successful operation
     return flask.redirect(flask.url_for('data.users'))
