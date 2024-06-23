@@ -5,3 +5,6 @@
 
 # noinspection PyUnresolvedReferences
 import kringlecraft.data.users
+
+# noinspection PyUnresolvedReferences
+import kringlecraft.data.worlds
