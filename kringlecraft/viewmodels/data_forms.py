@@ -1,10 +1,11 @@
 from flask_wtf import FlaskForm  # integration with WTForms, data validation and CSRF protection
-from wtforms import (StringField, TextAreaField, BooleanField)
+from wtforms import (StringField, TextAreaField, BooleanField, SelectField)
 from wtforms.validators import (InputRequired, Length, URL)
 from markupsafe import escape  # to safely escape form data
 
 from kringlecraft.viewmodels.__validators import (space_ascii_validator, full_ascii_validator)
 from kringlecraft.data.worlds import World
+from kringlecraft.data.rooms import Room
 
 # Every form used both in the Flask/Jinja templates as well the main Python app is defined here.
 # Not all fields have full validators as they are used in modal windows.
@@ -58,3 +59,36 @@ class WorldForm(FlaskForm):
         self.visible.default = self.visible_content
         self.url.default = self.url_content
         self.archived.default = self.archived_content
+
+
+class RoomForm(FlaskForm):
+    name = StringField('Name', validators=[InputRequired(), Length(max=100), space_ascii_validator])
+    description = TextAreaField('Description', validators=[Length(max=1024), full_ascii_validator])
+    world = SelectField('Select World', choices=[(1, "none")], validate_choice=False)
+
+    @property
+    def name_content(self):
+        return str(escape(self.name.data))
+
+    @property
+    def description_content(self):
+        return str(escape(self.description.data))
+
+    @property
+    def world_content(self):
+        return str(escape(self.world.data))
+
+    def __init__(self, room: Room = None):
+        super().__init__()
+        if room is not None:
+            self.name.default = room.name
+            self.description.default = room.description
+            self.world.default = room.world
+
+    def set_field_defaults(self, rename: bool = False):
+        self.name.default = self.name_content
+        if rename:
+            self.name.default = self.name_content + FILE_ALT_ENDING
+            self.name.errors.append(FILE_ALT_WARNING)
+        self.description.default = self.description_content
+        self.world.default = self.world_content

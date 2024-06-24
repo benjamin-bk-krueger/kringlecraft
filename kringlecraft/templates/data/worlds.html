@@ -126,7 +126,7 @@
                     {% for world in worlds %}
                         <div class="col-sm">
                             <figure class="figure">
-                                <a href="#">
+                                <a href="{{ url_for('data.rooms', world_id=world.id) }}">
                                     <img src="{{ url_for('static', filename=world_images[world.id]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{ world.name }}">
                                 </a>
                                 <figcaption class="figure-caption c-title">{{ world.name }} <a href="{{ url_for('data.world', world_id=world.id) }}"><i class="bi bi-pencil-square"></i></a></figcaption>

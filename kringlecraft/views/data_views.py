@@ -13,11 +13,13 @@ def stats():
     # (1) import forms and utilities
     import kringlecraft.services.user_services as user_services
     import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.room_services as room_services
 
     # (2) initialize form data
     counts = dict()
     counts['user'] = user_services.get_user_count()
     counts['world'] = world_services.get_world_count()
+    counts['room'] = room_services.get_room_count()
 
     # (6a) show rendered page
     return flask.render_template('data/stats.html', counts=counts)
@@ -231,3 +233,76 @@ def world_delete(world_id):
 
     # (6b) redirect to new page after successful operation
     return flask.redirect(flask.url_for('data.worlds'))
+
+
+# Displays all available rooms
+@blueprint.route('/rooms/<int:world_id>', methods=['GET'])
+def rooms(world_id):
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.data_forms import RoomForm
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.room_services as room_services
+
+    # (2) initialize form data
+    room_form = RoomForm()
+    my_world = world_services.find_world_by_id(world_id)
+
+    if not my_world:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="World does not exist.")
+
+    all_rooms = room_services.find_world_rooms(my_world.id)
+    room_images = room_services.get_all_images()
+
+    # (6a) show rendered page
+    return flask.render_template('data/rooms.html', room_form=room_form, rooms=all_rooms,
+                                 room_images=room_images, world=my_world, page_mode="init")
+
+
+# Post a new room - if it doesn't already exist
+@blueprint.route('/rooms/<int:world_id>', methods=['POST'])
+@login_required
+def rooms_post(world_id):
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.data_forms import RoomForm
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.room_services as room_services
+
+    if current_user.role != 0:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="You are not authorized to create rooms.")
+
+    # (2) initialize form data
+    room_form = RoomForm()
+    my_world = world_services.find_world_by_id(world_id)
+
+    if not my_world:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="World does not exist.")
+
+    conflicting_room = room_services.find_world_room_by_name(my_world.id, room_form.name_content)
+    temp_ending = None if get_temp_file("room") is None else (file_ending(get_temp_file("room")))
+
+    # (3) check valid form data
+    if room_form.validate_on_submit() and conflicting_room is None:
+        # (4a) perform operations
+        my_room = room_services.create_room(room_form.name_content, room_form.description_content,
+                                            my_world.id, current_user.id)
+        room_services.enable_room_image(my_room.id)
+
+        if not my_room:
+            # (6e) show dedicated error page
+            return flask.render_template('home/error.html', error_message="Room could not be created.")
+
+        # (6b) redirect to new page after successful operation
+        return flask.redirect(flask.url_for('data.rooms', world_id=my_world.id))
+
+    # (5) preset form with existing data
+    room_form.set_field_defaults(conflicting_room is not None)
+    room_form.process()
+    all_rooms = room_services.find_world_rooms(my_world.id)
+    room_images = room_services.get_all_images()
+
+    # (6c) show rendered page with possible error messages
+    return flask.render_template('data/rooms.html', room_form=room_form, rooms=all_rooms,
+                                 room_images=room_images, world=my_world, page_mode="add", temp_ending=temp_ending)

@@ -68,3 +68,28 @@ def world_image_post(world_id, world_hash):
 
     # (6f) other result
     return "Uploaded successfully"
+
+
+@blueprint.route('/room/image/<int:room_id>/<string:room_hash>', methods=['POST'])
+@login_required
+def room_image_post(room_id, room_hash):
+    # (1) import forms and utilities
+    import kringlecraft.services.room_services as room_services
+
+    # (2) initialize form data
+    delete_temp_files("room")
+    f = flask.request.files.get('file')
+    f.save(build_path("room", room_hash, file_ending(f.filename)))
+
+    # (4a) perform operations
+    if room_id == 0:
+        return "Uploaded successfully (temp file)"
+
+    room = room_services.set_room_image(room_id, room_hash + "." + file_ending(f.filename))
+
+    if not room:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Room does not exist.")
+
+    # (6f) other result
+    return "Uploaded successfully"
