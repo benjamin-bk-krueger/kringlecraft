@@ -1,28 +1,6 @@
-import os
-import random
-import string
-import hashlib
-
-from passlib.handlers.sha2_crypt import sha512_crypt as crypto
 import kringlecraft.data.db_session as db_session
 from kringlecraft.data.users import User
-
-
-# ----------- Generic functions -----------
-def random_hash() -> str:
-    return ''.join(random.sample(string.ascii_letters + string.digits, 32))
-
-
-def hash_text(text: str) -> str:
-    return crypto.encrypt(text, rounds=171204)
-
-
-def verify_hash(hashed_text: str, plain_text: str) -> bool:
-    return crypto.verify(plain_text, hashed_text)
-
-
-def user_hash(email: str) -> str:
-    return hashlib.md5(email.encode('utf-8')).hexdigest()
+from kringlecraft.services.misc_services import (random_hash, hash_text, verify_hash, check_path, web_path, dummy_path)
 
 
 # ----------- Login functions -----------
@@ -101,10 +79,10 @@ def get_all_images() -> dict | None:
         users = session.query(User).order_by(User.name.asc()).all()
 
         for user in users:
-            if user.image is not None and os.path.isfile(os.path.join('static/uploads/profile/', user.image)):
-                images[user.id] = os.path.join('uploads/profile/', user.image)
+            if user.image is not None and check_path("profile", user.image):
+                images[user.id] = web_path("profile", user.image)
             else:
-                images[user.id] = "img/not_found.jpg"
+                images[user.id] = dummy_path()
 
         return images
     finally:
@@ -116,10 +94,10 @@ def get_user_image(user_id: int) -> str | None:
     try:
         user = session.query(User).filter(User.id == user_id).first()
 
-        if user.image is not None and os.path.isfile(os.path.join('static/uploads/profile/', user.image)):
-            return os.path.join('uploads/profile/', user.image)
+        if user.image is not None and check_path("profile", user.image):
+            return web_path("profile", user.image)
         else:
-            return "img/not_found.jpg"
+            return dummy_path()
     finally:
         session.close()
 

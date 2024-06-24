@@ -4,7 +4,7 @@ import sys
 import kringlecraft.data.db_session as db_session
 from kringlecraft.data.users import User
 from kringlecraft.data.worlds import World
-from kringlecraft.services.user_services import hash_text
+from kringlecraft.services.misc_services import hash_text
 
 # Make it run more easily outside PyCharm
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))

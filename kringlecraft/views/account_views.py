@@ -1,5 +1,7 @@
 import flask
 from flask_login import (login_required, current_user, logout_user)  # to manage user sessions
+
+import kringlecraft.services.misc_services
 from kringlecraft.utils.mail_tools import (send_admin_mail, send_mail)
 
 blueprint = flask.Blueprint('account', __name__, template_folder='templates')
@@ -66,7 +68,7 @@ def profile_edit():
 
     # (2) initialize form data
     user = user_services.find_user_by_id(current_user.id)
-    user_hash = user_services.user_hash(user.email)
+    user_hash = kringlecraft.services.misc_services.file_hash(user.email)
     user_image = user_services.get_user_image(user.id)
     mail_form = MailForm(user)
     password_form = PasswordForm()

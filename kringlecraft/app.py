@@ -80,7 +80,6 @@ def setup_dropzone():
     app.config['DROPZONE_UPLOAD_MULTIPLE'] = False
     app.config['DROPZONE_ALLOWED_FILE_CUSTOM'] = True
     app.config['DROPZONE_ALLOWED_FILE_TYPE'] = 'image/*'
-    app.config['DROPZONE_REDIRECT_VIEW'] = 'home.index'
     app.config['DROPZONE_ENABLE_CSRF'] = True
 
 

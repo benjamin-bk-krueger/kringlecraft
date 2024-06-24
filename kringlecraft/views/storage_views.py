@@ -31,7 +31,6 @@ def profile_image_post(user_hash):
     # (2) initialize form data
     f = flask.request.files.get('file')
     ending = os.path.splitext(f.filename)[1][1:]
-    # f.save(os.path.join('static/uploads/profile', f.filename))
     f.save(os.path.join('static/uploads/profile/', user_hash) + "." + ending)
 
     # (4a) perform operations
@@ -40,6 +39,32 @@ def profile_image_post(user_hash):
     if not user:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="User does not exist.")
+
+    # (6f) other result
+    return "Uploaded successfully"
+
+
+@blueprint.route('/world/image/<int:world_id>/<string:world_hash>', methods=['POST'])
+@login_required
+def world_image_post(world_id, world_hash):
+    # (1) import forms and utilities
+    import kringlecraft.services.world_services as world_services
+
+    # (2) initialize form data
+    world_services.delete_temp_files()
+    f = flask.request.files.get('file')
+    ending = os.path.splitext(f.filename)[1][1:]
+    f.save(os.path.join('static/uploads/world/', world_hash) + "." + ending)
+
+    # (4a) perform operations
+    if world_id == 0:
+        return "Uploaded successfully (temp file)"
+
+    world = world_services.set_world_image(world_id, world_hash + "." + ending)
+
+    if not world:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="World does not exist.")
 
     # (6f) other result
     return "Uploaded successfully"
