@@ -43,7 +43,7 @@ class WorldForm(FlaskForm):
     def __init__(self, world: World = None):
         super().__init__()
         if world is not None:
-            self.name_content.default = world.name
+            self.name.default = world.name
             self.description.default = world.description
             self.visible.default = world.visible
             self.url.default = world.url

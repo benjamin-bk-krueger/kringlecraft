@@ -7,6 +7,10 @@ def file_hash(filename: str) -> str:
     return hashlib.md5(filename.encode('utf-8')).hexdigest()
 
 
+def build_path(category: str, hash_value: str, ending: str):
+    return os.path.join(f'static/uploads/{category}/', hash_value) + "." + ending
+
+
 def check_path(category: str, filename: str) -> bool:
     return os.path.isfile(os.path.join(f'static/uploads/{category}/', filename))
 

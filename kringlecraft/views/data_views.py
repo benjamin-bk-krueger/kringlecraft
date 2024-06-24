@@ -48,6 +48,10 @@ def user(user_id):
     # (2) initialize form data
     my_user = user_services.find_user_by_id(user_id) if current_user.role == 0 else (
         user_services.find_active_user_by_id(user_id))
+    if not my_user:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="User does not exist.")
+
     user_image = user_services.get_user_image(user_id)
 
     # (6a) show rendered page
@@ -138,3 +142,25 @@ def worlds_post():
         # (6c) show rendered page with possible error messages
         return flask.render_template('data/worlds.html', world_form=world_form, worlds=all_worlds,
                                      world_images=world_images, page_mode="add", temp_ending=temp_ending)
+
+
+# Shows information about a specific world
+@blueprint.route('/world/<int:world_id>', methods=['GET'])
+def world(world_id):
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.data_forms import WorldForm
+    import kringlecraft.services.world_services as world_services
+
+    # (2) initialize form data
+    my_world = world_services.find_world_by_id(world_id)
+    if not my_world:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="World does not exist.")
+
+    world_image = world_services.get_world_image(world_id)
+    world_form = WorldForm(my_world)
+    world_form.process()
+
+    # (6a) show rendered page
+    return flask.render_template('data/world.html', world_form=world_form, world=my_world,
+                                 world_image=world_image, page_mode="init")

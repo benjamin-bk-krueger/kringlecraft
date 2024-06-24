@@ -22,6 +22,14 @@ def find_all_worlds() -> list[World] | None:
         session.close()
 
 
+def find_world_by_id(world_id: int) -> World | None:
+    session = db_session.create_session()
+    try:
+        return session.query(World).filter(World.id == world_id).first()
+    finally:
+        session.close()
+
+
 def find_world_by_name(name: str) -> World | None:
     session = db_session.create_session()
     try:
@@ -43,6 +51,19 @@ def get_all_images() -> dict | None:
                 images[world.id] = dummy_path()
 
         return images
+    finally:
+        session.close()
+
+
+def get_world_image(world_id: int) -> str | None:
+    session = db_session.create_session()
+    try:
+        world = session.query(World).filter(World.id == world_id).first()
+
+        if world.image is not None and check_path("world", world.image):
+            return web_path("world", world.image)
+        else:
+            return dummy_path()
     finally:
         session.close()
 

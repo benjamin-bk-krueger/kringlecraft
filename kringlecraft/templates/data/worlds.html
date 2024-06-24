@@ -129,7 +129,7 @@
                                 <a href="#">
                                     <img src="{{ url_for('static', filename=world_images[world.id]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{ world.name }}">
                                 </a>
-                                <figcaption class="figure-caption c-title">{{ world.name }} <a href="#"><i class="bi bi-pencil-square"></i></a></figcaption>
+                                <figcaption class="figure-caption c-title">{{ world.name }} <a href="{{ url_for('data.world', world_id=world.id) }}"><i class="bi bi-pencil-square"></i></a></figcaption>
                             </figure>
                         </div>
                     {% endfor %}

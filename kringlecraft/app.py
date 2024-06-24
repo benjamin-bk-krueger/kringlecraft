@@ -56,7 +56,7 @@ def register_blueprints():
 
 def setup_db():
     db_file = os.path.join(os.path.dirname(__file__), 'db', 'kringlecraft.sqlite')
-    db_session.global_init(db_file, True)
+    db_session.global_init(db_file, False)
 
 
 def setup_csrf():

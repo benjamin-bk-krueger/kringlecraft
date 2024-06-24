@@ -2,7 +2,7 @@ import os
 import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
-from kringlecraft.utils.file_tools import (file_ending, delete_temp_files)
+from kringlecraft.utils.file_tools import (file_ending, delete_temp_files, build_path)
 
 blueprint = flask.Blueprint('storage', __name__, template_folder='templates')
 
@@ -32,11 +32,10 @@ def profile_image_post(user_hash):
 
     # (2) initialize form data
     f = flask.request.files.get('file')
-    ending = file_ending(f.filename)
-    f.save(os.path.join('static/uploads/profile/', user_hash) + "." + ending)
+    f.save(build_path("profile", user_hash, file_ending(f.filename)))
 
     # (4a) perform operations
-    user = user_services.set_user_image(current_user.id, user_hash + "." + ending)
+    user = user_services.set_user_image(current_user.id, user_hash + "." + file_ending(f.filename))
 
     if not user:
         # (6e) show dedicated error page
@@ -55,14 +54,13 @@ def world_image_post(world_id, world_hash):
     # (2) initialize form data
     delete_temp_files("world")
     f = flask.request.files.get('file')
-    ending = os.path.splitext(f.filename)[1][1:]
-    f.save(os.path.join('static/uploads/world/', world_hash) + "." + ending)
+    f.save(build_path("world", world_hash, file_ending(f.filename)))
 
     # (4a) perform operations
     if world_id == 0:
         return "Uploaded successfully (temp file)"
 
-    world = world_services.set_world_image(world_id, world_hash + "." + ending)
+    world = world_services.set_world_image(world_id, world_hash + "." + file_ending(f.filename))
 
     if not world:
         # (6e) show dedicated error page
