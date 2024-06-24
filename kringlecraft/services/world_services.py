@@ -127,3 +127,19 @@ def create_world(name: str, description: str, url: str, visible: bool, archived:
         return world
     finally:
         session.close()
+
+
+# ----------- Delete functions -----------
+def delete_world(world_id: int) -> World | None:
+    session = db_session.create_session()
+    try:
+        world = session.query(World).filter(World.id == world_id).first()
+        if world:
+            session.query(World).filter(World.id == world_id).delete()
+            session.commit()
+
+            print(f"INFO: World {world.name} deleted")
+
+            return world
+    finally:
+        session.close()

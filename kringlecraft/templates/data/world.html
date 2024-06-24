@@ -23,7 +23,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form action="#" id="form_deletion">
+                        <form action="{{ url_for('data.world_delete', world_id=world.id) }}" id="form_deletion">
                             Are you sure?
                         </form>
                     </div>

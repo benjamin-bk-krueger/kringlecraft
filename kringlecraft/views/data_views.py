@@ -164,3 +164,25 @@ def world(world_id):
     # (6a) show rendered page
     return flask.render_template('data/world.html', world_form=world_form, world=my_world,
                                  world_image=world_image, page_mode="init")
+
+
+# Delete a specific world - and all included elements!!!
+@blueprint.route('/world/delete/<int:world_id>', methods=['GET'])
+@login_required
+def world_delete(world_id):
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.data_forms import WorldForm
+    import kringlecraft.services.world_services as world_services
+
+    if current_user.role != 0:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="You are not authorized to delete worlds.")
+
+    # (2) initialize form data
+    my_world = world_services.delete_world(world_id)
+    if not my_world:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="World does not exist.")
+
+    # (6b) redirect to new page after successful operation
+    return flask.redirect(flask.url_for('data.worlds'))
