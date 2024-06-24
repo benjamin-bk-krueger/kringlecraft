@@ -132,16 +132,16 @@ def worlds_post():
 
         # (6b) redirect to new page after successful operation
         return flask.redirect(flask.url_for('data.worlds'))
-    else:
-        # (5) preset form with existing data
-        world_form.set_field_defaults(conflicting_world is not None)
-        world_form.process()
-        all_worlds = world_services.find_all_worlds()
-        world_images = world_services.get_all_images()
 
-        # (6c) show rendered page with possible error messages
-        return flask.render_template('data/worlds.html', world_form=world_form, worlds=all_worlds,
-                                     world_images=world_images, page_mode="add", temp_ending=temp_ending)
+    # (5) preset form with existing data
+    world_form.set_field_defaults(conflicting_world is not None)
+    world_form.process()
+    all_worlds = world_services.find_all_worlds()
+    world_images = world_services.get_all_images()
+
+    # (6c) show rendered page with possible error messages
+    return flask.render_template('data/worlds.html', world_form=world_form, worlds=all_worlds,
+                                 world_images=world_images, page_mode="add", temp_ending=temp_ending)
 
 
 # Shows information about a specific world
@@ -200,15 +200,15 @@ def world_post(world_id):
 
         # (6b) redirect to new page after successful operation
         return flask.redirect(flask.url_for('data.world', world_id=my_world.id))
-    else:
-        # (5) preset form with existing data
-        world_form.set_field_defaults(conflicting_world is not None and (my_world.name != world_form.name_content))
-        world_form.process()
-        world_image = world_services.get_world_image(world_id)
 
-        # (6c) show rendered page with possible error messages
-        return flask.render_template('data/world.html', world_form=world_form, world=my_world,
-                                     world_image=world_image, page_mode="edit") #, temp_ending=temp_ending)
+    # (5) preset form with existing data
+    world_form.set_field_defaults(conflicting_world is not None and (my_world.name != world_form.name_content))
+    world_form.process()
+    world_image = world_services.get_world_image(world_id)
+
+    # (6c) show rendered page with possible error messages
+    return flask.render_template('data/world.html', world_form=world_form, world=my_world,
+                                 world_image=world_image, page_mode="edit") #, temp_ending=temp_ending)
 
 
 # Delete a specific world - and all included elements!!!

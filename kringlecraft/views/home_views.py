@@ -54,15 +54,15 @@ def contact_post():
 
         # (6b) redirect to new page after successful operation
         return flask.redirect(flask.url_for('home.index'))
-    else:
-        # (5) preset form with existing data
-        contact_form.set_field_defaults()
-        check_captcha = create_captcha()
-        contact_form.set_captcha(check_captcha["res"])
-        contact_form.process()
 
-        # (6c) show rendered page with possible error messages
-        return flask.render_template('home/contact.html', contact_form=contact_form, check_captcha=check_captcha)
+    # (5) preset form with existing data
+    contact_form.set_field_defaults()
+    check_captcha = create_captcha()
+    contact_form.set_captcha(check_captcha["res"])
+    contact_form.process()
+
+    # (6c) show rendered page with possible error messages
+    return flask.render_template('home/contact.html', contact_form=contact_form, check_captcha=check_captcha)
 
 
 # Show error page  - for all "hard" crashes a mail is sent to the site admin
@@ -116,13 +116,13 @@ def login_post():
 
         # (6b) redirect to new page after successful operation
         return flask.redirect(flask.url_for('home.index'))
-    else:
-        # (5) preset form with existing data
-        login_form.set_field_defaults()
-        login_form.process()
 
-        # (6c) show rendered page with possible error messages
-        return flask.render_template('home/login.html', login_form=login_form)
+    # (5) preset form with existing data
+    login_form.set_field_defaults()
+    login_form.process()
+
+    # (6c) show rendered page with possible error messages
+    return flask.render_template('home/login.html', login_form=login_form)
 
 
 # Log out user and return to the site index afterward
@@ -182,13 +182,13 @@ def password_post():
 
         # (6b) redirect to new page after successful operation
         return flask.redirect(flask.url_for('home.index'))
-    else:
-        # (5) preset form with existing data
-        password_form.set_field_defaults()
-        password_form.process()
 
-        # (6c) show rendered page with possible error messages
-        return flask.render_template('home/password.html', password_form=password_form)
+    # (5) preset form with existing data
+    password_form.set_field_defaults()
+    password_form.process()
+
+    # (6c) show rendered page with possible error messages
+    return flask.render_template('home/password.html', password_form=password_form)
 
 
 # Show user password reset page
@@ -228,12 +228,12 @@ def reset_post(random_hash):
 
         # (6b) redirect to new page after successful operation
         return flask.redirect(flask.url_for('home.index'))
-    else:
-        # (5) preset form with existing data
-        reset_form.process()
 
-        # (6c) show rendered page with possible error messages
-        return flask.render_template('home/reset.html', reset_form=reset_form, random_hash=random_hash)
+    # (5) preset form with existing data
+    reset_form.process()
+
+    # (6c) show rendered page with possible error messages
+    return flask.render_template('home/reset.html', reset_form=reset_form, random_hash=random_hash)
 
 
 # Show privacy policy
