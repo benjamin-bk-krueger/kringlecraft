@@ -85,7 +85,7 @@ def get_room_image(room_id: int) -> str | None:
 
 
 # ----------- Edit functions -----------
-def edit_room(room_id: int, name: str = None, description: str = None, world_id: int = 0) -> Room | None:
+def edit_room(room_id: int, world_id: int, name: str = None, description: str = None) -> Room | None:
     session = db_session.create_session()
     try:
         room = session.query(Room).filter(Room.id == room_id).first()
@@ -138,9 +138,16 @@ def enable_room_image(room_id: int) -> Room | None:
         session.close()
 
 
+def get_room_choices(rooms: list[Room]) -> list[tuple[int, str]]:
+    rooms_choices = list()
+    for room in rooms:
+        rooms_choices.append((room.id, room.name))
+    return rooms_choices
+
+
 # ----------- Create functions -----------
 def create_room(name: str, description: str, world_id: int, user_id: int) -> Room | None:
-    if find_room_by_name(name):
+    if find_world_room_by_name(world_id, name):
         return None
 
     room = Room()

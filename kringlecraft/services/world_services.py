@@ -68,6 +68,13 @@ def get_world_image(world_id: int) -> str | None:
         session.close()
 
 
+def get_world_choices(worlds: list[World]) -> list[tuple[int, str]]:
+    worlds_choices = list()
+    for world in worlds:
+        worlds_choices.append((world.id, world.name))
+    return worlds_choices
+
+
 # ----------- Edit functions -----------
 def edit_world(world_id: int, name: str = None, description: str = None, url: str = None, visible: bool = None, archived: bool = None) -> World | None:
     session = db_session.create_session()

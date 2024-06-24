@@ -83,7 +83,6 @@ class RoomForm(FlaskForm):
         if room is not None:
             self.name.default = room.name
             self.description.default = room.description
-            self.world.default = room.world
 
     def set_field_defaults(self, rename: bool = False):
         self.name.default = self.name_content
