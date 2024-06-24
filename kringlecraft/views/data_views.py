@@ -166,6 +166,51 @@ def world(world_id):
                                  world_image=world_image, page_mode="init")
 
 
+# Post a change in a world's data
+@blueprint.route('/world_post/<int:world_id>', methods=['POST'])
+@login_required
+def world_post(world_id):
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.data_forms import WorldForm
+    import kringlecraft.services.world_services as world_services
+
+    if current_user.role != 0:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="You are not authorized to edit worlds.")
+
+    # (2) initialize form data
+    world_form = WorldForm()
+    my_world = world_services.find_world_by_id(world_id)
+    if not my_world:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="World does not exist.")
+
+    conflicting_world = world_services.find_world_by_name(world_form.name_content)
+    # temp_ending = None if get_temp_file("world") is None else (file_ending(get_temp_file("world")))
+
+    # (3) check valid form data
+    if world_form.validate_on_submit() and (my_world.name == world_form.name_content or conflicting_world is None):
+        # (4a) perform operations
+        my_world = world_services.edit_world(world_id, world_form.name_content, world_form.description_content, world_form.url_content, world_form.visible_content, world_form.archived_content)
+        # world_services.enable_world_image(my_world.id)
+
+        if not my_world:
+            # (6e) show dedicated error page
+            return flask.render_template('home/error.html', error_message="World could not be edited.")
+
+        # (6b) redirect to new page after successful operation
+        return flask.redirect(flask.url_for('data.world', world_id=my_world.id))
+    else:
+        # (5) preset form with existing data
+        world_form.set_field_defaults(conflicting_world is not None and (my_world.name != world_form.name_content))
+        world_form.process()
+        world_image = world_services.get_world_image(world_id)
+
+        # (6c) show rendered page with possible error messages
+        return flask.render_template('data/world.html', world_form=world_form, world=my_world,
+                                     world_image=world_image, page_mode="edit") #, temp_ending=temp_ending)
+
+
 # Delete a specific world - and all included elements!!!
 @blueprint.route('/world/delete/<int:world_id>', methods=['GET'])
 @login_required

@@ -44,7 +44,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form action="#" method="POST" id="form_edit">
+                        <form action="{{ url_for('data.world_post', world_id=world.id) }}" method="POST" id="form_edit">
                             {{ world_form.csrf_token }}
                             <div class="form-group mt-2 mb-2">
                                 <label for="{{ world_form.name.name }}">{{ world_form.name.label }}</label>
