@@ -33,7 +33,7 @@ def insert_admin_user():
 
     session = db_session.create_session()
     session.add(u)
-    session.add(w)
+    # session.add(w)
     session.commit()
     session.close()
 

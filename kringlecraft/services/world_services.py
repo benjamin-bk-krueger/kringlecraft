@@ -1,8 +1,7 @@
-import os
-
 import kringlecraft.data.db_session as db_session
 from kringlecraft.data.worlds import World
-from kringlecraft.utils.file_tools import file_hash, check_path, web_path, dummy_path, get_temp_file
+from kringlecraft.utils.file_tools import (file_hash, check_path, web_path, dummy_path, get_temp_file, file_ending,
+                                           rename_temp_file)
 
 
 # ----------- Count functions -----------
@@ -72,11 +71,8 @@ def enable_world_image(world_id: int) -> World | None:
         if world:
             temp_file = get_temp_file("world")
             if temp_file:
-                my_hash = file_hash(world.name)
-                ending = os.path.splitext(temp_file)[1][1:]
-                os.rename(temp_file, os.path.join('static/uploads/world/', my_hash + "." + ending))
-
-                world.image = my_hash + "." + ending
+                rename_temp_file("world", temp_file, file_hash(world.name), file_ending(temp_file))
+                world.image = file_hash(world.name) + "." + file_ending(temp_file)
 
                 session.commit()
 

@@ -21,5 +21,3 @@ def hash_text(text: str) -> str:
 
 def verify_hash(hashed_text: str, plain_text: str) -> bool:
     return crypto.verify(plain_text, hashed_text)
-
-

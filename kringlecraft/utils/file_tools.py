@@ -37,3 +37,7 @@ def delete_temp_files(category: str):
             os.remove(file_path)
         except Exception as e:
             print(f"FILE: Error deleting {file_path}: {e}")
+
+
+def rename_temp_file(category: str, temp_file: str, hash_value: str, ending: str):
+    os.rename(temp_file, os.path.join(f'static/uploads/{category}/', hash_value + "." + ending))
