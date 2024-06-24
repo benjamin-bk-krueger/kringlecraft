@@ -31,7 +31,7 @@ def profile_create_post():
     # (3) check valid form data
     if account_form.validate_on_submit():
         # (4a) perform operations
-        user = user_services.create_user(account_form.user_content, account_form.email_content,
+        user = user_services.create_user(account_form.name_content, account_form.email_content,
                                          account_form.password_content)
 
         if not user:
@@ -39,9 +39,9 @@ def profile_create_post():
             return flask.render_template('home/error.html', error_message="User could not be created.")
 
         # (4b) perform closing operations
-        send_admin_mail(f"{account_form.user_content} - Approval required",
+        send_admin_mail(f"{account_form.name_content} - Approval required",
                         "A new user has registered, please approve registration.")
-        send_mail(f"{account_form.user_content} - Registration pending",
+        send_mail(f"{account_form.name_content} - Registration pending",
                   "Your registration needs to be approved. This should not take too long.",
                   [account_form.email_content])
 

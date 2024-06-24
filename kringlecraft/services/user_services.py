@@ -21,24 +21,24 @@ def verify_hash(hashed_text: str, plain_text: str) -> bool:
     return crypto.verify(plain_text, hashed_text)
 
 
-def user_hash(user_email: str) -> str:
-    return hashlib.md5(user_email.encode('utf-8')).hexdigest()
+def user_hash(email: str) -> str:
+    return hashlib.md5(email.encode('utf-8')).hexdigest()
 
 
 # ----------- Login functions -----------
-def login_user(user_email: str, user_password: str) -> User | None:
+def login_user(email: str, password: str) -> User | None:
     session = db_session.create_session()
     try:
-        user = session.query(User).filter(User.email == user_email).first()
+        user = session.query(User).filter(User.email == email).first()
         if not user:
-            print(f"INFO: Login Failure for user {user_email}")
+            print(f"INFO: Login Failure for user {email}")
             return None
 
-        if not verify_hash(user.hashed_password, user_password):
-            print(f"INFO: Login Failure for user {user_email}")
+        if not verify_hash(user.hashed_password, password):
+            print(f"INFO: Login Failure for user {email}")
             return None
 
-        print(f"INFO: Login Successful for user {user_email}")
+        print(f"INFO: Login Successful for user {email}")
         return user
     finally:
         session.close()
@@ -86,10 +86,10 @@ def find_active_user_by_id(user_id: int) -> User | None:
         session.close()
 
 
-def find_user_by_email(user_email: str) -> User | None:
+def find_user_by_email(email: str) -> User | None:
     session = db_session.create_session()
     try:
-        return session.query(User).filter(User.email == user_email).first()
+        return session.query(User).filter(User.email == email).first()
     finally:
         session.close()
 
@@ -125,14 +125,14 @@ def get_user_image(user_id: int) -> str | None:
 
 
 # ----------- Create functions -----------
-def create_user(user_name: str, user_email: str, user_password: str) -> User | None:
-    if find_user_by_email(user_email):
+def create_user(name: str, email: str, password: str) -> User | None:
+    if find_user_by_email(email):
         return None
 
     user = User()
-    user.email = user_email
-    user.name = user_name
-    user.hashed_password = hash_text(user_password)
+    user.email = email
+    user.name = name
+    user.hashed_password = hash_text(password)
     user.role = 1
     user.active = 0
     user.notification = 0
@@ -150,15 +150,14 @@ def create_user(user_name: str, user_email: str, user_password: str) -> User | N
 
 
 # ----------- Edit functions -----------
-def edit_user(user_id: int, user_email: str = None, user_description: str = None,
-              user_notification: bool = None) -> User | None:
+def edit_user(user_id: int, email: str = None, description: str = None, notification: bool = None) -> User | None:
     session = db_session.create_session()
     try:
         user = session.query(User).filter(User.id == user_id).first()
         if user:
-            user.email = user_email if user_email is not None else user.email
-            user.description = user_description if user_description is not None else user.description
-            user.notification = user_notification if user_notification is not None else user.notification
+            user.email = email if email is not None else user.email
+            user.description = description if description is not None else user.description
+            user.notification = notification if notification is not None else user.notification
 
             session.commit()
 
@@ -169,12 +168,12 @@ def edit_user(user_id: int, user_email: str = None, user_description: str = None
         session.close()
 
 
-def change_user_password(user_id: int, user_password: str) -> User | None:
+def change_user_password(user_id: int, password: str) -> User | None:
     session = db_session.create_session()
     try:
         user = session.query(User).filter(User.id == user_id).first()
         if user:
-            user.hashed_password = hash_text(user_password)
+            user.hashed_password = hash_text(password)
 
             session.commit()
 
@@ -201,11 +200,11 @@ def enable_user(user_id: int) -> User | None:
         session.close()
 
 
-def prepare_user(user_email: str) -> User | None:
+def prepare_user(email: str) -> User | None:
     # check valid student account and sent out password reset mail
     session = db_session.create_session()
     try:
-        user = session.query(User).filter(User.active == 1).filter(User.email == user_email).first()
+        user = session.query(User).filter(User.active == 1).filter(User.email == email).first()
         if user:
             user.reset_password = random_hash()
             session.commit()
@@ -217,13 +216,13 @@ def prepare_user(user_email: str) -> User | None:
         session.close()
 
 
-def reset_user(user_hash_value: str, user_password: str) -> User | None:
+def reset_user(hash_value: str, password: str) -> User | None:
     # check valid student account and valid password reset link
     session = db_session.create_session()
     try:
-        user = session.query(User).filter(User.active == 1).filter(User.reset_password == user_hash_value).first()
+        user = session.query(User).filter(User.active == 1).filter(User.reset_password == hash_value).first()
         if user:
-            user.hashed_password = hash_text(user_password)
+            user.hashed_password = hash_text(password)
             user.reset_password = ""
             session.commit()
 
@@ -234,12 +233,12 @@ def reset_user(user_hash_value: str, user_password: str) -> User | None:
         session.close()
 
 
-def set_user_image(user_id: int, user_image: str) -> User | None:
+def set_user_image(user_id: int, image: str) -> User | None:
     session = db_session.create_session()
     try:
         user = session.query(User).filter(User.id == user_id).first()
         if user:
-            user.image = user_image
+            user.image = image
 
             session.commit()
 

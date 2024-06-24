@@ -11,15 +11,15 @@ from kringlecraft.data.users import User
 
 
 class AccountForm(FlaskForm):
-    user_name = StringField('Name', validators=[InputRequired(), Length(min=5, max=40), space_ascii_validator])
+    name = StringField('Name', validators=[InputRequired(), Length(min=5, max=40), space_ascii_validator])
     email = StringField('E-Mail', validators=[InputRequired(), Email()])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=20),
                                                      EqualTo('password2', message='Passwords must match')])
     password2 = PasswordField('Password Verification', validators=[InputRequired(), Length(min=8, max=20)])
 
     @property
-    def user_content(self):
-        return str(escape(self.user_name.data))
+    def name_content(self):
+        return str(escape(self.name.data))
 
     @property
     def email_content(self):
@@ -30,7 +30,7 @@ class AccountForm(FlaskForm):
         return str(self.password.data)
 
     def set_field_defaults(self):
-        self.user_name.default = self.user_content
+        self.name.default = self.name_content
         self.email.default = self.email_content
         self.password.default = self.password_content
 

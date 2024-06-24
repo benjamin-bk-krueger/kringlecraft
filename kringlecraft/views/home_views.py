@@ -48,7 +48,7 @@ def contact_post():
     # (3) check valid form data
     if contact_form.validate_on_submit():
         # (4a) perform operations
-        send_admin_mail(f"{contact_form.contact_content} - {contact_form.email_content}",
+        send_admin_mail(f"{contact_form.name_content} - {contact_form.email_content}",
                         f"{contact_form.message_content}")
 
         # (6b) redirect to new page after successful operation

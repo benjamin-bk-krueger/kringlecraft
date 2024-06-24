@@ -1,9 +1,13 @@
 import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
+
 from kringlecraft.utils.mail_tools import (send_mail)
 
 ADMIN = 0
 USER = 1
+PAGE_INIT = "init"
+PAGE_ADD = "add"
+PAGE_EDIT = "edit"
 
 blueprint = flask.Blueprint('data', __name__, template_folder='templates')
 
@@ -13,10 +17,12 @@ blueprint = flask.Blueprint('data', __name__, template_folder='templates')
 def stats():
     # (1) import forms and utilities
     import kringlecraft.services.user_services as user_services
+    import kringlecraft.services.world_services as world_services
 
     # (2) initialize form data
     counts = dict()
     counts['user'] = user_services.get_user_count()
+    counts['world'] = world_services.get_world_count()
 
     # (6a) show rendered page
     return flask.render_template('data/stats.html', counts=counts)
@@ -77,3 +83,57 @@ def user_approve(user_id):
 
     # (6b) redirect to new page after successful operation
     return flask.redirect(flask.url_for('data.users'))
+
+
+# Displays all available worlds
+@blueprint.route('/worlds', methods=['GET'])
+def worlds():
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.data_forms import WorldForm
+    import kringlecraft.services.world_services as world_services
+
+    # (2) initialize form data
+    world_form = WorldForm()
+    all_worlds = world_services.find_all_worlds()
+    world_images = world_services.get_all_images()
+
+    # (6a) show rendered page
+    return flask.render_template('data/worlds.html', world_form=world_form, worlds=all_worlds, world_images=world_images, page_mode=PAGE_INIT)
+
+
+# Post a new world - if it doesn't already exist
+@blueprint.route('/worlds', methods=['POST'])
+@login_required
+def worlds_post():
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.data_forms import WorldForm
+    import kringlecraft.services.world_services as world_services
+
+    if current_user.role != ADMIN:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="You are not authorized to create worlds.")
+
+    # (2) initialize form data
+    world_form = WorldForm()
+    conflicting_world = world_services.find_world_by_name(world_form.name_content)
+
+    # (3) check valid form data
+    if world_form.validate_on_submit() and conflicting_world is None:
+        # (4a) perform operations
+        my_world = world_services.create_world(world_form.name_content, world_form.description_content, world_form.url_content, world_form.visible_content, world_form.archived_content)
+
+        if not my_world:
+            # (6e) show dedicated error page
+            return flask.render_template('home/error.html', error_message="World could not be created.")
+
+        # (6b) redirect to new page after successful operation
+        return flask.redirect(flask.url_for('data.worlds'))
+    else:
+        # (5) preset form with existing data
+        world_form.set_field_defaults(conflicting_world is not None)
+        world_form.process()
+        all_worlds = world_services.find_all_worlds()
+        world_images = world_services.get_all_images()
+
+        # (6c) show rendered page with possible error messages
+        return flask.render_template('data/worlds.html', world_form=world_form, worlds=all_worlds, world_images=world_images, page_mode=PAGE_ADD)

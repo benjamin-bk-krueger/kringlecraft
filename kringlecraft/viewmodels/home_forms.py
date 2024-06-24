@@ -32,7 +32,7 @@ class LoginForm(FlaskForm):
 
 
 class ContactForm(FlaskForm):
-    contact_name = StringField('Name', validators=[InputRequired(), Length(min=5, max=40), full_ascii_validator])
+    name = StringField('Name', validators=[InputRequired(), Length(min=5, max=40), full_ascii_validator])
     email = StringField('E-Mail', validators=[InputRequired(), Email()])
     message = TextAreaField('Message', validators=[Length(max=1024), full_ascii_validator])
     check_captcha = HiddenField(default='0')
@@ -40,8 +40,8 @@ class ContactForm(FlaskForm):
                                                                           message='Captcha does not match')])
 
     @property
-    def contact_content(self):
-        return str(escape(self.contact_name.data))
+    def name_content(self):
+        return str(escape(self.name.data))
 
     @property
     def email_content(self):
@@ -63,7 +63,7 @@ class ContactForm(FlaskForm):
         self.check_captcha.default = captcha
 
     def set_field_defaults(self):
-        self.contact_name.default = self.contact_content
+        self.name.default = self.name_content
         self.email.default = self.email_content
         self.message.default = self.message_content
 
