@@ -1,9 +1,8 @@
 import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
-import kringlecraft.services.misc_services
 from kringlecraft.utils.mail_tools import (send_mail)
-
+from kringlecraft.utils.file_tools import (get_temp_file, file_ending)
 
 blueprint = flask.Blueprint('data', __name__, template_folder='templates')
 
@@ -95,7 +94,7 @@ def worlds():
 
     # (6a) show rendered page
     return flask.render_template('data/worlds.html', world_form=world_form, worlds=all_worlds,
-                                 world_images=world_images, page_mode="init", file_mode="init")
+                                 world_images=world_images, page_mode="init")
 
 
 # Post a new world - if it doesn't already exist
@@ -113,7 +112,7 @@ def worlds_post():
     # (2) initialize form data
     world_form = WorldForm()
     conflicting_world = world_services.find_world_by_name(world_form.name_content)
-    file_mode = "init" if world_services.get_temp_image() is None else kringlecraft.services.misc_services.file_ending(world_services.get_temp_image())
+    temp_ending = None if get_temp_file("world") is None else (file_ending(get_temp_file("world")))
 
     # (3) check valid form data
     if world_form.validate_on_submit() and conflicting_world is None:
@@ -138,4 +137,4 @@ def worlds_post():
 
         # (6c) show rendered page with possible error messages
         return flask.render_template('data/worlds.html', world_form=world_form, worlds=all_worlds,
-                                     world_images=world_images, page_mode="add", file_mode=file_mode)
+                                     world_images=world_images, page_mode="add", temp_ending=temp_ending)

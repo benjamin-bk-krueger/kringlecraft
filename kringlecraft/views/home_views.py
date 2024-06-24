@@ -1,5 +1,6 @@
 import flask
 from flask_login import (login_user, logout_user, login_required)  # to manage user sessions
+
 from kringlecraft.utils.mail_tools import (send_admin_mail, send_mail)
 
 blueprint = flask.Blueprint('home', __name__, template_folder='templates')

@@ -11,28 +11,27 @@
 {% block additional_js %}
     <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
 
-    {#  Enable modal window error handling #}
-    {%  if page_mode == "add"  %}
+    {# Enable modal window error handling #}
+    {% if page_mode == "add" %}
         <script src="{{ url_for('static', filename='js/func_modal_add.js') }}"></script>
-    {%  endif %}
+    {% endif %}
 
     {{ dropzone.load_js() }}
-    {{ dropzone.config(redirect_url=None) }}
+    {{ dropzone.config() }}
 
-    {%  if file_mode != "init"  %}
+    {% if temp_ending %}
         <script>
             Dropzone.options.myDropzone = {
               init: function() {
                 let myDropzone = this;
 
                 // Create the mock file:
-                var mockFile = { name: "static/uploads/world/_temp.{{file_mode}}", size: 217447 };
-                myDropzone.displayExistingFile(mockFile, "static/uploads/world/_temp.{{file_mode}}");
+                var mockFile = { name: "static/uploads/world/_temp.{{temp_ending}}", size: 217447 };
+                myDropzone.displayExistingFile(mockFile, "static/uploads/world/_temp.{{temp_ending}}");
               }
             };
         </script>
-    {%  endif %}
-
+    {% endif %}
 {% endblock %}
 
 {% block modal %}

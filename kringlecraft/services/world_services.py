@@ -1,9 +1,8 @@
 import os
-import glob
 
 import kringlecraft.data.db_session as db_session
 from kringlecraft.data.worlds import World
-from kringlecraft.services.misc_services import (check_path, web_path, dummy_path, file_hash)
+from kringlecraft.utils.file_tools import file_hash, check_path, web_path, dummy_path, get_temp_file
 
 
 # ----------- Count functions -----------
@@ -49,13 +48,6 @@ def get_all_images() -> dict | None:
         session.close()
 
 
-def get_temp_image() -> str | None:
-    temp_files = glob.glob(os.path.join('static/uploads/world/', "_temp.*"))
-    if temp_files:
-        # Return the first match; you can modify this to return all matches if needed
-        return temp_files[0]
-
-
 # ----------- Edit functions -----------
 def set_world_image(world_id: int, image: str) -> World | None:
     session = db_session.create_session()
@@ -78,7 +70,7 @@ def enable_world_image(world_id: int) -> World | None:
     try:
         world = session.query(World).filter(World.id == world_id).first()
         if world:
-            temp_file = get_temp_image()
+            temp_file = get_temp_file("world")
             if temp_file:
                 my_hash = file_hash(world.name)
                 ending = os.path.splitext(temp_file)[1][1:]
@@ -118,13 +110,3 @@ def create_world(name: str, description: str, url: str, visible: bool, archived:
         return world
     finally:
         session.close()
-
-
-# ----------- Delete functions -----------
-def delete_temp_files():
-    temp_files = glob.glob(os.path.join('static/uploads/world/', "_temp.*"))
-    for file_path in temp_files:
-        try:
-            os.remove(file_path)
-        except Exception as e:
-            print(f"FILE: Error deleting {file_path}: {e}")

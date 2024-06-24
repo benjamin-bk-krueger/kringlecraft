@@ -2,6 +2,8 @@ import os
 import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
+from kringlecraft.utils.file_tools import (file_ending, delete_temp_files)
+
 blueprint = flask.Blueprint('storage', __name__, template_folder='templates')
 
 
@@ -30,7 +32,7 @@ def profile_image_post(user_hash):
 
     # (2) initialize form data
     f = flask.request.files.get('file')
-    ending = os.path.splitext(f.filename)[1][1:]
+    ending = file_ending(f.filename)
     f.save(os.path.join('static/uploads/profile/', user_hash) + "." + ending)
 
     # (4a) perform operations
@@ -51,7 +53,7 @@ def world_image_post(world_id, world_hash):
     import kringlecraft.services.world_services as world_services
 
     # (2) initialize form data
-    world_services.delete_temp_files()
+    delete_temp_files("world")
     f = flask.request.files.get('file')
     ending = os.path.splitext(f.filename)[1][1:]
     f.save(os.path.join('static/uploads/world/', world_hash) + "." + ending)

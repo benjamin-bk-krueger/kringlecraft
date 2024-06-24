@@ -1,6 +1,7 @@
 import kringlecraft.data.db_session as db_session
 from kringlecraft.data.users import User
-from kringlecraft.services.misc_services import (random_hash, hash_text, verify_hash, check_path, web_path, dummy_path)
+from kringlecraft.utils.misc_tools import random_hash, hash_text, verify_hash
+from kringlecraft.utils.file_tools import check_path, web_path, dummy_path
 
 
 # ----------- Login functions -----------

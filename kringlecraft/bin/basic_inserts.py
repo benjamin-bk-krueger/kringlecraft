@@ -3,8 +3,8 @@ import sys
 
 import kringlecraft.data.db_session as db_session
 from kringlecraft.data.users import User
-from kringlecraft.data.worlds import World
-from kringlecraft.services.misc_services import hash_text
+# from kringlecraft.data.worlds import World
+from kringlecraft.utils.misc_tools import hash_text
 
 # Make it run more easily outside PyCharm
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
@@ -24,12 +24,12 @@ def insert_admin_user():
     u.role = 0
     u.notification = 0
 
-    w = World()
-    w.name = input('Name: ').strip()
-    w.user_id = 1
-    w.description = input('Description: ').strip()
-    w.visible = 1
-    w.archived = 0
+    # w = World()
+    # w.name = input('Name: ').strip()
+    # w.user_id = 1
+    # w.description = input('Description: ').strip()
+    # w.visible = 1
+    # w.archived = 0
 
     session = db_session.create_session()
     session.add(u)
