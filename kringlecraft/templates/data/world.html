@@ -3,6 +3,11 @@
 
 {% block title %}World {{ world.world_name }}{% endblock %}
 
+{% block additional_css %}
+    {{ dropzone.load_css() }}
+    {{ dropzone.style('border: 2px dashed #0087F7; margin: 10%;') }}
+{% endblock %}
+
 {% block additional_js %}
     <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
 
@@ -10,6 +15,23 @@
     {%  if page_mode == "edit"  %}
         <script src="{{ url_for('static', filename='js/func_modal_edit.js') }}"></script>
     {%  endif %}
+
+    {{ dropzone.load_js() }}
+    {{ dropzone.config() }}
+
+    {% if temp_ending %}
+        <script>
+            Dropzone.options.myDropzone = {
+              init: function() {
+                let myDropzone = this;
+
+                // Create the mock file:
+                var mockFile = { name: "static/uploads/world/_temp.{{temp_ending}}", size: 217447 };
+                myDropzone.displayExistingFile(mockFile, "../static/uploads/world/_temp.{{temp_ending}}");
+              }
+            };
+        </script>
+    {% endif %}
 {% endblock %}
 
 {% block modal %}
@@ -44,6 +66,9 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        {# Upload and view profile image #}
+                        {{ dropzone.create(action='storage.world_image_post', world_id=0, world_hash="_temp") }}
+
                         <form action="{{ url_for('data.world_post', world_id=world.id) }}" method="POST" id="form_edit">
                             {{ world_form.csrf_token }}
                             <div class="form-group mt-2 mb-2">

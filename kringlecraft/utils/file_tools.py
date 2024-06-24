@@ -1,7 +1,7 @@
 import glob
 import hashlib
 import os
-
+import shutil
 
 def file_hash(filename: str) -> str:
     return hashlib.md5(filename.encode('utf-8')).hexdigest()
@@ -44,4 +44,4 @@ def delete_temp_files(category: str):
 
 
 def rename_temp_file(category: str, temp_file: str, hash_value: str, ending: str):
-    os.rename(temp_file, os.path.join(f'static/uploads/{category}/', hash_value + "." + ending))
+    shutil.move(temp_file, os.path.join(f'static/uploads/{category}/', hash_value + "." + ending))

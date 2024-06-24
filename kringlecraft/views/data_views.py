@@ -186,13 +186,13 @@ def world_post(world_id):
         return flask.render_template('home/error.html', error_message="World does not exist.")
 
     conflicting_world = world_services.find_world_by_name(world_form.name_content)
-    # temp_ending = None if get_temp_file("world") is None else (file_ending(get_temp_file("world")))
+    temp_ending = None if get_temp_file("world") is None else (file_ending(get_temp_file("world")))
 
     # (3) check valid form data
     if world_form.validate_on_submit() and (my_world.name == world_form.name_content or conflicting_world is None):
         # (4a) perform operations
         my_world = world_services.edit_world(world_id, world_form.name_content, world_form.description_content, world_form.url_content, world_form.visible_content, world_form.archived_content)
-        # world_services.enable_world_image(my_world.id)
+        world_services.enable_world_image(my_world.id)
 
         if not my_world:
             # (6e) show dedicated error page
@@ -208,7 +208,7 @@ def world_post(world_id):
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/world.html', world_form=world_form, world=my_world,
-                                 world_image=world_image, page_mode="edit") #, temp_ending=temp_ending)
+                                 world_image=world_image, page_mode="edit", temp_ending=temp_ending)
 
 
 # Delete a specific world - and all included elements!!!
