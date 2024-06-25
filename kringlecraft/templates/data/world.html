@@ -39,9 +39,9 @@
         {# Modal dialog window - delete currently selected world #}
         <div id="myModalDelete" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Delete World</h4>
+                <div class="modal-content c-lightblue c-border c-shadow">
+                    <div class="modal-header c-blue c-bottomborder">
+                        <h4 class="modal-title c-bigtitle">Delete World</h4>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -60,9 +60,9 @@
         {# Modal dialog window - edit currently selected world #}
         <div id="myModalEdit" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Edit World</h4>
+                <div class="modal-content c-lightblue c-border c-shadow">
+                    <div class="modal-header c-blue c-bottomborder">
+                        <h4 class="modal-title c-bigtitle">Edit World</h4>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -85,18 +85,18 @@
                             {% for error in world_form.description.errors %}
                                 <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
                             {% endfor %}
-                            <div class="form-check mt-2 mb-2">
-                                <label class="form-check-label" for="visible">{{ world_form.visible.label }}</label>
-                                {{ world_form.visible(class="form-check-input") }}
-                            </div>
-                            {% for error in world_form.visible.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
                             <div class="form-group mt-2 mb-2">
                                 <label for="{{ world_form.url.name }}">{{ world_form.url.label }}</label>
                                 {{ world_form.url(size=20, class="form-control") }}
                             </div>
                             {% for error in world_form.url.errors %}
+                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                            {% endfor %}
+                            <div class="form-check mt-2 mb-2">
+                                <label class="form-check-label" for="visible">{{ world_form.visible.label }}</label>
+                                {{ world_form.visible(class="form-check-input") }}
+                            </div>
+                            {% for error in world_form.visible.errors %}
                                 <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
                             {% endfor %}
                             <div class="form-check mt-2 mb-2">

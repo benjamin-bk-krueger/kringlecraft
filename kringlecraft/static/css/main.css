@@ -94,8 +94,20 @@ table .w-30 { width:30%; }
     background-color: #F5F5F5;
 }
 
+.c-blue {
+    background-color: rgb(166, 175, 188);
+}
+
+.c-lightblue {
+    background-color: rgb(242, 247, 248);
+}
+
 .c-border {
     border: 1px solid black;
+}
+
+.c-bottomborder {
+    border-bottom: 1px solid black;
 }
 
 .c-restricted-sm {
@@ -120,6 +132,16 @@ table .w-30 { width:30%; }
 
 .c-shadow {
     box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.c-bigtitle {
+    color: #00315c;
+    font-size:20px;
+    line-height:1.7;
+    margin-bottom:0;
+    font-weight:500;
+    padding-left:20px;
+    padding-right:20px;
 }
 
 .c-title {
