@@ -1,7 +1,9 @@
 import kringlecraft.data.db_session as db_session
+from typing import Dict
 from kringlecraft.data.users import User
+from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, get_all_images,
+                                                  get_entity_image, delete_entity, set_entity_image)
 from kringlecraft.utils.misc_tools import (random_hash, hash_text, verify_hash)
-from kringlecraft.utils.file_tools import (check_path, web_path, dummy_path)
 
 
 # ----------- Login functions -----------
@@ -25,20 +27,28 @@ def login_user(email: str, password: str) -> User | None:
 
 # ----------- Count functions -----------
 def get_user_count() -> int | None:
-    session = db_session.create_session()
-    try:
-        return session.query(User).count()
-    finally:
-        session.close()
+    return get_count(User)
 
 
 # ----------- Find functions -----------
 def find_all_users() -> list[User] | None:
-    session = db_session.create_session()
-    try:
-        return session.query(User).order_by(User.name.asc()).all()
-    finally:
-        session.close()
+    return find_all(User)
+
+
+def find_user_by_id(user_id: int) -> User | None:
+    return find_by_id(User, user_id)
+
+
+def find_user_by_email(email: str) -> User | None:
+    return find_by_field(User, 'email', email)
+
+
+def get_all_user_images() -> Dict[int, str] | None:
+    return get_all_images(User, "profile")
+
+
+def get_user_image(user_id: int) -> str | None:
+    return get_entity_image(User, user_id, "profile")
 
 
 def find_active_users() -> list[User] | None:
@@ -49,56 +59,10 @@ def find_active_users() -> list[User] | None:
         session.close()
 
 
-def find_user_by_id(user_id: int) -> User | None:
-    session = db_session.create_session()
-    try:
-        return session.query(User).filter(User.id == user_id).first()
-    finally:
-        session.close()
-
-
 def find_active_user_by_id(user_id: int) -> User | None:
     session = db_session.create_session()
     try:
         return session.query(User).filter(User.active == True).filter(User.id == user_id).first()
-    finally:
-        session.close()
-
-
-def find_user_by_email(email: str) -> User | None:
-    session = db_session.create_session()
-    try:
-        return session.query(User).filter(User.email == email).first()
-    finally:
-        session.close()
-
-
-def get_all_images() -> dict | None:
-    session = db_session.create_session()
-    try:
-        images = dict()
-        users = session.query(User).order_by(User.name.asc()).all()
-
-        for user in users:
-            if user.image is not None and check_path("profile", user.image):
-                images[user.id] = web_path("profile", user.image)
-            else:
-                images[user.id] = dummy_path()
-
-        return images
-    finally:
-        session.close()
-
-
-def get_user_image(user_id: int) -> str | None:
-    session = db_session.create_session()
-    try:
-        user = session.query(User).filter(User.id == user_id).first()
-
-        if user.image is not None and check_path("profile", user.image):
-            return web_path("profile", user.image)
-        else:
-            return dummy_path()
     finally:
         session.close()
 
@@ -145,6 +109,10 @@ def edit_user(user_id: int, email: str = None, description: str = None, notifica
             return user
     finally:
         session.close()
+
+
+def set_user_image(user_id: int, image: str) -> User | None:
+    return set_entity_image(User, user_id, image, name_field='email')
 
 
 def change_user_password(user_id: int, password: str) -> User | None:
@@ -212,33 +180,6 @@ def reset_user(hash_value: str, password: str) -> User | None:
         session.close()
 
 
-def set_user_image(user_id: int, image: str) -> User | None:
-    session = db_session.create_session()
-    try:
-        user = session.query(User).filter(User.id == user_id).first()
-        if user:
-            user.image = image
-
-            session.commit()
-
-            print(f"INFO: Image changed for user {user.email}")
-
-            return user
-    finally:
-        session.close()
-
-
 # ----------- Delete functions -----------
 def delete_user(user_id: int) -> User | None:
-    session = db_session.create_session()
-    try:
-        user = session.query(User).filter(User.id == user_id).first()
-        if user:
-            session.query(User).filter(User.id == user_id).delete()
-            session.commit()
-
-            print(f"INFO: User {user.email} deleted")
-
-            return user
-    finally:
-        session.close()
+    return delete_entity(User, user_id, name_field='email')

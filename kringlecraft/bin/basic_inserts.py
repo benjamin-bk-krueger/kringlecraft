@@ -3,7 +3,6 @@ import sys
 
 import kringlecraft.data.db_session as db_session
 from kringlecraft.data.users import User
-# from kringlecraft.data.worlds import World
 from kringlecraft.utils.misc_tools import hash_text
 
 # Make it run more easily outside PyCharm
@@ -24,16 +23,8 @@ def insert_admin_user():
     u.role = 0
     u.notification = 0
 
-    # w = World()
-    # w.name = input('Name: ').strip()
-    # w.user_id = 1
-    # w.description = input('Description: ').strip()
-    # w.visible = 1
-    # w.archived = 0
-
     session = db_session.create_session()
     session.add(u)
-    # session.add(w)
     session.commit()
     session.close()
 

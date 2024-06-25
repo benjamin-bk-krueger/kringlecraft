@@ -34,7 +34,7 @@ def users():
 
     # (2) initialize form data
     all_users = user_services.find_all_users() if current_user.role == 0 else user_services.find_active_users()
-    user_images = user_services.get_all_images()
+    user_images = user_services.get_all_user_images()
 
     # (6a) show rendered page
     return flask.render_template('account/users.html', users=all_users, user_images=user_images)
@@ -96,7 +96,7 @@ def worlds():
     # (2) initialize form data
     world_form = WorldForm()
     all_worlds = world_services.find_all_worlds()
-    world_images = world_services.get_all_images()
+    world_images = world_services.get_all_world_images()
 
     # (6a) show rendered page
     return flask.render_template('data/worlds.html', world_form=world_form, worlds=all_worlds,
@@ -139,7 +139,7 @@ def worlds_post():
     world_form.set_field_defaults(conflicting_world is not None)
     world_form.process()
     all_worlds = world_services.find_all_worlds()
-    world_images = world_services.get_all_images()
+    world_images = world_services.get_all_world_images()
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/worlds.html', world_form=world_form, worlds=all_worlds,
@@ -252,7 +252,7 @@ def rooms(world_id):
         return flask.render_template('home/error.html', error_message="World does not exist.")
 
     all_rooms = room_services.find_world_rooms(my_world.id)
-    room_images = room_services.get_all_images()
+    room_images = room_services.get_all_room_images()
 
     # (6a) show rendered page
     return flask.render_template('data/rooms.html', room_form=room_form, rooms=all_rooms,
@@ -301,7 +301,7 @@ def rooms_post(world_id):
     room_form.set_field_defaults(conflicting_room is not None)
     room_form.process()
     all_rooms = room_services.find_world_rooms(my_world.id)
-    room_images = room_services.get_all_images()
+    room_images = room_services.get_room_choices()
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/rooms.html', room_form=room_form, rooms=all_rooms,

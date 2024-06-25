@@ -1,25 +1,39 @@
 import kringlecraft.data.db_session as db_session
+from typing import List, Dict, Tuple
 from kringlecraft.data.rooms import Room
-from kringlecraft.utils.file_tools import (file_hash, check_path, web_path, dummy_path, get_temp_file, file_ending,
-                                           rename_temp_file)
+from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, get_all_images,
+                                                  get_entity_image, delete_entity, get_entity_choices, set_entity_image,
+                                                  enable_entity_image)
 
 
 # ----------- Count functions -----------
 def get_room_count() -> int | None:
-    session = db_session.create_session()
-    try:
-        return session.query(Room).count()
-    finally:
-        session.close()
+    return get_count(Room)
 
 
 # ----------- Find functions -----------
 def find_all_rooms() -> list[Room] | None:
-    session = db_session.create_session()
-    try:
-        return session.query(Room).order_by(Room.name.asc()).all()
-    finally:
-        session.close()
+    return find_all(Room)
+
+
+def find_room_by_id(room_id: int) -> Room | None:
+    return find_by_id(Room, room_id)
+
+
+def find_room_by_name(name: str) -> Room | None:
+    return find_by_field(Room, 'name', name)
+
+
+def get_all_room_images() -> Dict[int, str] | None:
+    return get_all_images(Room, "room")
+
+
+def get_room_image(room_id: int) -> str | None:
+    return get_entity_image(Room, room_id, "room")
+
+
+def get_room_choices(rooms: List[Room]) -> List[Tuple[int, str]]:
+    return get_entity_choices(rooms)
 
 
 def find_world_rooms(world_id: int) -> list[Room] | None:
@@ -30,56 +44,10 @@ def find_world_rooms(world_id: int) -> list[Room] | None:
         session.close()
 
 
-def find_room_by_id(room_id: int) -> Room | None:
-    session = db_session.create_session()
-    try:
-        return session.query(Room).filter(Room.id == room_id).first()
-    finally:
-        session.close()
-
-
-def find_room_by_name(name: str) -> Room | None:
-    session = db_session.create_session()
-    try:
-        return session.query(Room).filter(Room.name == name).first()
-    finally:
-        session.close()
-
-
 def find_world_room_by_name(world_id: int, name: str) -> Room | None:
     session = db_session.create_session()
     try:
         return session.query(Room).filter(Room.world_id == world_id).filter(Room.name == name).first()
-    finally:
-        session.close()
-
-
-def get_all_images() -> dict | None:
-    session = db_session.create_session()
-    try:
-        images = dict()
-        rooms = session.query(Room).order_by(Room.name.asc()).all()
-
-        for room in rooms:
-            if room.image is not None and check_path("room", room.image):
-                images[room.id] = web_path("room", room.image)
-            else:
-                images[room.id] = dummy_path()
-
-        return images
-    finally:
-        session.close()
-
-
-def get_room_image(room_id: int) -> str | None:
-    session = db_session.create_session()
-    try:
-        room = session.query(Room).filter(Room.id == room_id).first()
-
-        if room.image is not None and check_path("room", room.image):
-            return web_path("room", room.image)
-        else:
-            return dummy_path()
     finally:
         session.close()
 
@@ -104,45 +72,11 @@ def edit_room(room_id: int, world_id: int, name: str = None, description: str = 
 
 
 def set_room_image(room_id: int, image: str) -> Room | None:
-    session = db_session.create_session()
-    try:
-        room = session.query(Room).filter(Room.id == room_id).first()
-        if room:
-            room.image = image
-
-            session.commit()
-
-            print(f"INFO: Image changed for room {room.name}")
-
-            return room
-    finally:
-        session.close()
+    return set_entity_image(Room, room_id, image)
 
 
 def enable_room_image(room_id: int) -> Room | None:
-    session = db_session.create_session()
-    try:
-        room = session.query(Room).filter(Room.id == room_id).first()
-        if room:
-            temp_file = get_temp_file("room")
-            if temp_file:
-                rename_temp_file("room", temp_file, file_hash(room.name), file_ending(temp_file))
-                room.image = file_hash(room.name) + "." + file_ending(temp_file)
-
-                session.commit()
-
-                print(f"INFO: Image changed for room {room.name}")
-
-                return room
-    finally:
-        session.close()
-
-
-def get_room_choices(rooms: list[Room]) -> list[tuple[int, str]]:
-    rooms_choices = list()
-    for room in rooms:
-        rooms_choices.append((room.id, room.name))
-    return rooms_choices
+    return enable_entity_image(Room, room_id, "room")
 
 
 # ----------- Create functions -----------
@@ -170,15 +104,4 @@ def create_room(name: str, description: str, world_id: int, user_id: int) -> Roo
 
 # ----------- Delete functions -----------
 def delete_room(room_id: int) -> Room | None:
-    session = db_session.create_session()
-    try:
-        room = session.query(Room).filter(Room.id == room_id).first()
-        if room:
-            session.query(Room).filter(Room.id == room_id).delete()
-            session.commit()
-
-            print(f"INFO: Room {room.name} deleted")
-
-            return room
-    finally:
-        session.close()
+    return delete_entity(Room, room_id)

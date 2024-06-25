@@ -1,78 +1,39 @@
 import kringlecraft.data.db_session as db_session
+from typing import List, Dict, Tuple
 from kringlecraft.data.worlds import World
-from kringlecraft.utils.file_tools import (file_hash, check_path, web_path, dummy_path, get_temp_file, file_ending,
-                                           rename_temp_file)
+from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, get_all_images,
+                                                  get_entity_image, delete_entity, get_entity_choices, set_entity_image,
+                                                  enable_entity_image)
 
 
 # ----------- Count functions -----------
 def get_world_count() -> int | None:
-    session = db_session.create_session()
-    try:
-        return session.query(World).count()
-    finally:
-        session.close()
+    return get_count(World)
 
 
 # ----------- Find functions -----------
 def find_all_worlds() -> list[World] | None:
-    session = db_session.create_session()
-    try:
-        return session.query(World).order_by(World.name.asc()).all()
-    finally:
-        session.close()
+    return find_all(World)
 
 
 def find_world_by_id(world_id: int) -> World | None:
-    session = db_session.create_session()
-    try:
-        return session.query(World).filter(World.id == world_id).first()
-    finally:
-        session.close()
+    return find_by_id(World, world_id)
 
 
 def find_world_by_name(name: str) -> World | None:
-    session = db_session.create_session()
-    try:
-        return session.query(World).filter(World.name == name).first()
-    finally:
-        session.close()
+    return find_by_field(World, 'name', name)
 
 
-def get_all_images() -> dict | None:
-    session = db_session.create_session()
-    try:
-        images = dict()
-        worlds = session.query(World).order_by(World.name.asc()).all()
-
-        for world in worlds:
-            if world.image is not None and check_path("world", world.image):
-                images[world.id] = web_path("world", world.image)
-            else:
-                images[world.id] = dummy_path()
-
-        return images
-    finally:
-        session.close()
+def get_all_world_images() -> Dict[int, str] | None:
+    return get_all_images(World, "world")
 
 
 def get_world_image(world_id: int) -> str | None:
-    session = db_session.create_session()
-    try:
-        world = session.query(World).filter(World.id == world_id).first()
-
-        if world.image is not None and check_path("world", world.image):
-            return web_path("world", world.image)
-        else:
-            return dummy_path()
-    finally:
-        session.close()
+    return get_entity_image(World, world_id, "world")
 
 
-def get_world_choices(worlds: list[World]) -> list[tuple[int, str]]:
-    worlds_choices = list()
-    for world in worlds:
-        worlds_choices.append((world.id, world.name))
-    return worlds_choices
+def get_world_choices(worlds: List[World]) -> List[Tuple[int, str]]:
+    return get_entity_choices(worlds)
 
 
 # ----------- Edit functions -----------
@@ -97,38 +58,11 @@ def edit_world(world_id: int, name: str = None, description: str = None, url: st
 
 
 def set_world_image(world_id: int, image: str) -> World | None:
-    session = db_session.create_session()
-    try:
-        world = session.query(World).filter(World.id == world_id).first()
-        if world:
-            world.image = image
-
-            session.commit()
-
-            print(f"INFO: Image changed for world {world.email}")
-
-            return world
-    finally:
-        session.close()
+    return set_entity_image(World, world_id, image)
 
 
 def enable_world_image(world_id: int) -> World | None:
-    session = db_session.create_session()
-    try:
-        world = session.query(World).filter(World.id == world_id).first()
-        if world:
-            temp_file = get_temp_file("world")
-            if temp_file:
-                rename_temp_file("world", temp_file, file_hash(world.name), file_ending(temp_file))
-                world.image = file_hash(world.name) + "." + file_ending(temp_file)
-
-                session.commit()
-
-                print(f"INFO: Image changed for world {world.name}")
-
-                return world
-    finally:
-        session.close()
+    return enable_entity_image(World, world_id, "world")
 
 
 # ----------- Create functions -----------
@@ -158,15 +92,4 @@ def create_world(name: str, description: str, url: str, visible: bool, archived:
 
 # ----------- Delete functions -----------
 def delete_world(world_id: int) -> World | None:
-    session = db_session.create_session()
-    try:
-        world = session.query(World).filter(World.id == world_id).first()
-        if world:
-            session.query(World).filter(World.id == world_id).delete()
-            session.commit()
-
-            print(f"INFO: World {world.name} deleted")
-
-            return world
-    finally:
-        session.close()
+    return delete_entity(World, world_id)
