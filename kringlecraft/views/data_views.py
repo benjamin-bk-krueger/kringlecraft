@@ -438,7 +438,66 @@ def objectives(room_id):
     objective_images = objective_services.get_all_objective_images()
     my_world = world_services.find_world_by_id(my_room.world_id)
 
+    objective_form.type.choices = objective_services.get_objective_type_choices()
+    objective_form.process()
+
     # (6a) show rendered page
     return flask.render_template('data/objectives.html', objective_form=objective_form,
                                  objectives=all_objectives, objective_images=objective_images, room=my_room,
-                                 world=my_world, page_mode="init")
+                                 world=my_world, page_mode="init", objective_types=objective_services.get_objective_types())
+
+
+# Post a new objective - if it doesn't already exist
+@blueprint.route('/objectives/<int:room_id>', methods=['POST'])
+@login_required
+def objectives_post(room_id):
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.data_forms import ObjectiveForm
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.room_services as room_services
+    import kringlecraft.services.objective_services as objective_services
+
+    if current_user.role != 0:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="You are not authorized to create objectives.")
+
+    # (2) initialize form data
+    objective_form = ObjectiveForm()
+    my_room = room_services.find_room_by_id(room_id)
+
+    if not my_room:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Room does not exist.")
+
+    conflicting_objective = objective_services.find_room_objective_by_name(my_room.id, objective_form.name_content)
+    temp_ending = None if get_temp_file("objective") is None else (file_ending(get_temp_file("objective")))
+
+    # (3) check valid form data
+    if objective_form.validate_on_submit() and conflicting_objective is None:
+        # (4a) perform operations
+        my_objective = objective_services.create_objective(objective_form.name_content, objective_form.description_content,
+                                                           objective_form.difficulty_content, objective_form.visible_content,
+                                                           objective_form.type_content, my_room.id, current_user.id)
+        objective_services.enable_objective_image(my_objective.id)
+
+        if not my_objective:
+            # (6e) show dedicated error page
+            return flask.render_template('home/error.html', error_message="Objective could not be created.")
+
+        # (6b) redirect to new page after successful operation
+        return flask.redirect(flask.url_for('data.objectives', room_id=my_room.id))
+
+    # (5) preset form with existing data
+    objective_form.set_field_defaults(conflicting_objective is not None)
+    objective_form.process()
+    all_objectives = objective_services.find_room_objectives(my_room.id)
+    objective_images = objective_services.get_all_objective_images()
+    my_world = world_services.find_world_by_id(my_room.world_id)
+
+    objective_form.type.choices = objective_services.get_objective_type_choices()
+    objective_form.type.default = objective_form.type_content
+    objective_form.process()
+
+    # (6c) show rendered page with possible error messages
+    return flask.render_template('data/objectives.html', objective_form=objective_form, objectives=all_objectives,
+                                 objective_images=objective_images, room=my_room, world=my_world, page_mode="add", objective_types=objective_services.get_objective_types(), temp_ending=temp_ending)

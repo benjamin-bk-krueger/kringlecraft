@@ -45,7 +45,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                       <form action="#" method="POST" id="form_new">
+                        {# Upload and view profile image #}
+                        {{ dropzone.create(action='storage.objective_image_post', objective_id=0, objective_hash="_temp") }}
+
+                        <form action="#" method="POST" id="form_new">
                             {{ objective_form.csrf_token }}
                             <div class="form-group mt-2 mb-2">
                                 <label for="{{ objective_form.name.name }}">{{ objective_form.name.label }}</label>
@@ -68,6 +71,10 @@
                             {% for error in objective_form.difficulty.errors %}
                                 <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
                             {% endfor %}
+                            <div class="form-group mt-2 mb-2">
+                                <label for="{{ objective_form.type.name }}">{{ objective_form.type.label }}</label>
+                                {{ objective_form.type(class="form-select") }}
+                            </div>
                             <div class="form-check mt-2 mb-2">
                                 <label class="form-check-label" for="visible">{{ objective_form.visible.label }}</label>
                                 {{ objective_form.visible(class="form-check-input") }}
@@ -75,10 +82,6 @@
                             {% for error in objective_form.visible.errors %}
                                 <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
                             {% endfor %}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ objective_form.type.name }}">{{ objective_form.type.label }}</label>
-                                {{ objective_form.type(class="form-select") }}
-                            </div>
                        </form>
                     </div>
                     <div class="modal-footer">
@@ -127,7 +130,7 @@
                                 <a href="#">
                                     <img src="{{ url_for('static', filename=objective_images[objective.id]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ objective.name }}">
                                 </a>
-                                <figcaption class="figure-caption">TBD {{ objective.name }}</figcaption>
+                                <figcaption class="figure-caption">{{ objective_types[objective.type] }} {{ objective.name }}</figcaption>
                             </figure>
                         </div>
                     {% endfor %}

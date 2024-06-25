@@ -52,6 +52,22 @@ def find_room_objective_by_name(room_id: int, name: str) -> Objective | None:
         session.close()
 
 
+def get_objective_type_choices() -> list[tuple[int, str]]:
+    objective_reverse = {1: "objective", 2: "character", 3: "item"}
+    objective_type_choices = list()
+    for key, value in objective_reverse.items():
+        objective_type_choices.append((key, value.title()))
+    return objective_type_choices
+
+
+def get_objective_types() -> dict[int, str]:
+    objective_reverse = {1: "objective", 2: "character", 3: "item"}
+    objective_type_choices = dict()
+    for key, value in objective_reverse.items():
+        objective_type_choices[key] = value.title()
+    return objective_type_choices
+
+
 # ----------- Edit functions -----------
 def edit_objective(objective_id: int, room_id: int, name: str = None, description: str = None, difficulty: int = 1,
                    visible: bool = False, type: int = 1) -> Objective | None:
