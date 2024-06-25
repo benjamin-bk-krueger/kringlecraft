@@ -76,7 +76,8 @@ def get_entity_choices(entities: List[T], id_field: str = 'id', name_field: str 
 
 
 # ----------- Edit functions -----------
-def set_entity_image(model: Type[T], entity_id: int, image: str, id_field: str = 'id', name_field: str = 'name') -> T | None:
+def set_entity_image(model: Type[T], entity_id: int, image: str, id_field: str = 'id',
+                     name_field: str = 'name') -> T | None:
     session = db_session.create_session()
     try:
         entity = session.query(model).filter(getattr(model, id_field) == entity_id).first()
@@ -92,7 +93,8 @@ def set_entity_image(model: Type[T], entity_id: int, image: str, id_field: str =
         session.close()
 
 
-def enable_entity_image(model: Type[T], entity_id: int, entity_type: str, id_field: str = 'id', name_field: str = 'name') -> T | None:
+def enable_entity_image(model: Type[T], entity_id: int, entity_type: str, id_field: str = 'id',
+                        name_field: str = 'name') -> T | None:
     session = db_session.create_session()
     try:
         entity = session.query(model).filter(getattr(model, id_field) == entity_id).first()

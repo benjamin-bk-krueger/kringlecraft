@@ -37,7 +37,8 @@ def get_world_choices(worlds: List[World]) -> List[Tuple[int, str]]:
 
 
 # ----------- Edit functions -----------
-def edit_world(world_id: int, name: str = None, description: str = None, url: str = None, visible: bool = None, archived: bool = None) -> World | None:
+def edit_world(world_id: int, name: str = None, description: str = None, url: str = None, visible: bool = None,
+               archived: bool = None) -> World | None:
     session = db_session.create_session()
     try:
         world = session.query(World).filter(World.id == world_id).first()

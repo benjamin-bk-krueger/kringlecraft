@@ -3,6 +3,7 @@ import hashlib
 import os
 import shutil
 
+
 def file_hash(filename: str) -> str:
     return hashlib.md5(filename.encode('utf-8')).hexdigest()
 

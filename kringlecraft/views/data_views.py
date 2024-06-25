@@ -193,7 +193,9 @@ def world_post(world_id):
     # (3) check valid form data
     if world_form.validate_on_submit() and (my_world.name == world_form.name_content or conflicting_world is None):
         # (4a) perform operations
-        my_world = world_services.edit_world(world_id, world_form.name_content, world_form.description_content, world_form.url_content, world_form.visible_content, world_form.archived_content)
+        my_world = world_services.edit_world(world_id, world_form.name_content, world_form.description_content,
+                                             world_form.url_content, world_form.visible_content,
+                                             world_form.archived_content)
         world_services.enable_world_image(my_world.id)
 
         if not my_world:
@@ -301,7 +303,7 @@ def rooms_post(world_id):
     room_form.set_field_defaults(conflicting_room is not None)
     room_form.process()
     all_rooms = room_services.find_world_rooms(my_world.id)
-    room_images = room_services.get_room_choices()
+    room_images = room_services.get_all_room_images()
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/rooms.html', room_form=room_form, rooms=all_rooms,
@@ -360,9 +362,11 @@ def room_post(room_id):
     temp_ending = None if get_temp_file("room") is None else (file_ending(get_temp_file("room")))
 
     # (3) check valid form data
-    if room_form.validate_on_submit() and (conflicting_room is None or my_room.world_id == conflicting_room.world_id and my_room.name == room_form.name_content):
+    if room_form.validate_on_submit() and (conflicting_room is None or my_room.world_id == conflicting_room.world_id and
+                                           my_room.name == room_form.name_content):
         # (4a) perform operations
-        my_room = room_services.edit_room(room_id, room_form.world_content, room_form.name_content, room_form.description_content)
+        my_room = room_services.edit_room(room_id, room_form.world_content, room_form.name_content,
+                                          room_form.description_content)
         room_services.enable_room_image(my_room.id)
 
         if not my_room:
@@ -373,7 +377,8 @@ def room_post(room_id):
         return flask.redirect(flask.url_for('data.room', room_id=my_room.id))
 
     # (5) preset form with existing data
-    room_form.set_field_defaults(conflicting_room is not None and ((my_room.name != room_form.name_content) or (my_room.world_id != conflicting_room.world_id)))
+    room_form.set_field_defaults(conflicting_room is not None and ((my_room.name != room_form.name_content) or
+                                                                   (my_room.world_id != conflicting_room.world_id)))
     room_form.process()
     room_image = room_services.get_room_image(room_id)
     my_world = world_services.find_world_by_id(my_room.world_id)

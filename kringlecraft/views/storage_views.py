@@ -1,4 +1,3 @@
-import os
 import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
