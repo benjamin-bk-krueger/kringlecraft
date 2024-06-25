@@ -1,11 +1,12 @@
 from flask_wtf import FlaskForm  # integration with WTForms, data validation and CSRF protection
-from wtforms import (StringField, TextAreaField, BooleanField, SelectField)
-from wtforms.validators import (InputRequired, Length, URL)
+from wtforms import (StringField, TextAreaField, BooleanField, SelectField, IntegerRangeField)
+from wtforms.validators import (InputRequired, Length, URL, NumberRange)
 from markupsafe import escape  # to safely escape form data
 
 from kringlecraft.viewmodels.__validators import (space_ascii_validator, full_ascii_validator)
 from kringlecraft.data.worlds import World
 from kringlecraft.data.rooms import Room
+from kringlecraft.data.objectives import Objective
 
 # Every form used both in the Flask/Jinja templates as well the main Python app is defined here.
 # Not all fields have full validators as they are used in modal windows.
@@ -91,3 +92,56 @@ class RoomForm(FlaskForm):
             self.name.errors.append(FILE_ALT_WARNING)
         self.description.default = self.description_content
         self.world.default = self.world_content
+
+
+class ObjectiveForm(FlaskForm):
+    name = StringField('Name', validators=[InputRequired(), Length(max=100), space_ascii_validator])
+    description = TextAreaField('Description', validators=[Length(max=1024), full_ascii_validator])
+    difficulty = IntegerRangeField('Difficulty', validators=[NumberRange(min=0, max=6)])
+    visible = BooleanField('Visible', default=True)
+    type = SelectField('Type', choices=[(1, "none")], validate_choice=False)
+    room = SelectField('Select Room', choices=[(1, "none")], validate_choice=False)
+
+    @property
+    def name_content(self):
+        return str(escape(self.name.data))
+
+    @property
+    def description_content(self):
+        return str(escape(self.description.data))
+
+    @property
+    def difficulty_content(self):
+        return int(self.difficulty.data)
+
+    @property
+    def visible_content(self):
+        return bool(self.visible.data)
+
+    @property
+    def type_content(self):
+        return int(self.type.data)
+
+    @property
+    def room_content(self):
+        return str(escape(self.room.data))
+
+    def __init__(self, objective: Objective = None):
+        super().__init__()
+        if objective is not None:
+            self.name.default = objective.name
+            self.description.default = objective.description
+            self.difficulty.default = objective.difficulty
+            self.visible.default = objective.visible
+            self.type.default = objective.type
+
+    def set_field_defaults(self, rename: bool = False):
+        self.name.default = self.name_content
+        if rename:
+            self.name.default = self.name_content + FILE_ALT_ENDING
+            self.name.errors.append(FILE_ALT_WARNING)
+        self.description.default = self.description_content
+        self.difficulty.default = self.difficulty.data
+        self.visible.default = self.visible.data
+        self.type.default = self.type.data
+        self.room.default = self.room_content

@@ -11,3 +11,6 @@ import kringlecraft.data.worlds
 
 # noinspection PyUnresolvedReferences
 import kringlecraft.data.rooms
+
+# noinspection PyUnresolvedReferences
+import kringlecraft.data.objectives

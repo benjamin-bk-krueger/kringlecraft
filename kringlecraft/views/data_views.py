@@ -415,3 +415,30 @@ def room_delete(room_id):
 
     # (6b) redirect to new page after successful operation
     return flask.redirect(flask.url_for('data.rooms', world_id=my_world.id))
+
+
+# Displays all available objectives
+@blueprint.route('/objectives/<int:room_id>', methods=['GET'])
+def objectives(room_id):
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.data_forms import ObjectiveForm
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.room_services as room_services
+    import kringlecraft.services.objective_services as objective_services
+
+    # (2) initialize form data
+    objective_form = ObjectiveForm()
+    my_room = room_services.find_room_by_id(room_id)
+
+    if not my_room:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Room does not exist.")
+
+    all_objectives = objective_services.find_room_objectives(my_room.id)
+    objective_images = objective_services.get_all_objective_images()
+    my_world = world_services.find_world_by_id(my_room.world_id)
+
+    # (6a) show rendered page
+    return flask.render_template('data/objectives.html', objective_form=objective_form,
+                                 objectives=all_objectives, objective_images=objective_images, room=my_room,
+                                 world=my_world, page_mode="init")

@@ -48,7 +48,7 @@
                         {# Upload and view profile image #}
                         {{ dropzone.create(action='storage.room_image_post', room_id=0, room_hash="_temp") }}
 
-                        <form action="#" method="POST" id="form_new">
+                        <form action="{{ url_for('data.rooms_post', world_id=world.id)}}" method="POST" id="form_new">
                             {{ room_form.csrf_token }}
                             <div class="form-group mt-2 mb-2">
                                 <label for="{{ room_form.name.name }}">{{ room_form.name.label }}</label>
@@ -108,7 +108,7 @@
                 {% for room in rooms %}
                     <div class="col-sm">
                         <figure class="figure">
-                            <a href="#">
+                            <a href="{{ url_for('data.objectives', room_id=room.id) }}">
                                 <img src="{{ url_for('static', filename=room_images[room.id]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ room.name }}">
                             </a>
                             <figcaption class="figure-caption c-title">{{ room.name }} <a href="{{ url_for('data.room', room_id=room.id ) }}"><i class="bi bi-pencil-square"></i></a></figcaption>
