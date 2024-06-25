@@ -501,3 +501,122 @@ def objectives_post(room_id):
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/objectives.html', objective_form=objective_form, objectives=all_objectives,
                                  objective_images=objective_images, room=my_room, world=my_world, page_mode="add", objective_types=objective_services.get_objective_types(), temp_ending=temp_ending)
+
+
+# Shows information about a specific objective
+@blueprint.route('/objective/<int:objective_id>', methods=['GET'])
+def objective(objective_id):
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.data_forms import ObjectiveForm
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.room_services as room_services
+    import kringlecraft.services.objective_services as objective_services
+
+    # (2) initialize form data
+    my_objective = objective_services.find_objective_by_id(objective_id)
+    if not objective:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Objective does not exist.")
+
+    objective_image = objective_services.get_objective_image(objective_id)
+    objective_form = ObjectiveForm(my_objective)
+    objective_form.process()
+    my_room = room_services.find_room_by_id(my_objective.room_id)
+    my_world = world_services.find_world_by_id(my_room.world_id)
+
+    objective_form.type.choices = objective_services.get_objective_type_choices()
+    objective_form.type.default = objective_form.type_content
+
+    objective_form.room.choices = room_services.get_room_choices(room_services.find_all_rooms())
+    objective_form.room.default = my_objective.room_id
+    objective_form.process()
+
+    # (6a) show rendered page
+    return flask.render_template('data/objective.html', objective_form=objective_form, objective=my_objective,
+                                 objective_image=objective_image, room=my_room, world=my_world, page_mode="init", objective_types=objective_services.get_objective_types())
+
+
+# Post a change in an objective's data
+@blueprint.route('/objective_post/<int:objective_id>', methods=['POST'])
+@login_required
+def objective_post(objective_id):
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.data_forms import ObjectiveForm
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.room_services as room_services
+    import kringlecraft.services.objective_services as objective_services
+
+    if current_user.role != 0:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="You are not authorized to edit objectives.")
+
+    # (2) initialize form data
+    objective_form = ObjectiveForm()
+    my_objective = objective_services.find_objective_by_id(objective_id)
+    if not my_objective:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Objective does not exist.")
+
+    conflicting_objective = objective_services.find_room_objective_by_name(objective_form.room_content, objective_form.name_content)
+    temp_ending = None if get_temp_file("objective") is None else (file_ending(get_temp_file("objective")))
+
+    # (3) check valid form data
+    if objective_form.validate_on_submit() and (conflicting_objective is None or my_objective.room_id == conflicting_objective.room_id and
+                                           my_objective.name == objective_form.name_content):
+        # (4a) perform operations
+        my_objective = objective_services.edit_objective(objective_id, objective_form.room_content, objective_form.name_content,
+                                          objective_form.description_content, objective_form.difficulty_content,
+                                          objective_form.visible_content, objective_form.type_content)
+        objective_services.enable_objective_image(my_objective.id)
+
+        if not my_objective:
+            # (6e) show dedicated error page
+            return flask.render_template('home/error.html', error_message="Objective could not be edited.")
+
+        # (6b) redirect to new page after successful operation
+        return flask.redirect(flask.url_for('data.objective', objective_id=my_objective.id))
+
+    # (5) preset form with existing data
+    objective_form.set_field_defaults(conflicting_objective is not None and ((my_objective.name != objective_form.name_content) or
+                                                                   (my_objective.room_id != conflicting_objective.room_id)))
+    objective_form.process()
+    objective_image = objective_services.get_objective_image(objective_id)
+    my_room = room_services.find_room_by_id(my_objective.room_id)
+    my_world = world_services.find_world_by_id(my_room.world_id)
+
+    objective_form.type.choices = objective_services.get_objective_type_choices()
+    objective_form.type.default = objective_form.type_content
+
+    objective_form.room.choices = room_services.get_room_choices(room_services.find_all_rooms())
+    objective_form.room.default = objective_form.room_content
+    objective_form.process()
+
+    # (6c) show rendered page with possible error messages
+    return flask.render_template('data/objective.html', objective_form=objective_form, objective=my_objective,
+                                 objective_image=objective_image, page_mode="edit", room=my_room, world=my_world, objective_types=objective_services.get_objective_types(), temp_ending=temp_ending)
+
+
+# Delete a specific objective - and all included elements!!!
+@blueprint.route('/objective/delete/<int:objective_id>', methods=['GET'])
+@login_required
+def objective_delete(objective_id):
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.data_forms import ObjectiveForm
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.room_services as room_services
+    import kringlecraft.services.objective_services as objective_services
+
+    if current_user.role != 0:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="You are not authorized to delete objctives.")
+
+    # (2) initialize form data
+    my_objective = objective_services.delete_objective(objective_id)
+    if not my_objective:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Objective does not exist.")
+
+    my_room = room_services.find_room_by_id(my_objective.room_id)
+
+    # (6b) redirect to new page after successful operation
+    return flask.redirect(flask.url_for('data.objectives', room_id=my_room.id))
