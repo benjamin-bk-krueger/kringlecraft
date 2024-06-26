@@ -95,6 +95,7 @@ def worlds():
 
     # (2) initialize form data
     world_form = WorldForm()
+    world_form.process()
     all_worlds = world_services.find_all_worlds()
     world_images = world_services.get_all_world_images()
 
@@ -227,7 +228,7 @@ def world_delete(world_id):
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to delete worlds.")
 
-    # (2) initialize form data
+    # (4a) perform operations
     my_world = world_services.delete_world(world_id)
     if not my_world:
         # (6e) show dedicated error page
@@ -247,6 +248,7 @@ def rooms(world_id):
 
     # (2) initialize form data
     room_form = RoomForm()
+    room_form.process()
     my_world = world_services.find_world_by_id(world_id)
 
     if not my_world:
@@ -405,7 +407,7 @@ def room_delete(room_id):
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to delete rooms.")
 
-    # (2) initialize form data
+    # (4a) perform operations
     my_room = room_services.delete_room(room_id)
     if not my_room:
         # (6e) show dedicated error page
@@ -428,6 +430,7 @@ def objectives(room_id):
 
     # (2) initialize form data
     objective_form = ObjectiveForm()
+    objective_form.process()
     my_room = room_services.find_room_by_id(room_id)
 
     if not my_room:
@@ -610,7 +613,7 @@ def objective_delete(objective_id):
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to delete objctives.")
 
-    # (2) initialize form data
+    # (4a) perform operations
     my_objective = objective_services.delete_objective(objective_id)
     if not my_objective:
         # (6e) show dedicated error page
