@@ -67,7 +67,7 @@
                     </div>
                     <div class="modal-body">
                         {# Upload and view profile image #}
-                        {{ dropzone.create(action='storage.world_image_post', world_id=0, world_hash="_temp") }}
+                        {{ dropzone.create(action='storage.prepare_image_post', category="world") }}
 
                         <form action="{{ url_for('data.world_post', world_id=world.id) }}" method="POST" id="form_edit">
                             {{ world_form.csrf_token }}

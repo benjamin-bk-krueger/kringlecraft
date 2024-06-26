@@ -44,76 +44,16 @@ def profile_image_post(user_hash):
     return "Uploaded successfully"
 
 
-@blueprint.route('/world/image/<int:world_id>/<string:world_hash>', methods=['POST'])
+@blueprint.route('/prepare/image/<string:category>', methods=['POST'])
 @login_required
-def world_image_post(world_id, world_hash):
-    # (1) import forms and utilities
-    import kringlecraft.services.world_services as world_services
-
+def prepare_image_post(category):
     # (2) initialize form data
-    delete_temp_files("world")
-    f = flask.request.files.get('file')
-    f.save(build_path("world", world_hash, file_ending(f.filename)))
+    if category not in ("world", "room", "objective"):
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Category does not exist.")
 
     # (4a) perform operations
-    if world_id == 0:
-        return "Uploaded successfully (temp file)"
-
-    world = world_services.set_world_image(world_id, world_hash + "." + file_ending(f.filename))
-
-    if not world:
-        # (6e) show dedicated error page
-        return flask.render_template('home/error.html', error_message="World does not exist.")
-
-    # (6f) other result
-    return "Uploaded successfully"
-
-
-@blueprint.route('/room/image/<int:room_id>/<string:room_hash>', methods=['POST'])
-@login_required
-def room_image_post(room_id, room_hash):
-    # (1) import forms and utilities
-    import kringlecraft.services.room_services as room_services
-
-    # (2) initialize form data
-    delete_temp_files("room")
+    delete_temp_files(category)
     f = flask.request.files.get('file')
-    f.save(build_path("room", room_hash, file_ending(f.filename)))
-
-    # (4a) perform operations
-    if room_id == 0:
-        return "Uploaded successfully (temp file)"
-
-    room = room_services.set_room_image(room_id, room_hash + "." + file_ending(f.filename))
-
-    if not room:
-        # (6e) show dedicated error page
-        return flask.render_template('home/error.html', error_message="Room does not exist.")
-
-    # (6f) other result
-    return "Uploaded successfully"
-
-
-@blueprint.route('/objective/image/<int:objective_id>/<string:objective_hash>', methods=['POST'])
-@login_required
-def objective_image_post(objective_id, objective_hash):
-    # (1) import forms and utilities
-    import kringlecraft.services.objective_services as objective_services
-
-    # (2) initialize form data
-    delete_temp_files("objective")
-    f = flask.request.files.get('file')
-    f.save(build_path("objective", objective_hash, file_ending(f.filename)))
-
-    # (4a) perform operations
-    if objective_id == 0:
-        return "Uploaded successfully (temp file)"
-
-    objective = objective_services.set_objective_image(objective_id, objective_hash + "." + file_ending(f.filename))
-
-    if not objective:
-        # (6e) show dedicated error page
-        return flask.render_template('home/error.html', error_message="Objective does not exist.")
-
-    # (6f) other result
-    return "Uploaded successfully"
+    f.save(build_path(category, "_temp", file_ending(f.filename)))
+    return "Uploaded successfully (temp file)"
