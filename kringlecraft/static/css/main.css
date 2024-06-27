@@ -181,3 +181,15 @@ table .w-30 { width:30%; }
     font-size:25px;
     right: 20px;
 }
+
+.image-item {
+    width: 200px;
+    height: 200px;
+    flex: 0 0 auto;
+}
+
+.image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

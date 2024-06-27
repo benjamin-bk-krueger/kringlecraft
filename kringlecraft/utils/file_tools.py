@@ -28,6 +28,10 @@ def file_ending(filename: str) -> str:
     return os.path.splitext(filename)[1][1:]
 
 
+def file_name_without_extension(filename: str) -> str:
+    return os.path.splitext(filename)[0]
+
+
 def get_temp_file(category: str) -> str | None:
     temp_files = glob.glob(os.path.join(f'static/uploads/{category}/', "_temp.*"))
     if temp_files:
@@ -46,3 +50,10 @@ def delete_temp_files(category: str):
 
 def rename_temp_file(category: str, temp_file: str, hash_value: str, ending: str):
     shutil.move(temp_file, os.path.join(f'static/uploads/{category}/', hash_value + "." + ending))
+
+
+def get_image_files(category: str) -> list | None:
+    image_files = glob.glob(os.path.join('static', 'uploads', category, "*.*"))
+    if image_files:
+        # Convert backslashes to forward slashes and ensure the path starts with 'static'
+        return ['/'.join(path.split(os.sep)[1:]) for path in image_files]
