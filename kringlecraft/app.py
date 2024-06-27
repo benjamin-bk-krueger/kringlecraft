@@ -46,12 +46,13 @@ def configure_logging():
 
 
 def register_blueprints():
-    from kringlecraft.views import (home_views, account_views, storage_views, data_views)
+    from kringlecraft.views import (home_views, account_views, storage_views, data_views, task_views)
 
     app.register_blueprint(home_views.blueprint)
     app.register_blueprint(account_views.blueprint)
     app.register_blueprint(storage_views.blueprint)
     app.register_blueprint(data_views.blueprint)
+    app.register_blueprint(task_views.blueprint)
 
 
 def setup_db():

@@ -517,7 +517,7 @@ def objective(objective_id):
 
     # (2) initialize form data
     my_objective = objective_services.find_objective_by_id(objective_id)
-    if not objective:
+    if not my_objective:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="Objective does not exist.")
 
