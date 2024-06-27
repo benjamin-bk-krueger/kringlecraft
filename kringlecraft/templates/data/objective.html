@@ -170,4 +170,10 @@
         {# Show fullscreen wallpaper #}
         <img src="{{ url_for('static', filename=objective_image) }}" class="img-fluid rounded img-restricted-lg" alt="Objective Image">
     </div>
+
+    <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
+        {#  Display challenge of the selected objective - the markdown has been converted to HTML #}
+        <div class="fs-3 c-title">Challenge</div>
+        {{ md_challenge|safe }}
+    </div>
 {% endblock %}

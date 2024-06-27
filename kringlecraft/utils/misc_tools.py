@@ -1,5 +1,7 @@
 import random  # for captcha random numbers
 import string
+import markdown2  # for markdown parsing
+import pygments  # for syntax highlighting
 
 from passlib.handlers.sha2_crypt import sha512_crypt as crypto
 
@@ -21,3 +23,9 @@ def hash_text(text: str) -> str:
 
 def verify_hash(hashed_text: str, plain_text: str) -> bool:
     return crypto.verify(plain_text, hashed_text)
+
+
+def get_markdown(challenge):
+    md = markdown2.markdown(str(bytes(challenge), 'utf-8'), extras=['fenced-code-blocks', 'code-friendly', 'pygments'])
+    md.replace("<img src=", "<img class=\"img-fluid\" src=")
+    return md

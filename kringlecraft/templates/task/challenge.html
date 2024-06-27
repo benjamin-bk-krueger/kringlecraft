@@ -3,6 +3,16 @@
 
 {% block title %}Challenge Editor for {{ objective.name }}{% endblock %}
 
+{% block additional_css %}
+    <!-- EasyMDE - Markdown Editor -->
+    <!-- https://easy-markdown-editor.tk -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+{% endblock %}
+
+{% block additional_js %}
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+{% endblock %}
+
 {% block content %}
     <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
         {# Show breadcrumb navigation #}
@@ -21,12 +31,30 @@
             <div class="underline"><span><i class="bi bi-clipboard-data" aria-hidden="true"></i></span></div>
         </div>
 
-        {# Display Markdown editor form - edit an objective's quest #}
-        TBD
+        {# Display Markdown editor form - edit an objective's challenge #}
+        <form action="{{ url_for('task.challenge_post', objective_id=objective.id)}}" id="challenge_form" method="POST">
+            {{ objective_form.csrf_token }}
+            <div class="mb-3">
+                <label for="challenge">Edit Content:</label>
+                <textarea name="challenge" rows="10" id="challenge" class="form-control">{{ challenge }}</textarea>
+            </div>
+            <script>
+                const easyMDE = new EasyMDE({
+                    element: document.getElementById('challenge'),
+                    toolbar: [
+                        'bold', 'italic', 'heading', 'heading-smaller', 'heading-bigger', '|',
+                        'code', 'quote', 'unordered-list', 'ordered-list', '|',
+                        'horizontal-rule', 'link', 'image', '|',
+                        'preview', 'side-by-side', 'fullscreen', '|',
+                        'guide'
+                    ]
+                });
+            </script>
+        </form>
 
         {# Display simple buttons - submit or cancel form editing #}
         <div class="btn-toolbar" role="toolbar" aria-label="Challenge Actions">
-            <button type="submit" form="challenge" class="btn btn-primary mt-4 mb-4 btn-space"><i class="bi bi-check"></i> Submit</button>
+            <button type="submit" form="challenge_form" class="btn btn-primary mt-4 mb-4 btn-space"><i class="bi bi-check"></i> Submit</button>
 
             <form action="{{ url_for('data.objective', objective_id=objective.id)}}">
                 <button type="submit" class="btn btn-secondary mt-4 mb-4 btn-space"><i class="bi bi-x"></i> Cancel</button>

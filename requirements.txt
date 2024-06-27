@@ -11,3 +11,5 @@ flask_dropzone
 MarkupSafe
 email-validator
 mkdocs
+markdown2
+pygments

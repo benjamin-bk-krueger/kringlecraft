@@ -68,6 +68,15 @@ def get_objective_types() -> dict[int, str]:
     return objective_type_choices
 
 
+def get_objective_challenge(objective_id: int) -> str | None:
+    session = db_session.create_session()
+    try:
+        objective = session.query(Objective).filter(Objective.id == objective_id).first()
+        return "New challenge" if objective.challenge is None else str(bytes(objective.challenge), 'utf-8')
+    finally:
+        session.close()
+
+
 # ----------- Edit functions -----------
 def edit_objective(objective_id: int, room_id: int, name: str = None, description: str = None, difficulty: int = 1,
                    visible: bool = False, type: int = 1) -> Objective | None:
@@ -97,6 +106,21 @@ def set_objective_image(objective_id: int, image: str) -> Objective | None:
 
 def enable_objective_image(objective_id: int) -> Objective | None:
     return enable_entity_image(Objective, objective_id, "objective")
+
+
+def set_objective_challenge(objective_id: int, challenge: bytes) -> Objective | None:
+    session = db_session.create_session()
+    try:
+        objective = session.query(Objective).filter(Objective.id == objective_id).first()
+        if objective:
+            objective.challenge = challenge
+            session.commit()
+
+            print(f"INFO: Challenge changed for {objective.name}")
+
+            return objective
+    finally:
+        session.close()
 
 
 # ----------- Create functions -----------

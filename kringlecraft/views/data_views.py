@@ -3,6 +3,7 @@ from flask_login import (login_required, current_user)  # to manage user session
 
 from kringlecraft.utils.mail_tools import (send_mail)
 from kringlecraft.utils.file_tools import (get_temp_file, file_ending)
+from kringlecraft.utils.misc_tools import get_markdown
 
 blueprint = flask.Blueprint('data', __name__, template_folder='templates')
 
@@ -534,9 +535,11 @@ def objective(objective_id):
     objective_form.room.default = my_objective.room_id
     objective_form.process()
 
+    md_challenge = "" if my_objective.challenge is None else get_markdown(my_objective.challenge)
+
     # (6a) show rendered page
     return flask.render_template('data/objective.html', objective_form=objective_form, objective=my_objective,
-                                 objective_image=objective_image, room=my_room, world=my_world, page_mode="init", objective_types=objective_services.get_objective_types())
+                                 objective_image=objective_image, room=my_room, world=my_world, page_mode="init", objective_types=objective_services.get_objective_types(), md_challenge=md_challenge)
 
 
 # Post a change in an objective's data

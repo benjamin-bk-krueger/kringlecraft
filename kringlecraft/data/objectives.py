@@ -19,7 +19,7 @@ class Objective(SqlAlchemyBase):
     type: int = sa.Column(sa.Integer, nullable=False, default=1)
     difficulty: int = sa.Column(sa.Integer, nullable=False, default=1)
     visible: bool = sa.Column(sa.Boolean, nullable=False, default=False)
-    quest: bytes = sa.Column(sa.LargeBinary, nullable=True)
+    challenge: bytes = sa.Column(sa.LargeBinary, nullable=True)
     image: str = sa.Column(sa.String, nullable=True)
     created_date: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
     modified_date: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
