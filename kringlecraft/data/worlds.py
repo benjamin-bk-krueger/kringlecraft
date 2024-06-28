@@ -15,7 +15,6 @@ class World(SqlAlchemyBase):
     url: str = sa.Column(sa.String, nullable=True)
     visible: bool = sa.Column(sa.Boolean, nullable=False, default=False)
     archived: bool = sa.Column(sa.Boolean, nullable=False, default=False)
-    image: str = sa.Column(sa.String, nullable=True)
     created_date: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
     modified_date: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
 

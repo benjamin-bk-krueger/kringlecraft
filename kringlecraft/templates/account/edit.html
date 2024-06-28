@@ -45,11 +45,15 @@
             <div class="underline"><span><i class="bi bi-body-text" aria-hidden="true"></i></span></div>
             <div class="row">
                 <div class="col-sm">
-                    <img src="{{ url_for('static', filename=user_image) }}" class="img-fluid rounded img-restricted-lg" alt="User Image">
-                    <a href="{{ url_for('storage.profile_image_clear') }}" title="Delete image" class="btn btn-danger mt-4"><i class="bi bi-trash"></i> Clear Image</a>
+                    {% if user_image %}
+                        <img src="{{ url_for('static', filename=user_image) }}" class="img-fluid rounded img-restricted-lg" alt="User Image">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="img-fluid rounded img-restricted-lg" alt="User Image">
+                    {% endif %}
+                    <a href="{{ url_for('storage.clear_image', category="profile", image_id=current_user.id) }}" title="Delete image" class="btn btn-danger mt-4"><i class="bi bi-trash"></i> Clear Image</a>
                 </div>
                 <div class="col-sm">
-                    {{ dropzone.create(action='storage.profile_image_post', user_hash=user_hash) }}
+                    {{ dropzone.create(action='storage.upload_image_id_post', category="profile", image_id=current_user.id) }}
                 </div>
             </div>
         </div>

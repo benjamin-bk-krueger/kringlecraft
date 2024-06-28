@@ -164,6 +164,10 @@
         </div>
 
         {# Show fullscreen wallpaper #}
-        <img src="{{ url_for('static', filename=world_image) }}" class="img-fluid rounded img-restricted-lg" alt="World Image">
+        {% if world_image %}
+            <img src="{{ url_for('static', filename=world_image) }}" class="img-fluid rounded img-restricted-lg" alt="World Image">
+        {% else %}
+            <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="img-fluid rounded img-restricted-lg" alt="World Image">
+        {% endif %}
     </div>
 {% endblock %}

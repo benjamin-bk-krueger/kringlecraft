@@ -79,7 +79,11 @@
                     {% for image in image_files %}
                         <figure class="figure col-auto px-1 image-item">
                             <a href="#">
-                                <img src="{{ url_for('static', filename=image) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="Image">
+                                {% if image %}
+                                    <img src="{{ url_for('static', filename=image) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="Image">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="figure-img img-fluid rounded img-restricted-sm" alt="Image">
+                                {% endif %}
                             </a>
                             <figcaption class="figure-caption c-title">TBD</figcaption>
                         </figure>
@@ -87,7 +91,7 @@
                 </div>
                 </div>
                 <div class="col-sm-2">
-                    {{ dropzone.create(action='storage.upload_image_post', category="world") }}
+                    {{ dropzone.create(action='storage.upload_image_sub_post', category="objective", object_id=objective.id) }}
                 </div>
             </div>
         </div>

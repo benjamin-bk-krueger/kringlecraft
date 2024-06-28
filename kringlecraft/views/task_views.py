@@ -1,7 +1,7 @@
 import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
-from kringlecraft.utils.file_tools import get_image_files
+from kringlecraft.utils.file_tools import get_sub_images
 
 blueprint = flask.Blueprint('task', __name__, template_folder='templates')
 
@@ -32,7 +32,7 @@ def challenge(objective_id):
     my_world = world_services.find_world_by_id(my_room.world_id)
     my_challenge = objective_services.get_objective_challenge(my_objective.id)
 
-    image_files = get_image_files("world")
+    image_files = get_sub_images("objective", my_objective.id)
 
     # (6a) show rendered page
     return flask.render_template('task/challenge.html', objective_form=objective_form, objective=my_objective,
@@ -92,7 +92,7 @@ def challenge_continue(objective_id):
     my_world = world_services.find_world_by_id(my_room.world_id)
     my_challenge = flask.request.form["challenge"]
 
-    image_files = get_image_files("world")
+    image_files = get_sub_images("objective", my_objective.id)
 
     # (6a) show rendered page
     return flask.render_template('task/challenge.html', objective_form=objective_form, objective=my_objective,

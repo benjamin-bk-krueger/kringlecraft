@@ -1,7 +1,7 @@
 import flask
 from flask_login import (login_required, current_user, logout_user)  # to manage user sessions
 
-from kringlecraft.utils.file_tools import file_hash
+from kringlecraft.utils.file_tools import get_image
 from kringlecraft.utils.mail_tools import (send_admin_mail, send_mail)
 
 blueprint = flask.Blueprint('account', __name__, template_folder='templates')
@@ -68,8 +68,7 @@ def profile_edit():
 
     # (2) initialize form data
     user = user_services.find_user_by_id(current_user.id)
-    user_hash = file_hash(user.email)
-    user_image = user_services.get_user_image(user.id)
+    user_image = get_image("profile", current_user.id)
     mail_form = MailForm(user)
     password_form = PasswordForm()
     deletion_form = DeletionForm()
@@ -79,7 +78,7 @@ def profile_edit():
 
     # (6a) show rendered page
     return flask.render_template('account/edit.html', mail_form=mail_form, password_form=password_form,
-                                 deletion_form=deletion_form, user_hash=user_hash, user_image=user_image)
+                                 deletion_form=deletion_form, user_image=user_image)
 
 
 @blueprint.route('/profile/edit/mail', methods=['POST'])

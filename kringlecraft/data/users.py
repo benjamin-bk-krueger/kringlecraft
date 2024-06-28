@@ -17,7 +17,6 @@ class User(UserMixin, SqlAlchemyBase):
     role: int = sa.Column(sa.Integer, nullable=False, default=1)
     active: bool = sa.Column(sa.Boolean, nullable=False, default=False)
     notification: bool = sa.Column(sa.Boolean, nullable=False, default=False)
-    image: str = sa.Column(sa.String, nullable=True)
     created_date: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
     modified_date: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
     last_login: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)

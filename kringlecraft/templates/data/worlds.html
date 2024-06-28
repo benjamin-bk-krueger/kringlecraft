@@ -127,7 +127,11 @@
                         <div class="col-sm">
                             <figure class="figure">
                                 <a href="{{ url_for('data.rooms', world_id=world.id) }}">
-                                    <img src="{{ url_for('static', filename=world_images[world.id]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{ world.name }}">
+                                    {% if world_images[world.id] %}
+                                        <img src="{{ url_for('static', filename=world_images[world.id]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ world.name }}">
+                                    {% else %}
+                                        <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ world.name }}">
+                                    {% endif %}
                                 </a>
                                 <figcaption class="figure-caption c-title">{{ world.name }} <a href="{{ url_for('data.world', world_id=world.id) }}"><i class="bi bi-pencil-square"></i></a></figcaption>
                             </figure>

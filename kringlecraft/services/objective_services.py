@@ -1,9 +1,8 @@
 import kringlecraft.data.db_session as db_session
 from typing import List, Dict, Tuple
 from kringlecraft.data.objectives import Objective
-from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, get_all_images,
-                                                  get_entity_image, delete_entity, get_entity_choices, set_entity_image,
-                                                  enable_entity_image)
+from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete_entity,
+                                                  get_entity_choices)
 
 
 # ----------- Count functions -----------
@@ -22,14 +21,6 @@ def find_objective_by_id(objective_id: int) -> Objective | None:
 
 def find_objective_by_name(name: str) -> Objective | None:
     return find_by_field(Objective, 'name', name)
-
-
-def get_all_objective_images() -> Dict[int, str] | None:
-    return get_all_images(Objective, "objective")
-
-
-def get_objective_image(objective_id: int) -> str | None:
-    return get_entity_image(Objective, objective_id, "objective")
 
 
 def get_objective_choices(objectives: List[Objective]) -> List[Tuple[int, str]]:
@@ -98,14 +89,6 @@ def edit_objective(objective_id: int, room_id: int, name: str = None, descriptio
             return objective
     finally:
         session.close()
-
-
-def set_objective_image(objective_id: int, image: str) -> Objective | None:
-    return set_entity_image(Objective, objective_id, image)
-
-
-def enable_objective_image(objective_id: int) -> Objective | None:
-    return enable_entity_image(Objective, objective_id, "objective")
 
 
 def set_objective_challenge(objective_id: int, challenge: bytes) -> Objective | None:

@@ -128,7 +128,11 @@
                         <div class="col-sm">
                             <figure class="figure">
                                 <a href="{{ url_for('data.objective', objective_id=objective.id) }}">
-                                    <img src="{{ url_for('static', filename=objective_images[objective.id]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ objective.name }}">
+                                    {% if objective_images[objective.id] %}
+                                        <img src="{{ url_for('static', filename=objective_images[objective.id]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ objective.name }}">
+                                    {% else %}
+                                        <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ objective.name }}">
+                                    {% endif %}
                                 </a>
                                 <figcaption class="figure-caption">{{ objective_types[objective.type] }} {{ objective.name }}</figcaption>
                             </figure>

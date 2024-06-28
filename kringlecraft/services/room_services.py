@@ -1,9 +1,8 @@
 import kringlecraft.data.db_session as db_session
 from typing import List, Dict, Tuple
 from kringlecraft.data.rooms import Room
-from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, get_all_images,
-                                                  get_entity_image, delete_entity, get_entity_choices, set_entity_image,
-                                                  enable_entity_image)
+from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete_entity,
+                                                  get_entity_choices)
 
 
 # ----------- Count functions -----------
@@ -22,14 +21,6 @@ def find_room_by_id(room_id: int) -> Room | None:
 
 def find_room_by_name(name: str) -> Room | None:
     return find_by_field(Room, 'name', name)
-
-
-def get_all_room_images() -> Dict[int, str] | None:
-    return get_all_images(Room, "room")
-
-
-def get_room_image(room_id: int) -> str | None:
-    return get_entity_image(Room, room_id, "room")
 
 
 def get_room_choices(rooms: List[Room]) -> List[Tuple[int, str]]:
@@ -69,14 +60,6 @@ def edit_room(room_id: int, world_id: int, name: str = None, description: str = 
             return room
     finally:
         session.close()
-
-
-def set_room_image(room_id: int, image: str) -> Room | None:
-    return set_entity_image(Room, room_id, image)
-
-
-def enable_room_image(room_id: int) -> Room | None:
-    return enable_entity_image(Room, room_id, "room")
 
 
 # ----------- Create functions -----------

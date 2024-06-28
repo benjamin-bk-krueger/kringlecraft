@@ -1,9 +1,8 @@
 import kringlecraft.data.db_session as db_session
 from typing import List, Dict, Tuple
 from kringlecraft.data.worlds import World
-from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, get_all_images,
-                                                  get_entity_image, delete_entity, get_entity_choices, set_entity_image,
-                                                  enable_entity_image)
+from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete_entity,
+                                                  get_entity_choices)
 
 
 # ----------- Count functions -----------
@@ -22,14 +21,6 @@ def find_world_by_id(world_id: int) -> World | None:
 
 def find_world_by_name(name: str) -> World | None:
     return find_by_field(World, 'name', name)
-
-
-def get_all_world_images() -> Dict[int, str] | None:
-    return get_all_images(World, "world")
-
-
-def get_world_image(world_id: int) -> str | None:
-    return get_entity_image(World, world_id, "world")
 
 
 def get_world_choices(worlds: List[World]) -> List[Tuple[int, str]]:
@@ -56,14 +47,6 @@ def edit_world(world_id: int, name: str = None, description: str = None, url: st
             return world
     finally:
         session.close()
-
-
-def set_world_image(world_id: int, image: str) -> World | None:
-    return set_entity_image(World, world_id, image)
-
-
-def enable_world_image(world_id: int) -> World | None:
-    return enable_entity_image(World, world_id, "world")
 
 
 # ----------- Create functions -----------
