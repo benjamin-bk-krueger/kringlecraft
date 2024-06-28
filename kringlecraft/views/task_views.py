@@ -34,9 +34,11 @@ def challenge(objective_id):
 
     image_files = get_sub_images("objective", my_objective.id)
 
+    www_server = flask.current_app.config['app.www_server']
+
     # (6a) show rendered page
     return flask.render_template('task/challenge.html', objective_form=objective_form, objective=my_objective,
-                                 room=my_room, world=my_world, challenge=my_challenge, image_files=image_files, page_mode="init")
+                                 room=my_room, world=my_world, challenge=my_challenge, image_files=image_files, www_server=www_server, page_mode="init")
 
 
 # Post a change in an objective's challenge
@@ -94,7 +96,9 @@ def challenge_continue(objective_id):
 
     image_files = get_sub_images("objective", my_objective.id)
 
+    www_server = flask.current_app.config['app.www_server']
+
     # (6a) show rendered page
     return flask.render_template('task/challenge.html', objective_form=objective_form, objective=my_objective,
-                                 room=my_room, world=my_world, challenge=my_challenge, image_files=image_files, page_mode="init")
+                                 room=my_room, world=my_world, challenge=my_challenge, image_files=image_files, www_server=www_server, page_mode="init")
 

@@ -21,6 +21,12 @@ def clear_image(category, image_id):
     # (6b) redirect to new page after successful operation
     if category == "profile":
         return flask.redirect(flask.url_for('account.profile_edit'))
+    if category == "world":
+        return flask.redirect(flask.url_for('data.world', world_id=image_id))
+    if category == "room":
+        return flask.redirect(flask.url_for('data.room', room_id=image_id))
+    if category == "objective":
+        return flask.redirect(flask.url_for('data.objective', objective_id=image_id))
 
 
 @blueprint.route('/prepare/image/<string:category>', methods=['POST'])

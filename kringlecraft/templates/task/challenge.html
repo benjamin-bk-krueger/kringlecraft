@@ -13,6 +13,9 @@
 {% endblock %}
 
 {% block additional_js %}
+    {#  Enable clipboard #}
+    <script src="{{ url_for('static', filename='js/func_clipboard.js') }}"></script>
+
     {{ dropzone.load_js() }}
     {{ dropzone.config() }}
     <script>
@@ -85,7 +88,7 @@
                                     <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="figure-img img-fluid rounded img-restricted-sm" alt="Image">
                                 {% endif %}
                             </a>
-                            <figcaption class="figure-caption c-title">TBD</figcaption>
+                            <figcaption class="figure-caption c-title"><a href="#" onclick="CopyToClipboardSilent('![{{ image }}]({{ www_server }}/static/{{ image }})');return false;" data-toggle="tooltip" title="Copy Markdown Link"><i class="bi bi-markdown me-2"></i></a></figcaption>
                         </figure>
                     {% endfor %}
                 </div>
