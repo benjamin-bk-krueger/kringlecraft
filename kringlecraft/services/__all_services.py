@@ -24,10 +24,10 @@ def find_all(model: Type[T], order_by_field: str = 'name') -> List[T] | None:
         session.close()
 
 
-def find_by_id(model: Type[T], id: int) -> T | None:
+def find_by_id(model: Type[T], entity_id: int) -> T | None:
     session = db_session.create_session()
     try:
-        return session.query(model).filter(model.id == id).first()
+        return session.query(model).filter(model.id == entity_id).first()
     finally:
         session.close()
 

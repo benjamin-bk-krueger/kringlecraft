@@ -1,5 +1,5 @@
 import kringlecraft.data.db_session as db_session
-from typing import List, Dict, Tuple
+from typing import List, Tuple
 from kringlecraft.data.objectives import Objective
 from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete_entity,
                                                   get_entity_choices)
@@ -70,7 +70,7 @@ def get_objective_challenge(objective_id: int) -> str | None:
 
 # ----------- Edit functions -----------
 def edit_objective(objective_id: int, room_id: int, name: str = None, description: str = None, difficulty: int = 1,
-                   visible: bool = False, type: int = 1) -> Objective | None:
+                   visible: bool = False, objective_type: int = 1) -> Objective | None:
     session = db_session.create_session()
     try:
         objective = session.query(Objective).filter(Objective.id == objective_id).first()
@@ -79,7 +79,7 @@ def edit_objective(objective_id: int, room_id: int, name: str = None, descriptio
             objective.description = description if description is not None else objective.description
             objective.difficulty = difficulty if difficulty is not None else objective.difficulty
             objective.visible = visible if visible is not None else objective.visible
-            objective.type = type if type is not None else objective.type
+            objective.type = objective_type if objective_type is not None else objective.type
             objective.room_id = room_id if room_id is not None else objective.room_id
 
             session.commit()
@@ -107,7 +107,7 @@ def set_objective_challenge(objective_id: int, challenge: bytes) -> Objective | 
 
 
 # ----------- Create functions -----------
-def create_objective(name: str, description: str, difficulty: int, visible: bool, type: int, room_id: int,
+def create_objective(name: str, description: str, difficulty: int, visible: bool, objective_type: int, room_id: int,
                      user_id: int) -> Objective | None:
     if find_room_objective_by_name(room_id, name):
         return None
@@ -117,7 +117,7 @@ def create_objective(name: str, description: str, difficulty: int, visible: bool
     objective.description = description
     objective.difficulty = difficulty
     objective.visible = visible
-    objective.type = type
+    objective.type = objective_type
     objective.room_id = room_id
     objective.user_id = user_id
 

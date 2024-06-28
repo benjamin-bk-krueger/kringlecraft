@@ -14,9 +14,10 @@
                 <ul class="list-group">
                     {% if current_user.is_authenticated %}
                         <li class="list-group-item">Users <span class="badge bg-secondary">{{ counts['user'] }}</span></li>
-                        <li class="list-group-item">Worlds <span class="badge bg-secondary">{{ counts['world'] }}</span></li>
-                        <li class="list-group-item">Rooms <span class="badge bg-secondary">{{ counts['room'] }}</span></li>
                     {%  endif %}
+                    <li class="list-group-item">Worlds <span class="badge bg-secondary">{{ counts['world'] }}</span></li>
+                    <li class="list-group-item">Rooms <span class="badge bg-secondary">{{ counts['room'] }}</span></li>
+                    <li class="list-group-item">Objectives <span class="badge bg-secondary">{{ counts['objective'] }}</span></li>
                 </ul>
             </div>
         </div>

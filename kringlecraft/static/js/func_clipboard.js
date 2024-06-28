@@ -21,3 +21,9 @@ function CopyToClipboardSilent(textToCopy) {
         console.log('Browser not compatible')
     }
 }
+
+function InsertMDE(textToInsert) {
+    const editor = easyMDE.codemirror;
+    const pos = editor.getCursor();
+    editor.replaceRange(textToInsert, pos);
+}

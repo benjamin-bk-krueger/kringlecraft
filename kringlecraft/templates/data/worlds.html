@@ -20,17 +20,9 @@
     {{ dropzone.config() }}
 
     {% if temp_ending %}
-        <script>
-            Dropzone.options.myDropzone = {
-              init: function() {
-                let myDropzone = this;
-
-                // Create the mock file:
-                let mockFile = { name: "static/uploads/world/_temp.{{temp_ending}}", size: 217447 };
-                myDropzone.displayExistingFile(mockFile, "static/uploads/world/_temp.{{temp_ending}}");
-              }
-            };
-        </script>
+        {#  Mock Dropzone #}
+        <script src="{{ url_for('static', filename='js/func_dropzone.js') }}"></script>
+        <script>MockDropzone("world", "{{ temp_ending }}")</script>
     {% endif %}
 {% endblock %}
 

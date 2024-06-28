@@ -65,7 +65,7 @@ def contact_post():
     return flask.render_template('home/contact.html', contact_form=contact_form, check_captcha=check_captcha)
 
 
-# Show error page  - for all "hard" crashes a mail is sent to the site admin
+# Show error page - for all "hard" crashes mail is sent to the site admin
 @blueprint.route('/error', methods=['GET'])
 def error():
     # (6a) show rendered page

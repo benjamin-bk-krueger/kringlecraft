@@ -32,13 +32,14 @@ def challenge(objective_id):
     my_world = world_services.find_world_by_id(my_room.world_id)
     my_challenge = objective_services.get_objective_challenge(my_objective.id)
 
-    image_files = get_sub_images("objective", my_objective.id)
+    image_files = get_sub_images("objective", str(my_objective.id))
 
     www_server = flask.current_app.config['app.www_server']
 
     # (6a) show rendered page
-    return flask.render_template('task/challenge.html', objective_form=objective_form, objective=my_objective,
-                                 room=my_room, world=my_world, challenge=my_challenge, image_files=image_files, www_server=www_server, page_mode="init")
+    return flask.render_template('task/challenge.html', objective_form=objective_form,
+                                 objective=my_objective, room=my_room, world=my_world, challenge=my_challenge,
+                                 image_files=image_files, www_server=www_server, page_mode="init")
 
 
 # Post a change in an objective's challenge
@@ -94,11 +95,11 @@ def challenge_continue(objective_id):
     my_world = world_services.find_world_by_id(my_room.world_id)
     my_challenge = flask.request.form["challenge"]
 
-    image_files = get_sub_images("objective", my_objective.id)
+    image_files = get_sub_images("objective", str(my_objective.id))
 
     www_server = flask.current_app.config['app.www_server']
 
     # (6a) show rendered page
-    return flask.render_template('task/challenge.html', objective_form=objective_form, objective=my_objective,
-                                 room=my_room, world=my_world, challenge=my_challenge, image_files=image_files, www_server=www_server, page_mode="init")
-
+    return flask.render_template('task/challenge.html', objective_form=objective_form,
+                                 objective=my_objective, room=my_room, world=my_world, challenge=my_challenge,
+                                 image_files=image_files, www_server=www_server, page_mode="init")

@@ -18,41 +18,13 @@
 
     {{ dropzone.load_js() }}
     {{ dropzone.config() }}
-    <script>
-        Dropzone.options.myDropzone = {
-            headers: {
-                'X-CSRF-TOKEN': "{{ csrf_token() }}"
-            },
-            init: function() {
-                this.on("queuecomplete", function(file) {
-                    // Get the content of the textarea
-                    var challengeContent = easyMDE.value();
 
-                    // Create a form and submit it
-                    var form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = "{{ url_for('task.challenge_continue', objective_id=objective.id) }}";
-
-                    var input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'challenge';
-                    input.value = challengeContent;
-
-                    var csrfInput = document.createElement('input');
-                    csrfInput.type = 'hidden';
-                    csrfInput.name = 'csrf_token';
-                    csrfInput.value = "{{ csrf_token() }}";
-
-                    form.appendChild(input);
-                    form.appendChild(csrfInput);
-                    document.body.appendChild(form);
-                    form.submit();
-                });
-            }
-        };
-    </script>
+    {#  Queue Dropzone #}
+    <script src="{{ url_for('static', filename='js/func_dropzone.js') }}"></script>
+    <script>QueueDropzone("{{ csrf_token() }}", "{{ url_for('task.challenge_continue', objective_id=objective.id) }}")</script>
 
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <script src="{{ url_for('static', filename='js/func_easymde.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -88,7 +60,11 @@
                                     <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="figure-img img-fluid rounded img-restricted-sm" alt="Image">
                                 {% endif %}
                             </a>
-                            <figcaption class="figure-caption c-title"><a href="#" onclick="CopyToClipboardSilent('![{{ image }}]({{ www_server }}/static/{{ image }})');return false;" data-toggle="tooltip" title="Copy Markdown Link"><i class="bi bi-markdown me-2"></i></a></figcaption>
+                            <figcaption class="figure-caption c-title">
+                                <a href="#" onclick="InsertMDE('![{{ image }}]({{ www_server }}/static/{{ image }})');return false;" data-toggle="tooltip" title="Copy Markdown Link"><i class="bi bi-markdown me-2"></i></a>
+                                {% set new_filename = image.replace("uploads/objective/" + objective.id | string + "/", "")  %}
+                                <a href="{{ url_for('storage.clear_image_path',  category="objective", path=objective.id, filename=new_filename) }}" data-toggle="tooltip" title="Delete Image"><i class="bi bi-trash"></i></a>
+                            </figcaption>
                         </figure>
                     {% endfor %}
                 </div>

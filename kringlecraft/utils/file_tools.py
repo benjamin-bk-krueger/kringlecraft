@@ -94,6 +94,21 @@ def delete_image(category: str, image_id: int) -> None:
                     print(f"FILE: Error deleting {file_path}: {e}")
 
 
+def delete_image_in_path(category: str, path: str, filename: str) -> None:
+    short_name = file_name_without_extension(filename)
+    if category in CATEGORIES:
+        patterns = [os.path.join(f'static/uploads/{category}/{path}', f"{short_name}.{ext}") for ext in EXTENSIONS]
+        deleted_files = []
+        for pattern in patterns:
+            for file_path in glob.glob(pattern):
+                try:
+                    os.remove(file_path)
+                    deleted_files.append(os.path.basename(file_path))
+                    print(f"FILE: Deleted {file_path}")
+                except OSError as e:
+                    print(f"FILE: Error deleting {file_path}: {e}")
+
+
 def enable_image(category: str, image_id: int):
     if category in CATEGORIES:
         temp_file = get_temp_file(category)
@@ -127,22 +142,6 @@ def rename_temp_file(category: str, temp_file: str, filename: str, extension: st
         delete_image(category, int(filename))
         shutil.move(temp_file, os.path.join(f'static/uploads/{category}/', filename + "." + extension))
         print(f"FILE: Renamed {temp_file} to {os.path.join(f'static/uploads/{category}/', filename + "." + extension)}")
-
-
-def get_image_files(category: str) -> List[str] | None:
-    if category in CATEGORIES:
-        image_files = glob.glob(os.path.join('static', 'uploads', category, "*.*"))
-        if image_files:
-            # Convert backslashes to forward slashes and ensure the path starts with 'static'
-            return ['/'.join(path.split(os.sep)[1:]) for path in image_files]
-
-
-def save_file(file, category: str):
-    if category in CATEGORIES:
-        full_path = build_path(category, file_name_without_extension(file.filename), file_extension(file.filename))
-        if full_path:
-            file.save(full_path)
-            print(f"FILE: Saved file {full_path}")
 
 
 def save_file_with_name(file, category: str, filename: str):

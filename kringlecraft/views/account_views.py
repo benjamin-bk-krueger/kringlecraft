@@ -112,13 +112,14 @@ def profile_edit_mail_post():
 
     # (5) preset form with existing data
     mail_form.set_field_defaults()
+    user_image = get_image("profile", current_user.id)
     mail_form.process()
     password_form.process()
     deletion_form.process()
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('account/edit.html', mail_form=mail_form,
-                                 password_form=password_form, deletion_form=deletion_form)
+                                 password_form=password_form, deletion_form=deletion_form, user_image=user_image)
 
 
 @blueprint.route('/profile/edit/password', methods=['POST'])
@@ -151,13 +152,14 @@ def profile_edit_password_post():
         return flask.redirect(flask.url_for('home.index'))
 
     # (5) preset form with existing data
+    user_image = get_image("profile", current_user.id)
     mail_form.process()
     password_form.process()
     deletion_form.process()
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('account/edit.html', mail_form=mail_form,
-                                 password_form=password_form, deletion_form=deletion_form)
+                                 password_form=password_form, deletion_form=deletion_form, user_image=user_image)
 
 
 @blueprint.route('/profile/edit/deletion', methods=['POST'])
@@ -189,10 +191,11 @@ def profile_edit_deletion_post():
         return flask.redirect(flask.url_for('home.index'))
 
     # (5) preset form with existing data
+    user_image = get_image("profile", current_user.id)
     mail_form.process()
     password_form.process()
     deletion_form.process()
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('account/edit.html', mail_form=mail_form,
-                                 password_form=password_form, deletion_form=deletion_form)
+                                 password_form=password_form, deletion_form=deletion_form, user_image=user_image)
