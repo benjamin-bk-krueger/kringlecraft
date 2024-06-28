@@ -183,8 +183,8 @@ table .w-30 { width:30%; }
 }
 
 .image-item {
-    width: 200px;
-    height: 200px;
+    width: 100px;
+    height: 100px;
     flex: 0 0 auto;
 }
 
