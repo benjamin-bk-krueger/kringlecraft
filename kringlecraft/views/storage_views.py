@@ -2,7 +2,7 @@ import os
 import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
-from kringlecraft.utils.file_tools import (file_extension, file_name_without_extension, delete_temp_files, build_path, delete_image, create_path, save_new_file, save_file, save_sub_file)
+from kringlecraft.utils.file_tools import (file_extension, file_name_without_extension, delete_temp_files, build_path, delete_image, create_path, save_file_with_name, save_file, save_file_in_path)
 
 blueprint = flask.Blueprint('storage', __name__, template_folder='templates')
 
@@ -34,15 +34,15 @@ def prepare_image_post(category):
     # (4a) perform operations
     delete_temp_files(category)
     f = flask.request.files.get('file')
-    save_new_file(f, category, "_temp")
+    save_file_with_name(f, category, "_temp")
 
     # (6f) other result
     return flask.jsonify({"status": "success", "message": "File uploaded successfully"})
 
 
-@blueprint.route('/upload/image/<string:category>', methods=['POST'])
+@blueprint.route('/upload/image/path/<string:category>/<string:path>', methods=['POST'])
 @login_required
-def upload_image_post(category):
+def upload_image_path_post(category, path):
     # (2) initialize form data
     if category not in ("profile", "world", "room", "objective"):
         # (6e) show dedicated error page
@@ -50,42 +50,26 @@ def upload_image_post(category):
 
     # (4a) perform operations
     f = flask.request.files.get('file')
-    save_file(f, category)
+    create_path(category, path)
+
+    save_file_in_path(f, category, path)
 
     # (6f) other result
     return flask.jsonify({"status": "success", "message": "File uploaded successfully"})
 
 
-@blueprint.route('/upload/image-sub/<string:category>/<int:object_id>', methods=['POST'])
+@blueprint.route('/upload/image/<string:category>/<string:filename>', methods=['POST'])
 @login_required
-def upload_image_sub_post(category, object_id):
+def upload_image_post(category, filename):
     # (2) initialize form data
     if category not in ("profile", "world", "room", "objective"):
         # (6e) show dedicated error page
         return flask.jsonify({"status": "error", "message": "Category does not exist."})
 
     # (4a) perform operations
+    delete_image(category, filename)
     f = flask.request.files.get('file')
-    create_path(category, object_id)
-
-    save_sub_file(f, category, str(object_id))
-
-    # (6f) other result
-    return flask.jsonify({"status": "success", "message": "File uploaded successfully"})
-
-
-@blueprint.route('/upload/image/<string:category>/<int:image_id>', methods=['POST'])
-@login_required
-def upload_image_id_post(category, image_id):
-    # (2) initialize form data
-    if category not in ("profile", "world", "room", "objective"):
-        # (6e) show dedicated error page
-        return flask.jsonify({"status": "error", "message": "Category does not exist."})
-
-    # (4a) perform operations
-    delete_image(category, image_id)
-    f = flask.request.files.get('file')
-    save_new_file(f, category, str(image_id))
+    save_file_with_name(f, category, filename)
 
     # (6f) other result
     return flask.jsonify({"status": "success", "message": "File uploaded successfully"})

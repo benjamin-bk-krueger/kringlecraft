@@ -8,13 +8,13 @@ CATEGORIES = ["profile", "world", "room", "objective"]
 EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff']
 
 
-def path_to_url(file_path):
+def path_to_url(path: str) -> str:
     # Remove the 'static/' prefix if present
-    if file_path.startswith('static/'):
-        file_path = file_path[7:]
+    if path.startswith('static/'):
+        path = path[7:]
 
     # Replace backslashes with forward slashes
-    url_path = file_path.replace('\\', '/')
+    url_path = path.replace('\\', '/')
 
     return url_path
 
@@ -27,14 +27,14 @@ def file_name_without_extension(filename: str) -> str:
     return os.path.splitext(filename)[0]
 
 
-def build_path(category: str, file_name: str, extension: str) -> str | None:
+def build_path(category: str, filename: str, extension: str) -> str | None:
     if category in CATEGORIES and extension in EXTENSIONS:
-        return os.path.join(f'static/uploads/{category}/', file_name) + "." + extension
+        return os.path.join(f'static/uploads/{category}/', filename) + "." + extension
 
 
-def create_path(category: str, object_id: int):
+def create_path(category: str, path: str):
     if category in CATEGORIES:
-        os.makedirs(os.path.join(f'static/uploads/{category}/', str(object_id)), exist_ok=True)
+        os.makedirs(os.path.join(f'static/uploads/{category}/', path), exist_ok=True)
 
 
 def get_image(category: str, image_id: int) -> str:
@@ -64,9 +64,9 @@ def get_all_images(category: str) -> Dict[int, str] | None:
         return image_dict
 
 
-def get_sub_images(category: str, object_id) -> List[str] | None:
+def get_sub_images(category: str, path: str) -> List[str] | None:
     if category in CATEGORIES:
-        patterns = [os.path.join(f'static/uploads/{category}/{object_id}', f"*.{ext}") for ext in EXTENSIONS]
+        patterns = [os.path.join(f'static/uploads/{category}/{path}', f"*.{ext}") for ext in EXTENSIONS]
         image_list = []
         for pattern in patterns:
             for file_path in glob.glob(pattern):
@@ -98,7 +98,6 @@ def enable_image(category: str, image_id: int):
     if category in CATEGORIES:
         temp_file = get_temp_file(category)
         if temp_file:
-            new_filename = f"{image_id}.{file_extension(temp_file)}"
             rename_temp_file(category, temp_file, str(image_id), file_extension(temp_file))
 
             print(f"INFO: Image changed for {category}:{image_id}")
@@ -123,14 +122,14 @@ def delete_temp_files(category: str):
                 print(f"FILE: Error deleting {file_path}: {e}")
 
 
-def rename_temp_file(category: str, temp_file: str, file_name: str, ending: str):
+def rename_temp_file(category: str, temp_file: str, filename: str, extension: str):
     if category in CATEGORIES:
-        delete_image(category, int(file_name))
-        shutil.move(temp_file, os.path.join(f'static/uploads/{category}/', file_name + "." + ending))
-        print(f"FILE: Renamed {temp_file} to {os.path.join(f'static/uploads/{category}/', file_name + "." + ending)}")
+        delete_image(category, int(filename))
+        shutil.move(temp_file, os.path.join(f'static/uploads/{category}/', filename + "." + extension))
+        print(f"FILE: Renamed {temp_file} to {os.path.join(f'static/uploads/{category}/', filename + "." + extension)}")
 
 
-def get_image_files(category: str) -> list | None:
+def get_image_files(category: str) -> List[str] | None:
     if category in CATEGORIES:
         image_files = glob.glob(os.path.join('static', 'uploads', category, "*.*"))
         if image_files:
@@ -146,17 +145,18 @@ def save_file(file, category: str):
             print(f"FILE: Saved file {full_path}")
 
 
-def save_new_file(file, category: str, file_name: str):
+def save_file_with_name(file, category: str, filename: str):
     if category in CATEGORIES:
-        full_path = build_path(category, file_name, file_extension(file.filename))
+        full_path = build_path(category, filename, file_extension(file.filename))
         if full_path:
             file.save(full_path)
             print(f"FILE: Saved new file {full_path}")
 
 
-def save_sub_file(file, category: str, object_id: str):
+def save_file_in_path(file, category: str, path: str):
     if category in CATEGORIES:
-        full_path = build_path(category, object_id + "/" + file_name_without_extension(file.filename), file_extension(file.filename))
+        full_path = build_path(category, path + "/" + file_name_without_extension(file.filename),
+                               file_extension(file.filename))
         if full_path:
             file.save(full_path)
             print(f"FILE: Saved sub file {full_path}")
