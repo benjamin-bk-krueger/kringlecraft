@@ -150,7 +150,8 @@ def summary_post(world_id):
 
     # (4a) perform operations
     my_summary = summary_services.create_or_edit_summary(world_id, current_user.id, summary_form.visible_content)
-    my_summary = summary_services.set_world_notes_for_user(my_world.id, current_user.id, flask.request.form["notes"].encode())
+    my_summary = summary_services.set_world_notes_for_user(my_world.id, current_user.id,
+                                                           flask.request.form["notes"].encode())
 
     if not my_summary:
         # (6e) show dedicated error page
