@@ -2,6 +2,7 @@ import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
 from kringlecraft.utils.file_tools import get_sub_images
+from kringlecraft.viewmodels.task_forms import SummaryForm
 
 blueprint = flask.Blueprint('task', __name__, template_folder='templates')
 
@@ -21,13 +22,13 @@ def challenge(objective_id):
         return flask.render_template('home/error.html', error_message="You are not authorized to edit challenges.")
 
     # (2) initialize form data
-    objective_form = ObjectiveForm()
-    objective_form.process()
     my_objective = objective_services.find_objective_by_id(objective_id)
     if not my_objective:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="Objective does not exist.")
 
+    objective_form = ObjectiveForm(my_objective)
+    objective_form.process()
     my_room = room_services.find_room_by_id(my_objective.room_id)
     my_world = world_services.find_world_by_id(my_room.world_id)
     my_challenge = objective_services.get_objective_challenge(my_objective.id)
@@ -47,6 +48,7 @@ def challenge(objective_id):
 @login_required
 def challenge_post(objective_id):
     # (1) import forms and utilities
+    from kringlecraft.viewmodels.data_forms import ObjectiveForm
     import kringlecraft.services.objective_services as objective_services
 
     if current_user.role != 0:
@@ -54,6 +56,7 @@ def challenge_post(objective_id):
         return flask.render_template('home/error.html', error_message="You are not authorized to edit objectives.")
 
     # (2) initialize form data
+    objective_form = ObjectiveForm()
     my_objective = objective_services.find_objective_by_id(objective_id)
     if not my_objective:
         # (6e) show dedicated error page
@@ -84,13 +87,13 @@ def challenge_continue(objective_id):
         return flask.render_template('home/error.html', error_message="You are not authorized to edit challenges.")
 
     # (2) initialize form data
-    objective_form = ObjectiveForm()
-    objective_form.process()
     my_objective = objective_services.find_objective_by_id(objective_id)
     if not my_objective:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="Objective does not exist.")
 
+    objective_form = ObjectiveForm()
+    objective_form.process()
     my_room = room_services.find_room_by_id(my_objective.room_id)
     my_world = world_services.find_world_by_id(my_room.world_id)
     my_challenge = flask.request.form["challenge"]
@@ -115,18 +118,43 @@ def summary(world_id):
     import kringlecraft.services.summary_services as summary_services
 
     # (2) initialize form data
-    summary_form = SummaryForm()
-    summary_form.process()
     my_world = world_services.find_world_by_id(world_id)
     if not my_world:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="World does not exist.")
 
     my_summary = summary_services.find_world_summary_for_user(world_id, current_user.id)
-    if my_summary is not None:
-        notes = str(bytes(summary.notes), 'utf-8')
-    else:
-        notes = ""
+    summary_form = SummaryForm(my_summary)
+    summary_form.process()
+    my_notes = summary_services.get_world_notes_for_user(world_id, current_user.id)
 
     # (6a) show rendered page
-    return flask.render_template('task/summary.html', summary_form=summary_form, notes=notes, world=my_world)
+    return flask.render_template('task/summary.html', summary_form=summary_form, notes=my_notes,
+                                 world=my_world)
+
+
+# Post a change in a report's notes
+@blueprint.route('/summary/<int:world_id>', methods=['POST'])
+@login_required
+def summary_post(world_id):
+    # (1) import forms and utilities
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.summary_services as summary_services
+
+    # (2) initialize form data
+    summary_form = SummaryForm()
+    my_world = world_services.find_world_by_id(world_id)
+    if not my_world:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="World does not exist.")
+
+    # (4a) perform operations
+    my_summary = summary_services.create_or_edit_summary(world_id, current_user.id, summary_form.visible_content)
+    my_summary = summary_services.set_world_notes_for_user(my_world.id, current_user.id, flask.request.form["notes"].encode())
+
+    if not my_summary:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Summary could not be edited.")
+
+    # (6b) redirect to new page after successful operation
+    return flask.redirect(flask.url_for('data.world', world_id=my_world.id))

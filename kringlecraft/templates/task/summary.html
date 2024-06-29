@@ -30,7 +30,7 @@
         </div>
 
         {# Display Markdown editor form - edit an world's notes #}
-        <form action="#" id="notes_form" method="POST">
+        <form action="{{ url_for('task.summary_post', world_id=world.id)}}" id="notes_form" method="POST">
             {{ summary_form.csrf_token }}
             <div class="mb-3">
                 <label for="notes">Edit Content:</label>
