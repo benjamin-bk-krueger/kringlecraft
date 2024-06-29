@@ -1,0 +1,70 @@
+{# /summary #}
+{% extends 'shared/_layout.html' %}
+
+{% block title %}Summary Editor for {{ world.name }}{% endblock %}
+
+{% block additional_css %}
+    <!-- EasyMDE - Markdown Editor -->
+    <!-- https://easy-markdown-editor.tk -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+{% endblock %}
+
+{% block additional_js %}
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
+        {# Show breadcrumb navigation #}
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('data.worlds') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ world.name }}</li>
+            </ol>
+        </nav>
+
+        {#  Show world info #}
+        <div class="rounded border mt-4 mb-4 c-color p-2">
+            <div class="fs-3 c-title">Summary Editor for {{ world.name }}</div>
+            <div class="underline"><span style="background: #f5f5f5;"><i class="bi bi-globe" aria-hidden="true"></i></span></div>
+        </div>
+
+        {# Display Markdown editor form - edit an world's notes #}
+        <form action="#" id="notes_form" method="POST">
+            {{ summary_form.csrf_token }}
+            <div class="mb-3">
+                <label for="notes">Edit Content:</label>
+                <textarea name="notes" rows="10" id="notes" class="form-control">{{ notes }}</textarea>
+            </div>
+            <script>
+                const easyMDE = new EasyMDE({
+                    element: document.getElementById('notes'),
+                    toolbar: [
+                        'bold', 'italic', 'heading', 'heading-smaller', 'heading-bigger', '|',
+                        'code', 'quote', 'unordered-list', 'ordered-list', '|',
+                        'horizontal-rule', 'link', 'image', '|',
+                        'preview', 'side-by-side', 'fullscreen', '|',
+                        'guide'
+                    ]
+                });
+            </script>
+
+            <div class="form-check mt-2 mb-2">
+                <label class="form-check-label" for="visible">{{ summary_form.visible.label }}</label>
+                {{ summary_form.visible(class="form-check-input") }}
+            </div>
+            {% for error in summary_form.visible.errors %}
+                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+            {% endfor %}
+        </form>
+
+        {# Display simple buttons - submit or cancel form editing #}
+        <div class="btn-toolbar" role="toolbar" aria-label="Summary Actions">
+            <button type="submit" form="notes_form" class="btn btn-primary mt-4 mb-4 btn-space"><i class="bi bi-check"></i> Submit</button>
+
+            <form action="{{ url_for('data.world', world_id=world.id)}}">
+                <button type="submit" class="btn btn-secondary mt-4 mb-4 btn-space"><i class="bi bi-x"></i> Cancel</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -103,3 +103,30 @@ def challenge_continue(objective_id):
     return flask.render_template('task/challenge.html', objective_form=objective_form,
                                  objective=my_objective, room=my_room, world=my_world, challenge=my_challenge,
                                  image_files=image_files, www_server=www_server, page_mode="init")
+
+
+# Shows information about a specific report's notes
+@blueprint.route('/summary/<int:world_id>', methods=['GET'])
+@login_required
+def summary(world_id):
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.task_forms import SummaryForm
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.summary_services as summary_services
+
+    # (2) initialize form data
+    summary_form = SummaryForm()
+    summary_form.process()
+    my_world = world_services.find_world_by_id(world_id)
+    if not my_world:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="World does not exist.")
+
+    my_summary = summary_services.find_world_summary_for_user(world_id, current_user.id)
+    if my_summary is not None:
+        notes = str(bytes(summary.notes), 'utf-8')
+    else:
+        notes = ""
+
+    # (6a) show rendered page
+    return flask.render_template('task/summary.html', summary_form=summary_form, notes=notes, world=my_world)
