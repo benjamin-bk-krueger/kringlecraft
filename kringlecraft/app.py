@@ -79,6 +79,7 @@ def setup_dropzone():
 
     # Dropzone settings
     app.config['DROPZONE_UPLOAD_MULTIPLE'] = False
+    app.config['DROPZONE_MAX_FILES'] = 1
     app.config['DROPZONE_ALLOWED_FILE_CUSTOM'] = True
     app.config['DROPZONE_ALLOWED_FILE_TYPE'] = 'image/*'
     app.config['DROPZONE_ENABLE_CSRF'] = True

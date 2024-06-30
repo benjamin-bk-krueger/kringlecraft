@@ -60,14 +60,14 @@
                             <figcaption class="figure-caption c-title">
                                 <a href="#" onclick="InsertMDE('![{{ image }}]({{ www_server }}/static/{{ image }})');return false;" data-toggle="tooltip" title="Copy Markdown Link"><i class="bi bi-markdown me-2"></i></a>
                                 {% set new_filename = image.replace("uploads/objective/" + objective.id | string + "/", "")  %}
-                                <a href="{{ url_for('storage.clear_image_path',  category="objective", path=objective.id, filename=new_filename) }}" data-toggle="tooltip" title="Delete Image"><i class="bi bi-trash"></i></a>
+                                <a href="{{ url_for('storage.clear_sub_image',  category="objective", path=objective.id, filename=new_filename) }}" data-toggle="tooltip" title="Delete Image"><i class="bi bi-trash"></i></a>
                             </figcaption>
                         </figure>
                     {% endfor %}
                 </div>
                 </div>
                 <div class="col-sm-2">
-                    {{ dropzone.create(action='storage.upload_image_path_post', category="objective", path=objective.id) }}
+                    {{ dropzone.create(action='storage.upload_sub_image_post', category="objective", path=objective.id) }}
                 </div>
             </div>
         </div>

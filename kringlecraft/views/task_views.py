@@ -221,7 +221,7 @@ def solution_post(objective_id):
                                                             solution_form.completed_content,
                                                             solution_form.ctf_flag_content)
     my_solution = solution_services.set_objective_notes_for_user(my_objective.id, current_user.id,
-                                                           flask.request.form["notes"].encode())
+                                                                 flask.request.form["notes"].encode())
 
     if not my_solution:
         # (6e) show dedicated error page

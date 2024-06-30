@@ -8,7 +8,7 @@ from kringlecraft.utils.misc_tools import get_markdown
 blueprint = flask.Blueprint('data', __name__, template_folder='templates')
 
 
-# Show statistics regarding available elements stored in the database and on S3 storage
+# Show statistics regarding available elements stored in the database and on local file storage
 @blueprint.route('/stats', methods=['GET'])
 def stats():
     # (1) import forms and utilities
@@ -174,7 +174,7 @@ def world(world_id):
                                  world_image=world_image, page_mode="init")
 
 
-# Post a change in a world's data
+# Post a change in the world's data
 @blueprint.route('/world_post/<int:world_id>', methods=['POST'])
 @login_required
 def world_post(world_id):
@@ -554,7 +554,8 @@ def objective(objective_id):
     return flask.render_template('data/objective.html', objective_form=objective_form,
                                  objective=my_objective, objective_image=objective_image, room=my_room, world=my_world,
                                  page_mode="init", objective_types=objective_services.get_objective_types(),
-                                 md_challenge=md_challenge, md_solution=md_solution, candidate_solutions=candidate_solutions, user_list=user_list)
+                                 md_challenge=md_challenge, md_solution=md_solution,
+                                 candidate_solutions=candidate_solutions, user_list=user_list)
 
 
 # Post a change in an objective's data
@@ -566,6 +567,8 @@ def objective_post(objective_id):
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
+    import kringlecraft.services.solution_services as solution_services
+    import kringlecraft.services.user_services as user_services
 
     if current_user.role != 0:
         # (6e) show dedicated error page
@@ -618,11 +621,18 @@ def objective_post(objective_id):
     objective_form.room.default = objective_form.room_content
     objective_form.process()
 
+    md_challenge = "" if my_objective.challenge is None else get_markdown(my_objective.challenge)
+    all_solutions = solution_services.find_active_solutions(objective_id)
+    md_solution = None if len(all_solutions) != 1 else get_markdown(all_solutions[0].notes)
+    candidate_solutions = None if len(all_solutions) < 1 else all_solutions
+    user_list = {key: value for key, value in user_services.get_user_choices(user_services.find_all_users())}
+
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/objective.html', objective_form=objective_form,
-                                 objective=my_objective, objective_image=objective_image, page_mode="edit",
-                                 room=my_room, world=my_world, objective_types=objective_services.get_objective_types(),
-                                 temp_ending=temp_ending)
+                                 objective=my_objective, objective_image=objective_image, room=my_room, world=my_world,
+                                 page_mode="edit", objective_types=objective_services.get_objective_types(),
+                                 md_challenge=md_challenge, md_solution=md_solution,
+                                 candidate_solutions=candidate_solutions, user_list=user_list, temp_ending=temp_ending)
 
 
 # Delete a specific objective - and all included elements!!!

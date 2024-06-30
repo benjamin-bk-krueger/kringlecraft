@@ -31,7 +31,7 @@ def clear_image(category, image_id):
 
 @blueprint.route('/clear/image/<string:category>/<string:path>/<string:filename>', methods=['GET'])
 @login_required
-def clear_image_path(category, path, filename):
+def clear_sub_image(category, path, filename):
     # (2) initialize form data
     if category not in ("profile", "world", "room", "objective"):
         # (6e) show dedicated error page
@@ -43,6 +43,22 @@ def clear_image_path(category, path, filename):
     # (6b) redirect to new page after successful operation
     if category == "objective":
         return flask.redirect(flask.url_for('task.challenge', objective_id=path))
+
+
+@blueprint.route('/clear/image/<string:category>/<string:path>/<string:subpath>/<string:filename>', methods=['GET'])
+@login_required
+def clear_sub_sub_image(category, path, subpath, filename):
+    # (2) initialize form data
+    if category not in ("profile", "world", "room", "objective"):
+        # (6e) show dedicated error page
+        return flask.jsonify({"status": "error", "message": "Category does not exist."})
+
+    # (4a) perform operations
+    delete_sub_image(category, path + "/" + subpath, filename)
+
+    # (6b) redirect to new page after successful operation
+    if category == "profile":
+        return flask.redirect(flask.url_for('task.solution', objective_id=subpath))
 
 
 @blueprint.route('/prepare/image/<string:category>', methods=['POST'])
@@ -62,9 +78,26 @@ def prepare_image_post(category):
     return flask.jsonify({"status": "success", "message": "File uploaded successfully"})
 
 
+@blueprint.route('/upload/image/<string:category>/<string:filename>', methods=['POST'])
+@login_required
+def upload_image_post(category, filename):
+    # (2) initialize form data
+    if category not in ("profile", "world", "room", "objective"):
+        # (6e) show dedicated error page
+        return flask.jsonify({"status": "error", "message": "Category does not exist."})
+
+    # (4a) perform operations
+    delete_image(category, filename)
+    f = flask.request.files.get('file')
+    save_file(f, category, filename)
+
+    # (6f) another result
+    return flask.jsonify({"status": "success", "message": "File uploaded successfully"})
+
+
 @blueprint.route('/upload/image/path/<string:category>/<string:path>', methods=['POST'])
 @login_required
-def upload_image_path_post(category, path):
+def upload_sub_image_post(category, path):
     # (2) initialize form data
     if category not in ("profile", "world", "room", "objective"):
         # (6e) show dedicated error page
@@ -82,29 +115,12 @@ def upload_image_path_post(category, path):
 
 @blueprint.route('/upload/image/user/<string:path>', methods=['POST'])
 @login_required
-def upload_image_user_post(path):
+def upload_user_image_post(path):
     # (4a) perform operations
     f = flask.request.files.get('file')
     create_path("profile", str(current_user.id) + "/" + path)
 
     save_sub_file(f, "profile", str(current_user.id) + "/" + path)
-
-    # (6f) another result
-    return flask.jsonify({"status": "success", "message": "File uploaded successfully"})
-
-
-@blueprint.route('/upload/image/<string:category>/<string:filename>', methods=['POST'])
-@login_required
-def upload_image_post(category, filename):
-    # (2) initialize form data
-    if category not in ("profile", "world", "room", "objective"):
-        # (6e) show dedicated error page
-        return flask.jsonify({"status": "error", "message": "Category does not exist."})
-
-    # (4a) perform operations
-    delete_image(category, filename)
-    f = flask.request.files.get('file')
-    save_file(f, category, filename)
 
     # (6f) another result
     return flask.jsonify({"status": "success", "message": "File uploaded successfully"})
