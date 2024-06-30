@@ -16,7 +16,7 @@
 
         <!-- Own functions and stylesheets, overrides -->
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
-        {% if session['style'] == "admin" %}
+        {% if current_user.role == 0 %}
             <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/background_admin.css') }}">
         {% else %}
             <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/background.css') }}">

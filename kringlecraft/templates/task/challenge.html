@@ -13,9 +13,6 @@
 {% endblock %}
 
 {% block additional_js %}
-    {#  Enable clipboard #}
-    <script src="{{ url_for('static', filename='js/func_clipboard.js') }}"></script>
-
     {{ dropzone.load_js() }}
     {{ dropzone.config() }}
 
