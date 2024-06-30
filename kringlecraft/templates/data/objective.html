@@ -153,8 +153,8 @@
 
                 <a class="btn btn-primary me-3" href="{{ url_for('task.challenge', objective_id=objective.id)}}" role="button"><i class="bi bi-question-square"></i> Challenge</a>
             {%  endif %}
-            {% if current_user.role == 0 or current_user.student_role == 1 %}
-                <a class="btn btn-primary me-3" href="#" role="button"><i class="bi bi-exclamation-square"></i> Solution</a>
+            {% if current_user.role == 0 or current_user.role == 1 %}
+                <a class="btn btn-primary me-3" href="{{ url_for('task.solution', objective_id=objective.id) }}" role="button"><i class="bi bi-exclamation-square"></i> Solution</a>
                 <a class="btn btn-primary me-3" href="#" role="button"><i class="bi bi-filetype-pdf"></i> Report</a>
                 <a class="btn btn-primary me-3" href="#" role="button"><i class="bi bi-filetype-html"></i> Report</a>
             {%  endif %}
