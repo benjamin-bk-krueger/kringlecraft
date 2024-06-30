@@ -21,7 +21,7 @@
 
     {#  Queue Dropzone #}
     <script src="{{ url_for('static', filename='js/func_dropzone.js') }}"></script>
-    <script>QueueDropzone("{{ csrf_token() }}", "{{ url_for('task.challenge_continue', objective_id=objective.id) }}")</script>
+    <script>QueueDropzone("{{ csrf_token() }}", "{{ url_for('task.challenge_continue', objective_id=objective.id) }}", "challenge")</script>
 
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
     <script src="{{ url_for('static', filename='js/func_easymde.js') }}"></script>

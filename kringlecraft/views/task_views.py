@@ -186,11 +186,16 @@ def solution(objective_id):
     solution_form.process()
     my_notes = solution_services.get_objective_notes_for_user(objective_id, current_user.id)
 
+    image_files = get_sub_images("profile", str(current_user.id) + "/" + str(my_objective.id))
+
+    www_server = flask.current_app.config['app.www_server']
+
     md_challenge = "" if my_objective.challenge is None else get_markdown(my_objective.challenge)
 
     # (6a) show rendered page
     return flask.render_template('task/solution.html', solution_form=solution_form, notes=my_notes,
-                                 world=my_world, room=my_room, objective=my_objective, md_challenge=md_challenge)
+                                 world=my_world, room=my_room, objective=my_objective, md_challenge=md_challenge,
+                                 image_files=image_files, www_server=www_server)
 
 
 # Post a change in an objective's solution
@@ -224,3 +229,38 @@ def solution_post(objective_id):
 
     # (6b) redirect to new page after successful operation
     return flask.redirect(flask.url_for('data.objective', objective_id=my_objective.id))
+
+
+@blueprint.route('/solution/continue/<int:objective_id>', methods=['POST'])
+@login_required
+def solution_continue(objective_id):
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.task_forms import SolutionForm
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.room_services as room_services
+    import kringlecraft.services.objective_services as objective_services
+    import kringlecraft.services.solution_services as solution_services
+
+    # (2) initialize form data
+    my_objective = objective_services.find_objective_by_id(objective_id)
+    if not my_objective:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Objective does not exist.")
+
+    my_room = room_services.find_room_by_id(my_objective.room_id)
+    my_world = world_services.find_world_by_id(my_room.world_id)
+    my_solution = solution_services.find_objective_solution_for_user(objective_id, current_user.id)
+    solution_form = SolutionForm(my_solution)
+    solution_form.process()
+    my_notes = flask.request.form["notes"]
+
+    image_files = get_sub_images("profile", str(current_user.id) + "/" + str(my_objective.id))
+
+    www_server = flask.current_app.config['app.www_server']
+
+    md_challenge = "" if my_objective.challenge is None else get_markdown(my_objective.challenge)
+
+    # (6a) show rendered page
+    return flask.render_template('task/solution.html', solution_form=solution_form, notes=my_notes,
+                                 world=my_world, room=my_room, objective=my_objective, md_challenge=md_challenge,
+                                 image_files=image_files, www_server=www_server)

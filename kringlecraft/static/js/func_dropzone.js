@@ -10,7 +10,7 @@ function MockDropzone(category, temp_ending) {
     };
 }
 
-function QueueDropzone(csrf_token, action_url) {
+function QueueDropzone(csrf_token, action_url, input_name) {
     Dropzone.options.myDropzone = {
         headers: {
             'X-CSRF-TOKEN': csrf_token
@@ -27,7 +27,7 @@ function QueueDropzone(csrf_token, action_url) {
 
                 var input = document.createElement('input');
                 input.type = 'hidden';
-                input.name = 'challenge';
+                input.name = input_name;
                 input.value = challengeContent;
 
                 var csrfInput = document.createElement('input');

@@ -1,5 +1,5 @@
 import flask
-from flask_login import (login_required)  # to manage user sessions
+from flask_login import (login_required, current_user)  # to manage user sessions
 
 from kringlecraft.utils.file_tools import (delete_temp_files, delete_image, delete_image_in_path, create_path,
                                            save_file_with_name, save_file_in_path)
@@ -75,6 +75,19 @@ def upload_image_path_post(category, path):
     create_path(category, path)
 
     save_file_in_path(f, category, path)
+
+    # (6f) another result
+    return flask.jsonify({"status": "success", "message": "File uploaded successfully"})
+
+
+@blueprint.route('/upload/image/user/<string:path>', methods=['POST'])
+@login_required
+def upload_image_user_post(path):
+    # (4a) perform operations
+    f = flask.request.files.get('file')
+    create_path("profile", str(current_user.id) + "/" + path)
+
+    save_file_in_path(f, "profile", str(current_user.id) + "/" + path)
 
     # (6f) another result
     return flask.jsonify({"status": "success", "message": "File uploaded successfully"})

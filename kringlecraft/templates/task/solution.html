@@ -4,13 +4,27 @@
 {% block title %}Solution Editor for {{ objective.name }}{% endblock %}
 
 {% block additional_css %}
+    {{ dropzone.load_css() }}
+    {{ dropzone.style('border: 2px dashed #0087F7; margin: 2%; max-width: 200px; ') }}
+
     <!-- EasyMDE - Markdown Editor -->
     <!-- https://easy-markdown-editor.tk -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
 {% endblock %}
 
 {% block additional_js %}
+    {#  Enable clipboard #}
+    <script src="{{ url_for('static', filename='js/func_clipboard.js') }}"></script>
+
+    {{ dropzone.load_js() }}
+    {{ dropzone.config() }}
+
+    {#  Queue Dropzone #}
+    <script src="{{ url_for('static', filename='js/func_dropzone.js') }}"></script>
+    <script>QueueDropzone("{{ csrf_token() }}", "{{ url_for('task.solution_continue', objective_id=objective.id) }}", "notes")</script>
+
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <script src="{{ url_for('static', filename='js/func_easymde.js') }}"></script>
 {% endblock %}
 
 {% block modal %}
@@ -54,6 +68,36 @@
         <div class="rounded border mt-4 mb-4 c-color p-2">
             <div class="fs-3 c-title">Solution Editor for {{ objective.name }}</div>
             <div class="underline"><span style="background: #f5f5f5;"><i class="bi bi-clipboard-data" aria-hidden="true"></i></span></div>
+        </div>
+
+        <div class="rounded border mt-4 mb-4 c-color p-2">
+            <div class="fs-3 c-title">Image Section</div>
+            <div class="underline"><span style="background: #f5f5f5;"><i class="bi bi-clipboard-data" aria-hidden="true"></i></span></div>
+            <div class="row">
+                <div class="col-sm-10">
+                <div class="row flex-nowrap overflow-x-auto overflow-y-hidden py-3 mx-2" id="image-container">
+                    {% for image in image_files %}
+                        <figure class="figure col-auto px-1 image-item">
+                            <a href="#">
+                                {% if image %}
+                                    <img src="{{ url_for('static', filename=image) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="Image">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="figure-img img-fluid rounded img-restricted-sm" alt="Image">
+                                {% endif %}
+                            </a>
+                            <figcaption class="figure-caption c-title">
+                                <a href="#" onclick="InsertMDE('![{{ image }}]({{ www_server }}/static/{{ image }})');return false;" data-toggle="tooltip" title="Copy Markdown Link"><i class="bi bi-markdown me-2"></i></a>
+                                {% set new_filename = image.replace("uploads/objective/" + objective.id | string + "/", "")  %}
+                                <a href="{{ url_for('storage.clear_image_path',  category="objective", path=objective.id, filename=new_filename) }}" data-toggle="tooltip" title="Delete Image"><i class="bi bi-trash"></i></a>
+                            </figcaption>
+                        </figure>
+                    {% endfor %}
+                </div>
+                </div>
+                <div class="col-sm-2">
+                    {{ dropzone.create(action='storage.upload_image_user_post', category="objective", path=objective.id) }}
+                </div>
+            </div>
         </div>
 
         {# Display Markdown editor form - edit an objective's solution #}
