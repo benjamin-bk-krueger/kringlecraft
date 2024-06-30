@@ -173,4 +173,12 @@
         <div class="fs-3 c-title">Challenge</div>
         {{ md_challenge|safe }}
     </div>
+
+    {% if md_solution is not none %}
+        <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
+            {#  Display solution of the selected objective - the markdown has been converted to HTML #}
+            <div class="fs-3 c-title">Solution</div>
+            {{ md_solution|safe }}
+        </div>
+    {% endif %}
 {% endblock %}

@@ -12,6 +12,14 @@ def find_objective_solution_for_user(objective_id: int, user_id: int) -> Solutio
         session.close()
 
 
+def find_active_solutions(objective_id: int) -> list[Solution] | None:
+    session = db_session.create_session()
+    try:
+        return session.query(Solution).filter(Solution.objective_id == objective_id).filter(Solution.visible == True).filter(Solution.completed == True).order_by(Solution.created_date.asc()).all()
+    finally:
+        session.close()
+
+
 def get_objective_notes_for_user(objective_id: int, user_id: int) -> str | None:
     session = db_session.create_session()
     try:

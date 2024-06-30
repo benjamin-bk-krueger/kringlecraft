@@ -520,6 +520,7 @@ def objective(objective_id):
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
+    import kringlecraft.services.solution_services as solution_services
 
     # (2) initialize form data
     my_objective = objective_services.find_objective_by_id(objective_id)
@@ -541,12 +542,14 @@ def objective(objective_id):
     objective_form.process()
 
     md_challenge = "" if my_objective.challenge is None else get_markdown(my_objective.challenge)
+    all_solutions = solution_services.find_active_solutions(objective_id)
+    md_solution = None if len(all_solutions) != 1 else get_markdown(all_solutions[0].notes)
 
     # (6a) show rendered page
     return flask.render_template('data/objective.html', objective_form=objective_form,
                                  objective=my_objective, objective_image=objective_image, room=my_room, world=my_world,
                                  page_mode="init", objective_types=objective_services.get_objective_types(),
-                                 md_challenge=md_challenge)
+                                 md_challenge=md_challenge, md_solution=md_solution)
 
 
 # Post a change in an objective's data
