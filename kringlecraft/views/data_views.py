@@ -16,6 +16,7 @@ def stats():
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
+    import kringlecraft.services.solution_services as solution_services
 
     # (2) initialize form data
     counts = dict()
@@ -23,6 +24,7 @@ def stats():
     counts['world'] = world_services.get_world_count()
     counts['room'] = room_services.get_room_count()
     counts['objective'] = objective_services.get_objective_count()
+    counts['solution'] = solution_services.get_active_count()
 
     # (6a) show rendered page
     return flask.render_template('data/stats.html', counts=counts)
@@ -546,7 +548,7 @@ def objective(objective_id):
     all_solutions = solution_services.find_active_solutions(objective_id)
     md_solution = None if len(all_solutions) != 1 else get_markdown(all_solutions[0].notes)
     candidate_solutions = None if len(all_solutions) < 1 else all_solutions
-    user_list = user_services.get_user_choices(user_services.find_all_users())
+    user_list = {key: value for key, value in user_services.get_user_choices(user_services.find_all_users())}
 
     # (6a) show rendered page
     return flask.render_template('data/objective.html', objective_form=objective_form,

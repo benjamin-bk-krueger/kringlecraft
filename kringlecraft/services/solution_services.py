@@ -2,6 +2,15 @@ import kringlecraft.data.db_session as db_session
 from kringlecraft.data.solutions import Solution
 
 
+# ----------- Count functions -----------
+def get_active_count() -> int | None:
+    session = db_session.create_session()
+    try:
+        return session.query(Solution).filter(Solution.visible == True).filter(Solution.completed == True).count()
+    finally:
+        session.close()
+
+
 # ----------- Find functions -----------
 def find_objective_solution_for_user(objective_id: int, user_id: int) -> Solution | None:
     session = db_session.create_session()

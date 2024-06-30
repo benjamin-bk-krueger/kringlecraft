@@ -23,6 +23,16 @@
                 <div class="carousel-item active">
                     <a href="{{ url_for('home.index') }}"><img class="img-fluid d-block mx-auto rounded img-restricted-lg" src="{{ url_for('static', filename='img/kringle_logo.jpg') }}" alt="KringleCraft.com Logo"></a>
                 </div>
+
+                {# Dynamic slides for all worlds #}
+                {% for world in worlds %}
+                    <div class="carousel-item">
+                        <a href="{{ url_for('data.world', world_id=world.id) }}"><img class="img-fluid d-block mx-auto rounded img-restricted-lg" src="{{ url_for('static', filename=world_images[world.id]) }}" alt="World Logo"></a>
+                        <div class="carousel-caption d-none d-md-block">
+                            <div class="fs-4">{{ world.name }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
 
             {# Left and right controls #}

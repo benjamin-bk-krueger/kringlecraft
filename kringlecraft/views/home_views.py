@@ -2,6 +2,8 @@ import flask
 from flask_login import (login_user, logout_user, login_required)  # to manage user sessions
 
 from kringlecraft.utils.mail_tools import (send_admin_mail, send_mail)
+from kringlecraft.utils.file_tools import (get_all_images)
+
 
 blueprint = flask.Blueprint('home', __name__, template_folder='templates')
 
@@ -75,8 +77,15 @@ def error():
 # Show index page
 @blueprint.route('/', methods=['GET'])
 def index():
+    # (1) import forms and utilities
+    import kringlecraft.services.world_services as world_services
+
+    # (2) initialize form data
+    all_worlds = world_services.find_all_worlds()
+    world_images = get_all_images("world")
+
     # (6a) show rendered page
-    return flask.render_template('home/index.html')
+    return flask.render_template('home/index.html', worlds=all_worlds, world_images=world_images)
 
 
 # Show user log-in page

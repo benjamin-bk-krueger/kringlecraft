@@ -100,7 +100,7 @@
         {#  Show objective info #}
         <div class="rounded border mt-4 mb-4 c-color p-2">
             <div class="fs-4 text-center c-title">All Objectives in {{  room.name }}</div>
-            <div class="underline"><span><i class="bi bi-clipboard-data" aria-hidden="true"></i></span></div>
+            <div class="underline"><span style="background: #f5f5f5;"><i class="bi bi-clipboard-data" aria-hidden="true"></i></span></div>
 
             {#  Display action buttons regarding the selected objective  #}
             <a class="btn btn-secondary me-3" href="{{ url_for('data.rooms', world_id=room.world_id )}}" role="button"><i class="bi bi-backspace"></i> Back</a>
