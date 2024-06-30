@@ -57,6 +57,18 @@ def find_active_user_by_id(user_id: int) -> User | None:
         session.close()
 
 
+def get_user_dict() -> dict[int, str] | None:
+    session = db_session.create_session()
+    try:
+        user_id_choices = dict()
+        all_users = session.query(User).filter(User.active == True).order_by(User.name.asc()).all()
+        for user in all_users:
+            user_id_choices[user.id] = user.name
+        return user_id_choices
+    finally:
+        session.close()
+
+
 # ----------- Create functions -----------
 def create_user(name: str, email: str, password: str) -> User | None:
     if find_user_by_email(email):

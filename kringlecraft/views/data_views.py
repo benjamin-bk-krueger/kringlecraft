@@ -521,6 +521,7 @@ def objective(objective_id):
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
     import kringlecraft.services.solution_services as solution_services
+    import kringlecraft.services.user_services as user_services
 
     # (2) initialize form data
     my_objective = objective_services.find_objective_by_id(objective_id)
@@ -544,12 +545,14 @@ def objective(objective_id):
     md_challenge = "" if my_objective.challenge is None else get_markdown(my_objective.challenge)
     all_solutions = solution_services.find_active_solutions(objective_id)
     md_solution = None if len(all_solutions) != 1 else get_markdown(all_solutions[0].notes)
+    candidate_solutions = None if len(all_solutions) < 1 else all_solutions
+    user_list = user_services.get_user_dict()
 
     # (6a) show rendered page
     return flask.render_template('data/objective.html', objective_form=objective_form,
                                  objective=my_objective, objective_image=objective_image, room=my_room, world=my_world,
                                  page_mode="init", objective_types=objective_services.get_objective_types(),
-                                 md_challenge=md_challenge, md_solution=md_solution)
+                                 md_challenge=md_challenge, md_solution=md_solution, candidate_solutions=candidate_solutions, user_list=user_list)
 
 
 # Post a change in an objective's data
