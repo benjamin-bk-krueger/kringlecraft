@@ -1,5 +1,5 @@
 from sqlalchemy import asc
-from typing import TypeVar, Type, List, Any, Tuple
+from typing import TypeVar, Type
 import kringlecraft.data.db_session as db_session
 
 
@@ -16,7 +16,7 @@ def get_count(model: Type[T]) -> int | None:
 
 
 # ----------- Find functions -----------
-def find_all(model: Type[T], order_by_field: str = 'name') -> List[T] | None:
+def find_all(model: Type[T], order_by_field: str = 'name') -> list[T] | None:
     session = db_session.create_session()
     try:
         return session.query(model).order_by(asc(getattr(model, order_by_field))).all()
@@ -32,7 +32,7 @@ def find_by_id(model: Type[T], entity_id: int) -> T | None:
         session.close()
 
 
-def find_by_field(model: Type[T], field: str, value: Any) -> T | None:
+def find_by_field(model: Type[T], field: str, value) -> T | None:
     session = db_session.create_session()
     try:
         return session.query(model).filter(getattr(model, field) == value).first()
@@ -40,12 +40,12 @@ def find_by_field(model: Type[T], field: str, value: Any) -> T | None:
         session.close()
 
 
-def get_entity_choices(entities: List[T], id_field: str = 'id', name_field: str = 'name') -> List[Tuple[int, str]]:
+def get_choices(entities: list[T], id_field: str = 'id', name_field: str = 'name') -> list[tuple[int, str]]:
     return [(getattr(entity, id_field), getattr(entity, name_field)) for entity in entities]
 
 
 # ----------- Delete functions -----------
-def delete_entity(model: Type[T], entity_id: int, id_field: str = 'id', name_field: str = 'name') -> T | None:
+def delete(model: Type[T], entity_id: int, id_field: str = 'id', name_field: str = 'name') -> T | None:
     session = db_session.create_session()
     try:
         entity = session.query(model).filter(getattr(model, id_field) == entity_id).first()

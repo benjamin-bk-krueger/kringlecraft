@@ -1,6 +1,6 @@
 import kringlecraft.data.db_session as db_session
 from kringlecraft.data.users import User
-from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete_entity)
+from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete, get_choices)
 from kringlecraft.utils.misc_tools import (random_hash, hash_text, verify_hash)
 
 
@@ -41,6 +41,10 @@ def find_user_by_email(email: str) -> User | None:
     return find_by_field(User, 'email', email)
 
 
+def get_user_choices(users: list[User]) -> list[tuple[int, str]]:
+    return get_choices(users)
+
+
 def find_active_users() -> list[User] | None:
     session = db_session.create_session()
     try:
@@ -53,43 +57,6 @@ def find_active_user_by_id(user_id: int) -> User | None:
     session = db_session.create_session()
     try:
         return session.query(User).filter(User.active == True).filter(User.id == user_id).first()
-    finally:
-        session.close()
-
-
-def get_user_dict() -> dict[int, str] | None:
-    session = db_session.create_session()
-    try:
-        user_id_choices = dict()
-        all_users = session.query(User).filter(User.active == True).order_by(User.name.asc()).all()
-        for user in all_users:
-            user_id_choices[user.id] = user.name
-        return user_id_choices
-    finally:
-        session.close()
-
-
-# ----------- Create functions -----------
-def create_user(name: str, email: str, password: str) -> User | None:
-    if find_user_by_email(email):
-        return None
-
-    user = User()
-    user.email = email
-    user.name = name
-    user.hashed_password = hash_text(password)
-    user.role = 1
-    user.active = 0
-    user.notification = 0
-
-    session = db_session.create_session()
-    try:
-        session.add(user)
-        session.commit()
-
-        print(f"INFO: Register approval for user {user.email}")
-
-        return user
     finally:
         session.close()
 
@@ -130,7 +97,7 @@ def change_user_password(user_id: int, password: str) -> User | None:
 
 
 def enable_user(user_id: int) -> User | None:
-    # check valid student account and enable account
+    # check a valid student account and enable an account
     session = db_session.create_session()
     try:
         user = session.query(User).filter(User.active == 0).filter(User.id == user_id).first()
@@ -146,7 +113,7 @@ def enable_user(user_id: int) -> User | None:
 
 
 def prepare_user(email: str) -> User | None:
-    # check valid student account and sent out password reset mail
+    # check a valid student account and sent out password reset mail
     session = db_session.create_session()
     try:
         user = session.query(User).filter(User.active == 1).filter(User.email == email).first()
@@ -178,6 +145,31 @@ def reset_user(hash_value: str, password: str) -> User | None:
         session.close()
 
 
+# ----------- Create functions -----------
+def create_user(name: str, email: str, password: str) -> User | None:
+    if find_user_by_email(email):
+        return None
+
+    user = User()
+    user.email = email
+    user.name = name
+    user.hashed_password = hash_text(password)
+    user.role = 1
+    user.active = 0
+    user.notification = 0
+
+    session = db_session.create_session()
+    try:
+        session.add(user)
+        session.commit()
+
+        print(f"INFO: Register approval for user {user.email}")
+
+        return user
+    finally:
+        session.close()
+
+
 # ----------- Delete functions -----------
 def delete_user(user_id: int) -> User | None:
-    return delete_entity(User, user_id, name_field='email')
+    return delete(User, user_id, name_field='email')

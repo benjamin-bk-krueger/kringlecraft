@@ -1,8 +1,7 @@
 import kringlecraft.data.db_session as db_session
-from typing import List, Tuple
 from kringlecraft.data.objectives import Objective
-from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete_entity,
-                                                  get_entity_choices)
+from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete,
+                                                  get_choices)
 
 
 # ----------- Count functions -----------
@@ -23,8 +22,8 @@ def find_objective_by_name(name: str) -> Objective | None:
     return find_by_field(Objective, 'name', name)
 
 
-def get_objective_choices(objectives: List[Objective]) -> List[Tuple[int, str]]:
-    return get_entity_choices(objectives)
+def get_objective_choices(objectives: list[Objective]) -> list[tuple[int, str]]:
+    return get_choices(objectives)
 
 
 def find_room_objectives(room_id: int) -> list[Objective] | None:
@@ -44,19 +43,11 @@ def find_room_objective_by_name(room_id: int, name: str) -> Objective | None:
 
 
 def get_objective_type_choices() -> list[tuple[int, str]]:
-    objective_reverse = {1: "objective", 2: "character", 3: "item"}
-    objective_type_choices = list()
-    for key, value in objective_reverse.items():
-        objective_type_choices.append((key, value.title()))
-    return objective_type_choices
+    return [(key, value.title()) for key, value in {1: "objective", 2: "character", 3: "item"}.items()]
 
 
 def get_objective_types() -> dict[int, str]:
-    objective_reverse = {1: "objective", 2: "character", 3: "item"}
-    objective_type_choices = dict()
-    for key, value in objective_reverse.items():
-        objective_type_choices[key] = value.title()
-    return objective_type_choices
+    return {key: value.title() for key, value in {1: "objective", 2: "character", 3: "item"}.items()}
 
 
 def get_objective_challenge(objective_id: int) -> str | None:
@@ -69,8 +60,8 @@ def get_objective_challenge(objective_id: int) -> str | None:
 
 
 # ----------- Edit functions -----------
-def edit_objective(objective_id: int, room_id: int, name: str = None, description: str = None, difficulty: int = 1,
-                   visible: bool = False, objective_type: int = 1) -> Objective | None:
+def edit_objective(objective_id: int, room_id: int, name: str = None, description: str = None, difficulty: int = None,
+                   visible: bool = None, objective_type: int = None) -> Objective | None:
     session = db_session.create_session()
     try:
         objective = session.query(Objective).filter(Objective.id == objective_id).first()
@@ -135,4 +126,4 @@ def create_objective(name: str, description: str, difficulty: int, visible: bool
 
 # ----------- Delete functions -----------
 def delete_objective(objective_id: int) -> Objective | None:
-    return delete_entity(Objective, objective_id)
+    return delete(Objective, objective_id)

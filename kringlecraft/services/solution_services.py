@@ -15,17 +15,8 @@ def find_objective_solution_for_user(objective_id: int, user_id: int) -> Solutio
 def find_active_solutions(objective_id: int) -> list[Solution] | None:
     session = db_session.create_session()
     try:
-        return session.query(Solution).filter(Solution.objective_id == objective_id).filter(Solution.visible == True).filter(Solution.completed == True).order_by(Solution.created_date.asc()).all()
-    finally:
-        session.close()
-
-
-def get_objective_notes_for_user(objective_id: int, user_id: int) -> str | None:
-    session = db_session.create_session()
-    try:
-        solution = session.query(Solution).filter(Solution.user_id == user_id).filter(Solution.objective_id ==
-                                                                                      objective_id).first()
-        return "New solution" if solution is None else str(bytes(solution.notes), 'utf-8')
+        return (session.query(Solution).filter(Solution.objective_id == objective_id).filter(Solution.visible == True).
+                filter(Solution.completed == True).order_by(Solution.created_date.asc()).all())
     finally:
         session.close()
 
@@ -48,17 +39,17 @@ def set_objective_notes_for_user(objective_id: int, user_id: int, notes: bytes) 
 
 
 # ----------- Create functions -----------
-def create_or_edit_solution(objective_id: int, user_id: int, visible: bool, completed: bool,
-                            ctf_flag: str) -> Solution | None:
+def create_or_edit_solution(objective_id: int, user_id: int, visible: bool = None, completed: bool = None,
+                            ctf_flag: str = None) -> Solution | None:
     if find_objective_solution_for_user(objective_id, user_id):
         session = db_session.create_session()
         try:
             solution = session.query(Solution).filter(Solution.user_id == user_id).filter(
                 Solution.objective_id == objective_id).first()
             if solution:
-                solution.visible = visible
-                solution.completed = completed
-                solution.ctf_flag = ctf_flag
+                solution.visible = visible if visible is not None else solution.visible
+                solution.completed = completed if completed is not None else solution.completed
+                solution.ctf_flag = ctf_flag if ctf_flag is not None else solution.ctf_flag
                 session.commit()
 
                 print(f"INFO: Solution notes changed for objective id:{objective_id}")

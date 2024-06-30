@@ -546,7 +546,7 @@ def objective(objective_id):
     all_solutions = solution_services.find_active_solutions(objective_id)
     md_solution = None if len(all_solutions) != 1 else get_markdown(all_solutions[0].notes)
     candidate_solutions = None if len(all_solutions) < 1 else all_solutions
-    user_list = user_services.get_user_dict()
+    user_list = user_services.get_user_choices(user_services.find_all_users())
 
     # (6a) show rendered page
     return flask.render_template('data/objective.html', objective_form=objective_form,

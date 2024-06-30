@@ -11,15 +11,6 @@ def find_world_summary_for_user(world_id: int, user_id: int) -> Summary | None:
         session.close()
 
 
-def get_world_notes_for_user(world_id: int, user_id: int) -> str | None:
-    session = db_session.create_session()
-    try:
-        summary = session.query(Summary).filter(Summary.user_id == user_id).filter(Summary.world_id == world_id).first()
-        return "New summary" if summary is None else str(bytes(summary.notes), 'utf-8')
-    finally:
-        session.close()
-
-
 # ----------- Edit functions -----------
 def set_world_notes_for_user(world_id: int, user_id: int, notes: bytes) -> Summary | None:
     session = db_session.create_session()
@@ -37,14 +28,14 @@ def set_world_notes_for_user(world_id: int, user_id: int, notes: bytes) -> Summa
 
 
 # ----------- Create functions -----------
-def create_or_edit_summary(world_id: int, user_id: int, visible: bool) -> Summary | None:
+def create_or_edit_summary(world_id: int, user_id: int, visible: bool = None) -> Summary | None:
     if find_world_summary_for_user(world_id, user_id):
         session = db_session.create_session()
         try:
             summary = session.query(Summary).filter(Summary.user_id == user_id).filter(
                 Summary.world_id == world_id).first()
             if summary:
-                summary.visible = visible
+                summary.visible = visible if visible is not None else summary.visible
                 session.commit()
 
                 print(f"INFO: Summary notes changed for world id:{world_id}")

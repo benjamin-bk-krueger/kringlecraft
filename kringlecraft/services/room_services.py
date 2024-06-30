@@ -1,8 +1,7 @@
 import kringlecraft.data.db_session as db_session
-from typing import List, Tuple
 from kringlecraft.data.rooms import Room
-from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete_entity,
-                                                  get_entity_choices)
+from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete,
+                                                  get_choices)
 
 
 # ----------- Count functions -----------
@@ -23,8 +22,8 @@ def find_room_by_name(name: str) -> Room | None:
     return find_by_field(Room, 'name', name)
 
 
-def get_room_choices(rooms: List[Room]) -> List[Tuple[int, str]]:
-    return get_entity_choices(rooms)
+def get_room_choices(rooms: list[Room]) -> list[tuple[int, str]]:
+    return get_choices(rooms)
 
 
 def find_world_rooms(world_id: int) -> list[Room] | None:
@@ -87,4 +86,4 @@ def create_room(name: str, description: str, world_id: int, user_id: int) -> Roo
 
 # ----------- Delete functions -----------
 def delete_room(room_id: int) -> Room | None:
-    return delete_entity(Room, room_id)
+    return delete(Room, room_id)

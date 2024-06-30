@@ -25,7 +25,11 @@ def verify_hash(hashed_text: str, plain_text: str) -> bool:
     return crypto.verify(plain_text, hashed_text)
 
 
-def get_markdown(challenge):
-    md = markdown2.markdown(str(bytes(challenge), 'utf-8'), extras=['fenced-code-blocks', 'code-friendly', 'pygments'])
+def get_markdown(notes):
+    md = markdown2.markdown(str(bytes(notes), 'utf-8'), extras=['fenced-code-blocks', 'code-friendly', 'pygments'])
     md.replace("<img src=", "<img class=\"img-fluid\" src=")
     return md
+
+
+def convert_markdown(notes) -> str:
+    return str(bytes(notes), 'utf-8')

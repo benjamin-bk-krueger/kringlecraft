@@ -1,8 +1,7 @@
 import kringlecraft.data.db_session as db_session
-from typing import List, Tuple
 from kringlecraft.data.worlds import World
-from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete_entity,
-                                                  get_entity_choices)
+from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete,
+                                                  get_choices)
 
 
 # ----------- Count functions -----------
@@ -23,8 +22,8 @@ def find_world_by_name(name: str) -> World | None:
     return find_by_field(World, 'name', name)
 
 
-def get_world_choices(worlds: List[World]) -> List[Tuple[int, str]]:
-    return get_entity_choices(worlds)
+def get_world_choices(worlds: list[World]) -> list[tuple[int, str]]:
+    return get_choices(worlds)
 
 
 # ----------- Edit functions -----------
@@ -76,4 +75,4 @@ def create_world(name: str, description: str, url: str, visible: bool, archived:
 
 # ----------- Delete functions -----------
 def delete_world(world_id: int) -> World | None:
-    return delete_entity(World, world_id)
+    return delete(World, world_id)

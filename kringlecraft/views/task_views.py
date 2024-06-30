@@ -2,7 +2,7 @@ import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
 from kringlecraft.utils.file_tools import get_sub_images
-from kringlecraft.utils.misc_tools import get_markdown
+from kringlecraft.utils.misc_tools import get_markdown, convert_markdown
 
 blueprint = flask.Blueprint('task', __name__, template_folder='templates')
 
@@ -126,7 +126,7 @@ def summary(world_id):
     my_summary = summary_services.find_world_summary_for_user(world_id, current_user.id)
     summary_form = SummaryForm(my_summary)
     summary_form.process()
-    my_notes = summary_services.get_world_notes_for_user(world_id, current_user.id)
+    my_notes = "New notes" if my_summary is None else convert_markdown(my_summary.notes)
 
     # (6a) show rendered page
     return flask.render_template('task/summary.html', summary_form=summary_form, notes=my_notes,
@@ -184,7 +184,7 @@ def solution(objective_id):
     my_solution = solution_services.find_objective_solution_for_user(objective_id, current_user.id)
     solution_form = SolutionForm(my_solution)
     solution_form.process()
-    my_notes = solution_services.get_objective_notes_for_user(objective_id, current_user.id)
+    my_notes = "New notes" if my_solution is None else convert_markdown(my_solution.notes)
 
     image_files = get_sub_images("profile", str(current_user.id) + "/" + str(my_objective.id))
 
