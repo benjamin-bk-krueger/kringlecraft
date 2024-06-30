@@ -1,8 +1,8 @@
 import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
-from kringlecraft.utils.file_tools import (delete_temp_files, delete_image, delete_image_in_path, create_path,
-                                           save_file_with_name, save_file_in_path)
+from kringlecraft.utils.file_tools import (delete_temp_files, delete_image, delete_sub_image, create_path,
+                                           save_file, save_sub_file)
 
 blueprint = flask.Blueprint('storage', __name__, template_folder='templates')
 
@@ -38,7 +38,7 @@ def clear_image_path(category, path, filename):
         return flask.jsonify({"status": "error", "message": "Category does not exist."})
 
     # (4a) perform operations
-    delete_image_in_path(category, path, filename)
+    delete_sub_image(category, path, filename)
 
     # (6b) redirect to new page after successful operation
     if category == "objective":
@@ -56,7 +56,7 @@ def prepare_image_post(category):
     # (4a) perform operations
     delete_temp_files(category)
     f = flask.request.files.get('file')
-    save_file_with_name(f, category, "_temp")
+    save_file(f, category, "_temp")
 
     # (6f) another result
     return flask.jsonify({"status": "success", "message": "File uploaded successfully"})
@@ -74,7 +74,7 @@ def upload_image_path_post(category, path):
     f = flask.request.files.get('file')
     create_path(category, path)
 
-    save_file_in_path(f, category, path)
+    save_sub_file(f, category, path)
 
     # (6f) another result
     return flask.jsonify({"status": "success", "message": "File uploaded successfully"})
@@ -87,7 +87,7 @@ def upload_image_user_post(path):
     f = flask.request.files.get('file')
     create_path("profile", str(current_user.id) + "/" + path)
 
-    save_file_in_path(f, "profile", str(current_user.id) + "/" + path)
+    save_sub_file(f, "profile", str(current_user.id) + "/" + path)
 
     # (6f) another result
     return flask.jsonify({"status": "success", "message": "File uploaded successfully"})
@@ -104,7 +104,7 @@ def upload_image_post(category, filename):
     # (4a) perform operations
     delete_image(category, filename)
     f = flask.request.files.get('file')
-    save_file_with_name(f, category, filename)
+    save_file(f, category, filename)
 
     # (6f) another result
     return flask.jsonify({"status": "success", "message": "File uploaded successfully"})
