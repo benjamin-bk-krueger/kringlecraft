@@ -2,7 +2,7 @@ import flask
 from flask_login import (login_user, logout_user, login_required)  # to manage user sessions
 
 from kringlecraft.utils.mail_tools import (send_admin_mail, send_mail)
-from kringlecraft.utils.file_tools import (get_all_images)
+from kringlecraft.utils.file_tools import (read_all_files_without_extension)
 
 
 blueprint = flask.Blueprint('home', __name__, template_folder='templates')
@@ -82,7 +82,7 @@ def index():
 
     # (2) initialize form data
     all_worlds = world_services.find_all_worlds()
-    world_images = get_all_images("world")
+    world_images = read_all_files_without_extension("world")
 
     # (6a) show rendered page
     return flask.render_template('home/index.html', worlds=all_worlds, world_images=world_images)

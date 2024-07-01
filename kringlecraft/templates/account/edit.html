@@ -46,14 +46,14 @@
             <div class="row">
                 <div class="col-sm">
                     {% if user_image %}
-                        <img src="{{ url_for('static', filename=user_image) }}" class="img-fluid rounded img-restricted-lg" alt="User Image">
+                        <img src="{{ url_for('static', filename='uploads' + "/" + user_image[0] + "/" + user_image[1]) }}" class="img-fluid rounded img-restricted-lg" alt="User Image">
+                        <a href="{{ url_for('storage.delete_image', path="profile", filename=user_image[1], redirect="account.profile_edit", target_id=0) }}" title="Delete image" class="btn btn-danger mt-4"><i class="bi bi-trash"></i> Clear Image</a>
                     {% else %}
                         <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="img-fluid rounded img-restricted-lg" alt="User Image">
                     {% endif %}
-                    <a href="{{ url_for('storage.clear_image', category="profile", image_id=current_user.id) }}" title="Delete image" class="btn btn-danger mt-4"><i class="bi bi-trash"></i> Clear Image</a>
                 </div>
                 <div class="col-sm">
-                    {{ dropzone.create(action='storage.upload_image_post', category="profile", filename=current_user.id) }}
+                    {{ dropzone.create(action='storage.upload_image_post', path="profile", filename_without_extension=current_user.id, overwrite=1) }}
                 </div>
             </div>
         </div>

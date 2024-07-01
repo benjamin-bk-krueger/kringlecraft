@@ -59,7 +59,7 @@
                     </div>
                     <div class="modal-body">
                         {# Upload and view profile image #}
-                        {{ dropzone.create(action='storage.prepare_image_post', category="room") }}
+                        {{ dropzone.create(action='storage.upload_image_post', path="room", filename_without_extension="_temp", overwrite=1) }}
 
                         <form action="{{ url_for('data.room_post', room_id=room.id)}}" method="POST" id="form_edit">
                             {{ room_form.csrf_token }}
@@ -119,13 +119,13 @@
             {% if current_user.role == 0 %}
                 <a class="btn btn-primary me-3" href="#" role="button" data-bs-toggle="modal" data-bs-target="#myModalEdit"><i class="bi bi-pencil"></i> Edit</a>
                 <a class="btn btn-danger me-3" href="#" role="button" data-bs-toggle="modal" data-bs-target="#myModalDelete"><i class="bi bi-trash"></i> Delete</a>
-                <a class="btn btn-primary me-3" href="{{ url_for('storage.clear_image', category="room", image_id=world.id) }}" role="button"><i class="bi bi-trash2"></i> No Image</a>
+                <a class="btn btn-primary me-3" href="{{ url_for('storage.delete_image', path="room", filename=room_image[1], redirect="data.room", target_id=room.id) }}" role="button"><i class="bi bi-trash2"></i> No Image</a>
             {%  endif %}
         </div>
 
         {# Show fullscreen wallpaper #}
         {% if room_image %}
-            <img src="{{ url_for('static', filename=room_image) }}" class="img-fluid rounded img-restricted-lg" alt="Room Image">
+            <img src="{{ url_for('static', filename='uploads' + "/" + room_image[0] + "/" + room_image[1]) }}" class="img-fluid rounded img-restricted-lg" alt="Room Image">
         {% else %}
             <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="img-fluid rounded img-restricted-lg" alt="Room Image">
         {% endif %}

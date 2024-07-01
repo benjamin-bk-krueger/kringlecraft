@@ -38,7 +38,7 @@
                     </div>
                     <div class="modal-body">
                         {# Upload and view profile image #}
-                        {{ dropzone.create(action='storage.prepare_image_post', category="objective") }}
+                        {{ dropzone.create(action='storage.upload_image_post', path="objective", filename_without_extension="_temp", overwrite=1) }}
 
                         <form action="#" method="POST" id="form_new">
                             {{ objective_form.csrf_token }}
@@ -121,7 +121,7 @@
                             <figure class="figure">
                                 <a href="{{ url_for('data.objective', objective_id=objective.id) }}">
                                     {% if objective_images[objective.id] %}
-                                        <img src="{{ url_for('static', filename=objective_images[objective.id]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ objective.name }}">
+                                        <img src="{{ url_for('static', filename='uploads' + "/" + objective_images[objective.id][0] + "/" + objective_images[objective.id][1]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ objective.name }}">
                                     {% else %}
                                         <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ objective.name }}">
                                     {% endif %}

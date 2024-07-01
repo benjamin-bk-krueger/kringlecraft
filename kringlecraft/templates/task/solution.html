@@ -76,23 +76,19 @@
                     {% for image in image_files %}
                         <figure class="figure col-auto px-1 image-item">
                             <a href="#">
-                                {% if image %}
-                                    <img src="{{ url_for('static', filename=image) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="Image">
-                                {% else %}
-                                    <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="figure-img img-fluid rounded img-restricted-sm" alt="Image">
-                                {% endif %}
+                                <img src="{{ url_for('static', filename='uploads' + "/" + image_files[image][0] + "/" + image_files[image][1]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="Image">
+
                             </a>
                             <figcaption class="figure-caption c-title">
-                                <a href="#" onclick="InsertMDE('![{{ image }}]({{ www_server }}/static/{{ image }})');return false;" data-toggle="tooltip" title="Copy Markdown Link"><i class="bi bi-markdown me-2"></i></a>
-                                {% set new_filename = image.replace("uploads/profile/" + current_user.id | string + "/" + objective.id | string + "/", "")  %}
-                                <a href="{{ url_for('storage.clear_sub_image',  category="profile", path=current_user.id | string + "/" + objective.id | string, filename=new_filename) }}" data-toggle="tooltip" title="Delete Image"><i class="bi bi-trash"></i></a>
+                                <a href="#" onclick="InsertMDE('![{{ image_files[image][1] }}]({{ www_server }}/static/uploads/{{ image_files[image][0] }}/{{ image_files[image][1] }})');return false;" data-toggle="tooltip" title="Copy Markdown Link"><i class="bi bi-markdown me-2"></i></a>
+                                <a href="{{ url_for('storage.delete_image', path=image_files[image][0].replace("/","_"), filename=image_files[image][1], redirect="task.solution", target_id=objective.id) }}" data-toggle="tooltip" title="Delete Image"><i class="bi bi-trash"></i></a>
                             </figcaption>
                         </figure>
                     {% endfor %}
                 </div>
                 </div>
                 <div class="col-sm-2">
-                    {{ dropzone.create(action='storage.upload_user_image_post', category="objective", path=objective.id) }}
+                    {{ dropzone.create(action='storage.upload_image_post', path="profile_" + current_user.id | string + "_" + objective.id | string, filename_without_extension="_temp", overwrite=0) }}
                 </div>
             </div>
         </div>

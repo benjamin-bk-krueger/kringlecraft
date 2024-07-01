@@ -2,7 +2,8 @@ import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
 from kringlecraft.utils.mail_tools import (send_mail)
-from kringlecraft.utils.file_tools import (get_temp_file, file_extension, get_all_images, get_image, enable_image)
+from kringlecraft.utils.file_tools import (get_temp_file, file_extension, enable_image, read_file_without_extension,
+                                           read_all_files_without_extension)
 from kringlecraft.utils.misc_tools import get_markdown
 
 blueprint = flask.Blueprint('data', __name__, template_folder='templates')
@@ -39,7 +40,7 @@ def users():
 
     # (2) initialize form data
     all_users = user_services.find_all_users() if current_user.role == 0 else user_services.find_active_users()
-    user_images = get_all_images("profile")
+    user_images = read_all_files_without_extension("profile")
 
     # (6a) show rendered page
     return flask.render_template('account/users.html', users=all_users, user_images=user_images)
@@ -59,7 +60,7 @@ def user(user_id):
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="User does not exist.")
 
-    user_image = get_image("profile", my_user.id)
+    user_image = read_file_without_extension("profile", my_user.id)
 
     # (6a) show rendered page
     return flask.render_template('account/user.html', user=my_user, user_image=user_image)
@@ -102,7 +103,7 @@ def worlds():
     world_form = WorldForm()
     world_form.process()
     all_worlds = world_services.find_all_worlds()
-    world_images = get_all_images("world")
+    world_images = read_all_files_without_extension("world")
 
     # (6a) show rendered page
     return flask.render_template('data/worlds.html', world_form=world_form, worlds=all_worlds,
@@ -145,7 +146,7 @@ def worlds_post():
     world_form.set_field_defaults(conflicting_world is not None)
     world_form.process()
     all_worlds = world_services.find_all_worlds()
-    world_images = get_all_images("world")
+    world_images = read_all_files_without_extension("world")
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/worlds.html', world_form=world_form, worlds=all_worlds,
@@ -165,7 +166,7 @@ def world(world_id):
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="World does not exist.")
 
-    world_image = get_image("world", my_world.id)
+    world_image = read_file_without_extension("world", my_world.id)
     world_form = WorldForm(my_world)
     world_form.process()
 
@@ -214,7 +215,7 @@ def world_post(world_id):
     # (5) preset form with existing data
     world_form.set_field_defaults(conflicting_world is not None and (my_world.name != world_form.name_content))
     world_form.process()
-    world_image = get_image("world", my_world.id)
+    world_image = read_file_without_extension("world", my_world.id)
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/world.html', world_form=world_form, world=my_world,
@@ -260,7 +261,7 @@ def rooms(world_id):
         return flask.render_template('home/error.html', error_message="World does not exist.")
 
     all_rooms = room_services.find_world_rooms(my_world.id)
-    room_images = get_all_images("room")
+    room_images = read_all_files_without_extension("room")
 
     # (6a) show rendered page
     return flask.render_template('data/rooms.html', room_form=room_form, rooms=all_rooms,
@@ -309,7 +310,7 @@ def rooms_post(world_id):
     room_form.set_field_defaults(conflicting_room is not None)
     room_form.process()
     all_rooms = room_services.find_world_rooms(my_world.id)
-    room_images = get_all_images("room")
+    room_images = read_all_files_without_extension("room")
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/rooms.html', room_form=room_form, rooms=all_rooms,
@@ -330,7 +331,7 @@ def room(room_id):
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="Room does not exist.")
 
-    room_image = get_image("room", my_room.id)
+    room_image = read_file_without_extension("room", my_room.id)
     room_form = RoomForm(my_room)
     room_form.process()
     my_world = world_services.find_world_by_id(my_room.world_id)
@@ -386,7 +387,7 @@ def room_post(room_id):
     room_form.set_field_defaults(conflicting_room is not None and ((my_room.name != room_form.name_content) or
                                                                    (my_room.world_id != conflicting_room.world_id)))
     room_form.process()
-    room_image = get_image("room", my_room.id)
+    room_image = read_file_without_extension("room", my_room.id)
     my_world = world_services.find_world_by_id(my_room.world_id)
 
     room_form.world.choices = world_services.get_world_choices(world_services.find_all_worlds())
@@ -441,7 +442,7 @@ def objectives(room_id):
         return flask.render_template('home/error.html', error_message="Room does not exist.")
 
     all_objectives = objective_services.find_room_objectives(my_room.id)
-    objective_images = get_all_images("objective")
+    objective_images = read_all_files_without_extension("objective")
     my_world = world_services.find_world_by_id(my_room.world_id)
 
     objective_form.type.choices = objective_services.get_objective_type_choices()
@@ -500,7 +501,7 @@ def objectives_post(room_id):
     objective_form.set_field_defaults(conflicting_objective is not None)
     objective_form.process()
     all_objectives = objective_services.find_room_objectives(my_room.id)
-    objective_images = get_all_images("objective")
+    objective_images = read_all_files_without_extension("objective")
     my_world = world_services.find_world_by_id(my_room.world_id)
 
     objective_form.type.choices = objective_services.get_objective_type_choices()
@@ -531,7 +532,7 @@ def objective(objective_id):
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="Objective does not exist.")
 
-    objective_image = get_image("objective", my_objective.id)
+    objective_image = read_file_without_extension("objective", my_objective.id)
     objective_form = ObjectiveForm(my_objective)
     objective_form.process()
     my_room = room_services.find_room_by_id(my_objective.room_id)
@@ -610,7 +611,7 @@ def objective_post(objective_id):
                                                                              (my_objective.room_id !=
                                                                               conflicting_objective.room_id)))
     objective_form.process()
-    objective_image = get_image("objective", my_objective.id)
+    objective_image = read_file_without_extension("objective", my_objective.id)
     my_room = room_services.find_room_by_id(my_objective.room_id)
     my_world = world_services.find_world_by_id(my_room.world_id)
 
