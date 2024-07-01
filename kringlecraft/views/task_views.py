@@ -70,7 +70,7 @@ def challenge_post(objective_id):
         return flask.render_template('home/error.html', error_message="Objective could not be edited.")
 
     # (6b) redirect to new page after successful operation
-    return flask.redirect(flask.url_for('data.objective', objective_id=my_objective.id))
+    return flask.redirect(flask.url_for('data.objectives', room_id=my_objective.room_id))
 
 
 @blueprint.route('/challenge/continue/<int:objective_id>', methods=['POST'])
@@ -228,7 +228,7 @@ def solution_post(objective_id):
         return flask.render_template('home/error.html', error_message="Solution could not be edited.")
 
     # (6b) redirect to new page after successful operation
-    return flask.redirect(flask.url_for('data.objective', objective_id=my_objective.id))
+    return flask.redirect(flask.url_for('data.objectives', room_id=my_objective.room_id))
 
 
 @blueprint.route('/solution/continue/<int:objective_id>', methods=['POST'])

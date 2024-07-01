@@ -85,7 +85,6 @@
 
             {#  Display action buttons regarding the selected room  #}
             <a class="btn btn-secondary me-3" href="{{ url_for('data.worlds')}}" role="button"><i class="bi bi-backspace"></i> Back</a>
-            <a class="btn btn-success me-3" href="{{ url_for('data.world', world_id=world.id ) }}" role="button"><i class="bi bi-card-list"></i> {{ world.name }}</a>
             {% if current_user.role == 0 %}
                 <a class="btn btn-primary me-3" href="#" role="button" data-bs-toggle="modal" data-bs-target="#myModalAdd"><i class="bi bi-plus-square"></i> Create</a>
             {%  endif %}
@@ -99,6 +98,7 @@
                 <div class="row">
                 {% for room in rooms %}
                     <div class="col-sm">
+                        <div class="c-title">{{ room.name }}</div>
                         <figure class="figure">
                             <a href="{{ url_for('data.objectives', room_id=room.id) }}">
                                 {% if room_images[room.id] %}
@@ -107,7 +107,11 @@
                                     <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ room.name }}">
                                 {% endif %}
                             </a>
-                            <figcaption class="figure-caption c-title">{{ room.name }} <a href="{{ url_for('data.room', room_id=room.id ) }}"><i class="bi bi-pencil-square"></i></a></figcaption>
+                            <figcaption class="figure-caption c-bigcaption">
+                                {% if current_user.role == 0 %}
+                                    <a href="{{ url_for('data.room', room_id=room.id ) }}" data-toggle="tooltip" title="Edit Room"><i class="bi bi-pencil-square"></i></a>
+                                {% endif %}
+                            </figcaption>
                         </figure>
                     </div>
                 {% endfor %}

@@ -104,7 +104,6 @@
 
             {#  Display action buttons regarding the selected objective  #}
             <a class="btn btn-secondary me-3" href="{{ url_for('data.rooms', world_id=room.world_id )}}" role="button"><i class="bi bi-backspace"></i> Back</a>
-            <a class="btn btn-success me-3" href="{{ url_for('data.room', room_id=room.id ) }}" role="button"><i class="bi bi-card-list"></i> {{ room.name }}</a>
             {% if current_user.role == 0 %}
                 <a class="btn btn-primary me-3" href="#" role="button" data-bs-toggle="modal" data-bs-target="#myModalAdd"><i class="bi bi-plus-square"></i> Create</a>
             {%  endif %}
@@ -118,7 +117,8 @@
                 <div class="row">
                     {% for objective in objectives %}
                         <div class="col-sm">
-                            <figure class="figure">
+                            <div class="c-title">{{ objective_types[objective.type] }} {{ objective.name }}</div>
+                            <figure class="figure c-bigcaption">
                                 <a href="{{ url_for('data.objective', objective_id=objective.id) }}">
                                     {% if objective_images[objective.id] %}
                                         <img src="{{ url_for('static', filename='uploads' + "/" + objective_images[objective.id][0] + "/" + objective_images[objective.id][1]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ objective.name }}">
@@ -126,7 +126,17 @@
                                         <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ objective.name }}">
                                     {% endif %}
                                 </a>
-                                <figcaption class="figure-caption">{{ objective_types[objective.type] }} {{ objective.name }}</figcaption>
+                                <figcaption class="figure-caption c-bigcaption">
+                                    {% if current_user.role == 0 %}
+                                        <a href="{{ url_for('data.objective', objective_id=objective.id) }}" data-toggle="tooltip" title="Edit Objective"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                                        <a href="{{ url_for('task.challenge', objective_id=objective.id)}}" data-toggle="tooltip" title="Create Challenge"><i class="bi bi-question-square"></i></a>&nbsp;
+                                    {% endif %}
+                                    {% if current_user.role == 0 or current_user.role == 1 %}
+                                        <a href="{{ url_for('task.solution', objective_id=objective.id) }}" data-toggle="tooltip" title="Create Solution"><i class="bi bi-exclamation-square"></i></a>&nbsp;
+                                        <a href="#" data-toggle="tooltip" title="Create PDF Report"><i class="bi bi-filetype-pdf"></i></a>&nbsp;
+                                        <a href="#" data-toggle="tooltip" title="Create HTML Report"><i class="bi bi-filetype-html"></i></a>
+                                    {% endif %}
+                                </figcaption>
                             </figure>
                         </div>
                     {% endfor %}

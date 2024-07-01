@@ -117,6 +117,7 @@
                 <div class="row">
                     {% for world in worlds %}
                         <div class="col-sm">
+                            <div class="c-title">{{ world.name }}</div>
                             <figure class="figure">
                                 <a href="{{ url_for('data.rooms', world_id=world.id) }}">
                                     {% if world_images[world.id] %}
@@ -126,13 +127,14 @@
                                     {% endif %}
                                 </a>
                                 <figcaption class="figure-caption c-bigcaption">
-                                    {{ world.name }}<br>
-                                    <a href="{{ url_for('data.world', world_id=world.id) }}"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                                    {% if current_user.role == 0 %}
+                                        <a href="{{ url_for('data.world', world_id=world.id) }}" data-toggle="tooltip" title="Edit World"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                                    {% endif %}
                                     {% if current_user.role == 0 or current_user.role == 1 %}
-                                        <a href="{{ url_for('task.summary', world_id=world.id) }}"><i class="bi bi-journal-text"></i></a>&nbsp;
-                                        <a href="#"><i class="bi bi-filetype-pdf"></i></a>&nbsp;
-                                        <a href="#"><i class="bi bi-filetype-html"></i></a>&nbsp;
-                                        <a href="{{ url_for('task.progress', world_id=world.id) }}"><i class="bi bi-speedometer"></i></a>
+                                        <a href="{{ url_for('task.summary', world_id=world.id) }}" data-toggle="tooltip" title="Write Summary"><i class="bi bi-journal-text"></i></a>&nbsp;
+                                        <a href="#" data-toggle="tooltip" title="Create PDF Report"><i class="bi bi-filetype-pdf"></i></a>&nbsp;
+                                        <a href="#" data-toggle="tooltip" title="Create HTML Report"><i class="bi bi-filetype-html"></i></a>&nbsp;
+                                        <a href="{{ url_for('task.progress', world_id=world.id) }} " data-toggle="tooltip" title="Show Progress"><i class="bi bi-speedometer"></i></a>
                                     {% endif %}
                                 </figcaption>
                             </figure>
