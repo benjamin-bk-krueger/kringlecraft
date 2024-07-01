@@ -159,7 +159,7 @@ def summary_post(world_id):
         return flask.render_template('home/error.html', error_message="Summary could not be edited.")
 
     # (6b) redirect to new page after successful operation
-    return flask.redirect(flask.url_for('data.world', world_id=my_world.id))
+    return flask.redirect(flask.url_for('data.worlds'))
 
 
 # Shows information about a specific objective's solution
