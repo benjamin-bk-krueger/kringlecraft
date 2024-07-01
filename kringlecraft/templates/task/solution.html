@@ -25,28 +25,26 @@
 {% endblock %}
 
 {% block modal %}
-    {% if solution  %}
-        {# Modal dialog window - delete currently selected solution #}
-        <div id="myModal_del" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content c-lightblue c-border c-shadow">
-                    <div class="modal-header c-blue c-bottomborder">
-                        <h4 class="modal-title c-bigtitle">Delete Solution</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="#" id="form_deletion">
-                            Are you sure?
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-danger mt-4 btn-space" form="form_deletion"><i class="bi bi-check"></i> Confirm</button>
-                        <button type="button" class="btn btn-secondary mt-4 btn-space" data-bs-dismiss="modal"><i class="bi bi-x"></i> Cancel</button>
-                    </div>
+    {# Modal dialog window - delete currently selected solution #}
+    <div id="myModal_del" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content c-lightblue c-border c-shadow">
+                <div class="modal-header c-blue c-bottomborder">
+                    <h4 class="modal-title c-bigtitle">Delete Solution</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('task.solution_delete', objective_id=objective.id) }}" id="form_deletion">
+                        Are you sure?
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger mt-4 btn-space" form="form_deletion"><i class="bi bi-check"></i> Confirm</button>
+                    <button type="button" class="btn btn-secondary mt-4 btn-space" data-bs-dismiss="modal"><i class="bi bi-x"></i> Cancel</button>
                 </div>
             </div>
         </div>
-    {% endif %}
+    </div>
 {% endblock %}
 
 {% block content %}
@@ -144,11 +142,9 @@
                 <button type="submit" class="btn btn-secondary mt-4 mb-4 btn-space"><i class="bi bi-x"></i> Cancel</button>
             </form>
 
-            {% if solution  %}
-                <div class="btn-group me-2" role="group" aria-label="Sixth group">
-                    <a href="#" class="btn btn-danger mt-4 mb-4 btn-space" data-toggle="tooltip" title="Delete" data-bs-toggle="modal" data-bs-target="#myModal_del"><i class="bi bi-trash"></i> Delete</a>
-                </div>
-            {% endif %}
+            <div class="btn-group me-2" role="group" aria-label="Sixth group">
+                <a href="#" class="btn btn-danger mt-4 mb-4 btn-space" data-toggle="tooltip" title="Delete" data-bs-toggle="modal" data-bs-target="#myModal_del"><i class="bi bi-trash"></i> Delete</a>
+            </div>
         </div>
     </div>
 

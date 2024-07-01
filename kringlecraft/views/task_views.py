@@ -264,3 +264,53 @@ def solution_continue(objective_id):
     return flask.render_template('task/solution.html', solution_form=solution_form, notes=my_notes,
                                  world=my_world, room=my_room, objective=my_objective, md_challenge=md_challenge,
                                  image_files=image_files, www_server=www_server)
+
+
+# Delete a specific solution
+@blueprint.route('/solution/delete/<int:objective_id>', methods=['GET'])
+@login_required
+def solution_delete(objective_id):
+    # (1) import forms and utilities
+    import kringlecraft.services.objective_services as objective_services
+    import kringlecraft.services.solution_services as solution_services
+
+    # (2) initialize form data
+    my_objective = objective_services.find_objective_by_id(objective_id)
+    if not my_objective:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Objective does not exist.")
+
+    my_solution = solution_services.delete(objective_id, current_user.id)
+    if not my_solution:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Solution does not exist.")
+
+    # (6b) redirect to new page after successful operation
+    return flask.redirect(flask.url_for('data.objective', objective_id=my_objective.id))
+
+
+# Shows information about a specific objective's solution - other users
+@blueprint.route('/walkthrough/<int:solution_id>', methods=['GET'])
+def walkthrough(solution_id):
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.task_forms import SolutionForm
+    import kringlecraft.services.objective_services as objective_services
+    import kringlecraft.services.room_services as room_services
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.solution_services as solution_services
+
+    # (2) initialize form data
+    my_solution = solution_services.find_active_solution_by_id(solution_id)
+    if not my_solution:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Solution does not exist.")
+
+    my_objective = objective_services.find_objective_by_id(my_solution.objective_id)
+    my_room = room_services.find_room_by_id(my_objective.room_id)
+    my_world = world_services.find_world_by_id(my_room.world_id)
+
+    md_solution = get_markdown(my_solution.notes)
+
+    # (6a) show rendered page
+    return flask.render_template('task/walkthrough.html', md_solution=md_solution, objective=my_objective,
+                                 room=my_room, world=my_world, solution=my_solution)

@@ -12,6 +12,15 @@ def get_active_count() -> int | None:
 
 
 # ----------- Find functions -----------
+def find_active_solution_by_id(solution_id: int) -> Solution | None:
+    session = db_session.create_session()
+    try:
+        return (session.query(Solution).filter(Solution.id == solution_id).filter(Solution.visible == True).
+                filter(Solution.completed == True).first())
+    finally:
+        session.close()
+
+
 def find_objective_solution_for_user(objective_id: int, user_id: int) -> Solution | None:
     session = db_session.create_session()
     try:
@@ -82,5 +91,23 @@ def create_or_edit_solution(objective_id: int, user_id: int, visible: bool = Non
         print(f"INFO: A new solution {solution.id} has been created")
 
         return solution
+    finally:
+        session.close()
+
+
+# ----------- Delete functions -----------
+def delete(objective_id: int, user_id: int) -> Solution | None:
+    session = db_session.create_session()
+    try:
+        solution = session.query(Solution).filter(Solution.user_id == user_id).filter(Solution.objective_id ==
+                                                                                      objective_id).first()
+        if solution:
+            session.query(Solution).filter(Solution.user_id == user_id).filter(Solution.objective_id ==
+                                                                               objective_id).delete()
+            session.commit()
+
+            print(f"INFO: Solution {Solution.__name__} deleted")
+
+            return solution
     finally:
         session.close()

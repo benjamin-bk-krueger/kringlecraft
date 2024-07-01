@@ -186,13 +186,13 @@
         </div>
     {% endif %}
 
-    {% if candidate_solutions is not none %}
+    {% if candidate_solutions is not none and md_solution is none %}
         <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
             {#  Display solution of the selected objective - the markdown has been converted to HTML #}
             <div class="fs-3 c-title">All Solutions</div>
             <ul class="list-group" id="myList">
                 {% for solution in candidate_solutions %}
-                    <li class="list-group-item"><i class="bi bi-eye me-2"></i> <a href="#" data-toggle="tooltip" title="View solution">View solution by {{ user_list[solution.user_id] }}</a></li>
+                    <li class="list-group-item"><i class="bi bi-eye me-2"></i> <a href="{{ url_for('task.walkthrough', solution_id=solution.id) }}" data-toggle="tooltip" title="View solution">View solution by {{ user_list[solution.user_id] }}</a></li>
                 {% endfor %}
             </ul>
         </div>
