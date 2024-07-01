@@ -117,8 +117,8 @@
         <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('data.worlds') }}">Home</a></li>
-                <li class="breadcrumb-item"><a href="{{ url_for('data.world', world_id=world.id) }}">{{ world.name }}</a></li>
-                <li class="breadcrumb-item"><a href="{{ url_for('data.room', room_id=room.id) }}">{{ room.name }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('data.rooms', world_id=world.id) }}">{{ world.name }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('data.objectives', room_id=room.id) }}">{{ room.name }}</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ objective.name }}</li>
             </ol>
         </nav>
