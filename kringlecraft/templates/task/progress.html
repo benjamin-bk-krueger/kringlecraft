@@ -14,14 +14,9 @@
         </nav>
 
         {#  Show progress for all objectives and solutions #}
-        <div class="rounded border mt-4 mb-4 c-color p-2">
-            <div class="mb-3 fs-4 c-title">Progress for {{ world.name }}</div>
-            <div class="progress-bar" role="progressbar" style="background-color: #0d6efd; width: {{ solved_percentage }}%;" aria-valuenow="{{ solved_percentage }}" aria-valuemin="0" aria-valuemax="100">{{ solved_percentage }}% solved</div>
-            <div class="underline"><span style="background: #f5f5f5;"><i class="bi bi-globe" aria-hidden="true"></i></span></div>
-
-            {#  Display action buttons regarding the selected world  #}
-            <a class="btn btn-secondary me-3" href="{{ url_for('data.worlds') }}" role="button"><i class="bi bi-backspace"></i> Back</a>
-        </div>
+        <div class="mb-3 fs-4 c-title">Progress for {{ world.name }}</div>
+        <div class="progress-bar" role="progressbar" style="background-color: #0d6efd; width: {{ solved_percentage }}%;" aria-valuenow="{{ solved_percentage }}" aria-valuemin="0" aria-valuemax="100">{{ solved_percentage }}% solved</div>
+        <div class="underline"><span><i class="bi bi-globe" aria-hidden="true"></i></span></div>
 
         {% for room in rooms %}
             <div>
@@ -52,5 +47,10 @@
                 </ul>
             </div>
         {% endfor %}
+
+        {#  Display action buttons regarding the selected world  #}
+        <div class="col d-flex mt-4">
+            <a class="btn btn-secondary me-3" href="{{ url_for('data.worlds') }}" role="button"><i class="bi bi-backspace"></i> Back</a>
+        </div>
     </div>
 {% endblock %}

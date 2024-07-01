@@ -17,12 +17,8 @@
         </nav>
 
         {#  Show objective info #}
-        <div class="rounded border mt-4 mb-4 c-color p-2">
-            <div class="fs-3 c-title">Solution for {{ objective.name }}</div>
-            <div class="underline"><span style="background: #f5f5f5;"><i class="bi bi-clipboard-data" aria-hidden="true"></i></span></div>
-
-            <a class="btn btn-secondary me-3" href="{{ url_for('data.objective', objective_id=objective.id) }}" role="button"><i class="bi bi-backspace"></i> Back</a>
-        </div>
+        <div class="mb-3 fs-4 c-title">Solution for {{ objective.name }}</div>
+        <div class="underline"><span><i class="bi bi-clipboard-data" aria-hidden="true"></i></span></div>
 
         <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
             {#  Display solution of the selected objective - the markdown has been converted to HTML #}
@@ -37,10 +33,9 @@
         </div>
 
         {# Display simple buttons - submit or cancel form editing #}
-        <div class="btn-toolbar" role="toolbar" aria-label="Solution Actions">
-            <a class="btn btn-secondary mt-4 mb-4 btn-space" data-bs-toggle="collapse" href="#collapseFlag" role="button" aria-expanded="false" aria-controls="collapseFlag">
-                <i class="bi bi-flag"></i> Show Flag
-            </a>
+        <div class="col d-flex mt-4">
+            <a class="btn btn-primary mt-4 mb-4 btn-space" data-bs-toggle="collapse" href="#collapseFlag" role="button" aria-expanded="false" aria-controls="collapseFlag"><i class="bi bi-flag"></i> Show Flag</a>
+            <a class="btn btn-secondary mt-4 mb-4 btn-space" href="{{ url_for('data.objective', objective_id=objective.id) }}" role="button"><i class="bi bi-backspace"></i> Back</a>
         </div>
     </div>
 {% endblock %}

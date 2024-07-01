@@ -37,14 +37,11 @@
         </nav>
 
         {#  Show objective info #}
-        <div class="rounded border mt-4 mb-4 c-color p-2">
-            <div class="fs-3 c-title">Challenge Editor for {{ objective.name }}</div>
-            <div class="underline"><span style="background: #f5f5f5;"><i class="bi bi-clipboard-data" aria-hidden="true"></i></span></div>
-        </div>
+        <div class="mb-3 fs-4 c-title">Challenge Editor for {{ objective.name }}</div>
+        <div class="underline"><span><i class="bi bi-clipboard-data" aria-hidden="true"></i></span></div>
 
         <div class="rounded border mt-4 mb-4 c-color p-2">
             <div class="fs-3 c-title">Image Section</div>
-            <div class="underline"><span style="background: #f5f5f5;"><i class="bi bi-clipboard-data" aria-hidden="true"></i></span></div>
             <div class="row">
                 <div class="col-sm-10">
                 <div class="row flex-nowrap overflow-x-auto overflow-y-hidden py-3 mx-2" id="image-container">
@@ -92,7 +89,7 @@
         <div class="btn-toolbar" role="toolbar" aria-label="Challenge Actions">
             <button type="submit" form="challenge_form" class="btn btn-primary mt-4 mb-4 btn-space"><i class="bi bi-check"></i> Submit</button>
 
-            <form action="{{ url_for('data.objective', objective_id=objective.id)}}">
+            <form action="{{ url_for('data.objectives', room_id=objective.room_id)}}">
                 <button type="submit" class="btn btn-secondary mt-4 mb-4 btn-space"><i class="bi bi-x"></i> Cancel</button>
             </form>
         </div>
