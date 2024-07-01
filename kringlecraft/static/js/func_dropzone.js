@@ -1,11 +1,11 @@
-function MockDropzone(category, temp_ending) {
+function MockDropzone(path, temp_ending) {
     Dropzone.options.myDropzone = {
         init: function () {
             let myDropzone = this;
 
             // Create the mock file:
-            let mockFile = {name: "static/uploads/" + category + "/_temp." + temp_ending, size: 217447};
-            myDropzone.displayExistingFile(mockFile, "../static/uploads/" + category + "/_temp." + temp_ending);
+            let mockFile = {name: "static/uploads/" + path + "/_temp." + temp_ending, size: 217447};
+            myDropzone.displayExistingFile(mockFile, "../static/uploads/" + path + "/_temp." + temp_ending);
         }
     };
 }
