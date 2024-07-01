@@ -314,3 +314,45 @@ def walkthrough(solution_id):
     # (6a) show rendered page
     return flask.render_template('task/walkthrough.html', md_solution=md_solution, objective=my_objective,
                                  room=my_room, world=my_world, solution=my_solution)
+
+
+# Shows progress regarding a specific world
+@blueprint.route('/progress/<int:world_id>', methods=['GET'])
+@login_required
+def progress(world_id):
+    # (1) import forms and utilities
+    import kringlecraft.services.objective_services as objective_services
+    import kringlecraft.services.room_services as room_services
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.solution_services as solution_services
+
+    # (2) initialize form data
+    my_world = world_services.find_world_by_id(world_id)
+    if not my_world:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="World does not exist.")
+
+    all_rooms = room_services.find_world_rooms(world_id)
+    objectives = list()
+    solutions = list()
+    counter_solved = 0
+    counter_all = 0
+
+    for room in all_rooms:
+        all_objectives = objective_services.find_room_objectives(room.id)
+        objectives.extend(all_objectives)
+
+        for objective in all_objectives:
+            my_solution = solution_services.find_objective_solution_for_user(objective.id, current_user.id)
+            solutions.append(my_solution)
+
+            if objective.difficulty > 0:
+                counter_all = counter_all + 1
+                if my_solution and my_solution.completed:
+                    counter_solved = counter_solved + 1
+    solved_percentage = str(int((counter_solved / counter_all) * 100)) if counter_solved > 0 else "0"
+
+    # (6a) show rendered page
+    return flask.render_template('task/progress.html', world=my_world, rooms=all_rooms,
+                                 objectives=objectives, solutions=solutions, solved_percentage=solved_percentage,
+                                 objective_types=objective_services.get_objective_types())

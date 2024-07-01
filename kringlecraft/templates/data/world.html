@@ -152,7 +152,7 @@
                 <a class="btn btn-primary me-3" href="{{ url_for('task.summary', world_id=world.id) }}" role="button"><i class="bi bi-journal-text"></i> Summary</a>
                 <a class="btn btn-primary me-3" href="#" role="button"><i class="bi bi-filetype-pdf"></i> Report</a>
                 <a class="btn btn-primary me-3" href="#" role="button"><i class="bi bi-filetype-html"></i> Report</a>
-                <a class="btn btn-primary me-3" href="#" role="button"><i class="bi bi-speedometer"></i> Progress</a>
+                <a class="btn btn-primary me-3" href="{{ url_for('task.progress', world_id=world.id) }}" role="button"><i class="bi bi-speedometer"></i> Progress</a>
             {%  endif %}
         </div>
 
