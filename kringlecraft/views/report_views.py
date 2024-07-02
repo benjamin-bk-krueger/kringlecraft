@@ -1,8 +1,8 @@
 import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
-from kringlecraft.utils.file_tools import read_file_without_extension
-from kringlecraft.utils.misc_tools import get_markdown
+from kringlecraft.utils.file_tools import read_file_without_extension, create_markdown_file
+from kringlecraft.utils.misc_tools import get_markdown, get_raw_markdown
 
 blueprint = flask.Blueprint('report', __name__, template_folder='templates')
 
@@ -57,9 +57,9 @@ def sitemap():
 
 
 # Show a report containing information about a specific objective and its solution in different formats
-@blueprint.route('/single/<int:objective_id>', methods=['GET'])
+@blueprint.route('/single/<string:report_format>/<int:objective_id>', methods=['GET'])
 @login_required
-def single(objective_id):
+def single(report_format, objective_id):
     # (1) import forms and utilities
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
@@ -76,12 +76,28 @@ def single(objective_id):
     my_room = room_services.find_room_by_id(my_objective.room_id)
     my_world = world_services.find_world_by_id(my_room.world_id)
 
-    html_challenge = "" if my_objective.challenge is None else get_markdown(my_objective.challenge)
-    html_solution = "" if solution_services.find_objective_solution_for_user(objective_id, current_user.id) is None else (
-        get_markdown(solution_services.find_objective_solution_for_user(objective_id, current_user.id).notes))
-
     # (6a) show rendered page
-    return flask.render_template('report/single.html', objective=my_objective,
-                                 objective_image=objective_image, room=my_room, world=my_world,
-                                 objective_types=objective_services.get_objective_types(),
-                                 html_challenge=html_challenge, html_solution=html_solution)
+    if report_format == "html":
+        html_challenge = "" if my_objective.challenge is None else get_markdown(my_objective.challenge)
+        html_solution = "" if (solution_services.find_objective_solution_for_user(objective_id, current_user.id) is
+                               None) else get_markdown(solution_services.find_objective_solution_for_user(objective_id, current_user.id).notes)
+
+        return flask.render_template('report/single.html', objective=my_objective,
+                                     objective_image=objective_image, room=my_room, world=my_world,
+                                     objective_types=objective_services.get_objective_types(),
+                                     html_challenge=html_challenge, html_solution=html_solution)
+
+    if report_format == "markdown":
+        md_challenge = "" if my_objective.challenge is None else get_raw_markdown(my_objective.challenge)
+        md_solution = "" if (solution_services.find_objective_solution_for_user(objective_id, current_user.id) is
+                               None) else get_raw_markdown(
+            solution_services.find_objective_solution_for_user(objective_id, current_user.id).notes)
+
+        md_output = flask.render_template('report/single.md', objective=my_objective,
+                                          objective_image=objective_image, room=my_room, world=my_world,
+                                          objective_types=objective_services.get_objective_types(),
+                                          md_challenge=md_challenge, md_solution=md_solution,
+                                          www_server=flask.current_app.config.get('app.www_server'),)
+        local_file = create_markdown_file(f"objective-{my_objective.id}.md", md_output)
+
+        return flask.send_file(local_file, download_name=f"objective-{my_objective.id}.md", as_attachment=True)

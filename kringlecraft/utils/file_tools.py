@@ -127,3 +127,14 @@ def get_temp_file(path: str) -> str | None:
     if temp_files:
         # Return the first match; you can modify this to return all matches if needed
         return temp_files[0]
+
+
+def create_markdown_file(filename: str, md_output: str) -> str | None:
+    local_file = os.path.join(f'static/downloads/', filename)
+    try:
+        with open(local_file, 'w') as f:
+            f.write(md_output)
+
+        return local_file
+    except OSError as e:
+        print(f"FILE: Error saving {local_file}: {e}")

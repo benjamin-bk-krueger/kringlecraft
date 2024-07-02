@@ -2,3 +2,4 @@
 kringlecraft/db/*.sqlite
 kringlecraft/static/doc/
 kringlecraft/static/uploads/
+kringlecraft/static/downloads/

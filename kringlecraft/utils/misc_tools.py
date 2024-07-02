@@ -31,5 +31,10 @@ def get_markdown(notes):
     return md
 
 
+def get_raw_markdown(notes):
+    md = str(bytes(notes), 'utf-8')
+    return md
+
+
 def convert_markdown(notes) -> str:
     return str(bytes(notes), 'utf-8')
