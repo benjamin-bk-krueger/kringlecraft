@@ -7,6 +7,55 @@ from kringlecraft.utils.misc_tools import get_markdown
 blueprint = flask.Blueprint('report', __name__, template_folder='templates')
 
 
+# Sitemap page
+@blueprint.route('/sitemap.xml', methods=['GET'])
+def sitemap():
+    # (1) import forms and utilities
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.room_services as room_services
+    import kringlecraft.services.objective_services as objective_services
+
+    # (2) initialize form data
+    class SitemapURL:
+        def __init__(self, loc, lastmod, changefreq):
+            self.loc = loc
+            self.lastmod = lastmod
+            self.changefreq = changefreq
+
+    all_urls = list()
+    www_server = flask.current_app.config.get('app.www_server')
+    sitemap_date = flask.current_app.config.get('app.date')
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+    YEARLY = "yearly"
+    all_urls.append(SitemapURL(www_server + flask.url_for("home.index"), sitemap_date, MONTHLY))
+    all_urls.append(SitemapURL(www_server + flask.url_for("account.profile_create"), sitemap_date, YEARLY))
+    all_urls.append(SitemapURL(www_server + flask.url_for("home.login"), sitemap_date, YEARLY))
+    all_urls.append(SitemapURL(www_server + flask.url_for("home.password"), sitemap_date, YEARLY))
+    all_urls.append(SitemapURL(www_server + flask.url_for("home.privacy"), sitemap_date, YEARLY))
+    all_urls.append(SitemapURL(www_server + flask.url_for("home.release"), sitemap_date, WEEKLY))
+    all_urls.append(SitemapURL(www_server + flask.url_for("data.stats"), sitemap_date, WEEKLY))
+
+    all_urls.append(SitemapURL(www_server + flask.url_for("data.worlds"), sitemap_date, WEEKLY))
+    all_worlds = world_services.find_all_worlds()
+    for world in all_worlds:
+        all_urls.append(SitemapURL(www_server + flask.url_for("data.world", world_id=world.id), sitemap_date, WEEKLY))
+        all_urls.append(SitemapURL(www_server + flask.url_for("data.rooms", world_id=world.id), sitemap_date, WEEKLY))
+        all_rooms = room_services.find_world_rooms(world.id)
+        for room in all_rooms:
+            all_urls.append(SitemapURL(www_server + flask.url_for("data.room", room_id=room.id), sitemap_date, WEEKLY))
+            all_urls.append(SitemapURL(www_server + flask.url_for("data.objectives", room_id=room.id), sitemap_date, WEEKLY))
+            all_objectives = objective_services.find_room_objectives(room.id)
+            for objective in all_objectives:
+                all_urls.append(SitemapURL(www_server + flask.url_for("data.objective", objective_id=objective.id), sitemap_date, WEEKLY))
+
+    # (6a) show rendered page
+    template = flask.render_template('report/sitemap.xml', urls=all_urls)
+    response = flask.make_response(template)
+    response.headers['Content-Type'] = 'application/xml'
+    return response
+
+
 # Show a report containing information about a specific objective and its solution in different formats
 @blueprint.route('/single/<int:objective_id>', methods=['GET'])
 @login_required

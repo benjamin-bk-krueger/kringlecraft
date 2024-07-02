@@ -166,7 +166,10 @@
     </div>
 
     {% if md_solution is none and candidate_solutions is none %}
-        No (public) solutions yet.
+        <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
+            <div class="fs-3 c-title">Solution</div>
+            No (public) solutions yet.
+        </div>
     {% endif %}
 
     {% if md_solution is not none %}
