@@ -1,0 +1,77 @@
+{# /single #}
+{% extends 'shared/_layout.html' %}
+
+{% block title %}Objective Report {{ objective.name }}{% endblock %}
+
+{% block content %}
+    <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
+        {# Show breadcrumb navigation #}
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('data.worlds') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('data.rooms', world_id=world.id) }}">{{ world.name }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('data.objectives', room_id=room.id) }}">{{ room.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ objective.name }}</li>
+            </ol>
+        </nav>
+
+        {#  Show image info #}
+        <div class="mb-3 fs-4 c-title">{{ objective_types[objective.type] }} {{ objective.name }} Report</div>
+        <div class="underline"><span><i class="bi bi-clipboard-data" aria-hidden="true"></i></span></div>
+
+        {#  Show detailed information regarding the selected objective #}
+        <div class="card rounded-0">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    {%  if objective_image %}
+                        <img src="{{ url_for('static', filename='uploads' + "/" + objective_image[0] + "/" + objective_image[1]) }}" class="img-fluid img-restricted-sm" alt="{{ objective_types[objective.objective_type] }} Image">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="img-fluid img-restricted-sm" alt="Objective Image">
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ objective.name }}</h5>
+                        {%  if objective.difficulty > 0 %}
+                            <h6 class="card-subtitle mb-2 text-muted">Difficulty:
+                                {% for i in range(objective.difficulty) %}
+                                    <i class="bi bi-tree-fill"></i>
+                                {% endfor %}
+                            </h6>
+                        {% endif %}
+                        <p class="card-text">{{ objective.description }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {#  Challenge #}
+        <div class="card rounded-0">
+            <div class="row g-0">
+                <div class="col-md-12">
+                    <div class="card-body">
+                        <h5 class="card-title">Challenge</h5>
+                        <p class="card-text">{{ html_challenge | safe }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {#  Solution #}
+        <div class="card rounded-0 rounded-bottom">
+            <div class="row g-0">
+                <div class="col-md-12">
+                    <div class="card-body">
+                        <h5 class="card-title">Solution</h5>
+                        <p class="card-text">{{ html_solution | safe }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {#  Display action buttons regarding the selected world  #}
+        <div class="col d-flex mt-4">
+            <a class="btn btn-secondary me-3" href="{{ url_for('data.objectives', room_id=objective.room_id) }}" role="button"><i class="bi bi-backspace"></i> Back</a>
+        </div>
+    </div>
+{% endblock %}

@@ -126,7 +126,7 @@
                                     {% if current_user.role == 0 or current_user.role == 1 %}
                                         <a href="{{ url_for('task.solution', objective_id=objective.id) }}" data-toggle="tooltip" title="Create Solution"><i class="bi bi-exclamation-square"></i></a>&nbsp;
                                         <a href="#" data-toggle="tooltip" title="Create PDF Report"><i class="bi bi-filetype-pdf"></i></a>&nbsp;
-                                        <a href="#" data-toggle="tooltip" title="Create HTML Report"><i class="bi bi-filetype-html"></i></a>
+                                        <a href="{{ url_for('report.single', objective_id=objective.id) }}" data-toggle="tooltip" title="Create HTML Report"><i class="bi bi-filetype-html"></i></a>
                                     {% endif %}
                                 </figcaption>
                             </figure>
