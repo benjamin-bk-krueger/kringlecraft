@@ -104,3 +104,12 @@ def setup_login_manager():
 
 if __name__ == '__main__':
     main()
+else:
+    configure_defaults()
+    configure_logging()
+    register_blueprints()
+    setup_db()
+    setup_csrf()
+    setup_mail()
+    setup_dropzone()
+    setup_login_manager()
