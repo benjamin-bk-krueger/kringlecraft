@@ -118,7 +118,7 @@ def enable_image(path: str, image_id: int):
 
         shutil.move(temp_file, os.path.join(f'static/uploads/{path}/', str(image_id) + "." +
                                             file_extension(temp_file)))
-        print(f"FILE: Renamed {temp_file} to {os.path.join(f'static/uploads/{path}/', str(image_id) + "." + 
+        print(f"FILE: Renamed {temp_file} to {os.path.join(f'static/uploads/{path}/', str(image_id) + '.' + 
                                                            file_extension(temp_file))}")
 
 
