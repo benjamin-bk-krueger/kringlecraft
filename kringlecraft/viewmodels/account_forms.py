@@ -46,7 +46,7 @@ class MailForm(FlaskForm):
 
     @property
     def description_content(self):
-        return str(escape(self.description.data))
+        return str(self.description.data)
 
     @property
     def notification_content(self):

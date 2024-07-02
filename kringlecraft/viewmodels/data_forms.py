@@ -28,7 +28,7 @@ class WorldForm(FlaskForm):
 
     @property
     def description_content(self):
-        return str(escape(self.description.data))
+        return str(self.description.data)
 
     @property
     def visible_content(self):
@@ -73,7 +73,7 @@ class RoomForm(FlaskForm):
 
     @property
     def description_content(self):
-        return str(escape(self.description.data))
+        return str(self.description.data)
 
     @property
     def world_content(self):
@@ -108,7 +108,7 @@ class ObjectiveForm(FlaskForm):
 
     @property
     def description_content(self):
-        return str(escape(self.description.data))
+        return str(self.description.data)
 
     @property
     def difficulty_content(self):
