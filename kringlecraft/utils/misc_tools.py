@@ -27,8 +27,7 @@ def verify_hash(hashed_text: str, plain_text: str) -> bool:
 
 def get_markdown(notes):
     md = markdown2.markdown(str(bytes(notes), 'utf-8'), extras=['fenced-code-blocks', 'code-friendly', 'pygments'])
-    md.replace("<img src=", "<img class=\"img-fluid\" src=")
-    return md
+    return md.replace("<img src=", "<img class=\"img-fluid img-restricted-md\" src=")
 
 
 def get_raw_markdown(notes):
