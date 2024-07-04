@@ -2,6 +2,7 @@ import os
 import sys
 import flask
 import logging
+from logging.handlers import SMTPHandler  # get crashes via mail
 
 from flask_login import LoginManager  # to manage user sessions
 from flask_wtf.csrf import CSRFProtect  # CSRF protection
@@ -26,6 +27,7 @@ def main():
     setup_csrf()
     setup_mail()
     setup_dropzone()
+    setup_mail_logger()
     setup_login_manager()
     app.run(debug=True, port=5006)
 
@@ -87,6 +89,24 @@ def setup_dropzone():
     app.config['DROPZONE_MAX_FILE_SIZE'] = 10
 
 
+def setup_mail_logger():
+    # Enable logging and crashes via mail
+    if app.config["app.mail_enable"] == "true":
+        mail_handler = SMTPHandler(
+            mailhost=app.config["app.mail_server"],
+            fromaddr=app.config["app.mail_sender"],
+            toaddrs=[app.config["app.mail_admin"]],
+            subject='kringlecraft.com: Application Error'
+        )
+        mail_handler.setLevel(logging.ERROR)
+        mail_handler.setFormatter(logging.Formatter(
+            '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+        ))
+
+        if not app.debug:
+            app.logger.addHandler(mail_handler)
+
+
 def setup_login_manager():
     from kringlecraft.services.user_services import find_active_user_by_id
 
@@ -112,4 +132,5 @@ else:
     setup_csrf()
     setup_mail()
     setup_dropzone()
+    setup_mail_logger()
     setup_login_manager()
