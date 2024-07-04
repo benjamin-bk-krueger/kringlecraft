@@ -1,7 +1,8 @@
 import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
-from kringlecraft.utils.file_tools import read_file_without_extension, create_markdown_file
+from kringlecraft.utils.file_tools import (read_file_without_extension, read_all_files_without_extension,
+                                           create_markdown_file)
 from kringlecraft.utils.misc_tools import get_markdown, get_raw_markdown
 
 blueprint = flask.Blueprint('report', __name__, template_folder='templates')
@@ -90,14 +91,88 @@ def single(report_format, objective_id):
     if report_format == "markdown":
         md_challenge = "" if my_objective.challenge is None else get_raw_markdown(my_objective.challenge)
         md_solution = "" if (solution_services.find_objective_solution_for_user(objective_id, current_user.id) is
-                               None) else get_raw_markdown(
+                             None) else get_raw_markdown(
             solution_services.find_objective_solution_for_user(objective_id, current_user.id).notes)
 
         md_output = flask.render_template('report/single.md', objective=my_objective,
                                           objective_image=objective_image, room=my_room, world=my_world,
                                           objective_types=objective_services.get_objective_types(),
                                           md_challenge=md_challenge, md_solution=md_solution,
-                                          www_server=flask.current_app.config.get('app.www_server'),)
+                                          www_server=flask.current_app.config.get('app.www_server'))
         local_file = create_markdown_file(f"objective-{my_objective.id}.md", md_output)
 
         return flask.send_file(local_file, download_name=f"objective-{my_objective.id}.md", as_attachment=True)
+
+
+# Shows a full report containing information about the world, its objectives and solutions in different formats
+@blueprint.route('/full/<string:report_format>/<int:world_id>', methods=['GET'])
+@login_required
+def full(report_format, world_id):
+    # (1) import forms and utilities
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.room_services as room_services
+    import kringlecraft.services.objective_services as objective_services
+    import kringlecraft.services.solution_services as solution_services
+    import kringlecraft.services.user_services as user_services
+    import kringlecraft.services.summary_services as summary_services
+
+    # (2) initialize form data
+    my_world = world_services.find_world_by_id(world_id)
+    if not my_world:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="World does not exist.")
+
+    world_image = read_file_without_extension("world", my_world.id)
+    user_image = read_file_without_extension("profile", current_user.id)
+    room_images = read_all_files_without_extension("room")
+    objective_images = read_all_files_without_extension("objective")
+
+    my_user = user_services.find_user_by_id(current_user.id)
+
+    all_rooms = room_services.find_world_rooms(world_id)
+    all_objectives = list()
+    for room in all_rooms:
+        all_objectives.extend(objective_services.find_room_objectives(room.id))
+
+    md_challenges = dict()
+    md_solutions = dict()
+    html_challenges = dict()
+    html_solutions = dict()
+
+    for objective in all_objectives:
+        md_challenge = "" if objective.challenge is None else get_raw_markdown(objective.challenge)
+        html_challenge = "" if objective.challenge is None else get_markdown(objective.challenge)
+        md_challenges[objective.id] = md_challenge
+        html_challenges[objective.id] = html_challenge
+
+        md_solution = "" if (solution_services.find_objective_solution_for_user(objective.id, current_user.id) is
+                             None) else get_raw_markdown(
+            solution_services.find_objective_solution_for_user(objective.id, current_user.id).notes)
+        html_solution = "" if (solution_services.find_objective_solution_for_user(objective.id, current_user.id) is
+                               None) else get_markdown(
+            solution_services.find_objective_solution_for_user(objective.id, current_user.id).notes)
+        md_solutions[objective.id] = md_solution
+        html_solutions[objective.id] = html_solution
+
+    md_summary = "" if summary_services.find_world_summary_for_user(world_id, current_user.id) is None else (
+        get_raw_markdown(summary_services.find_world_summary_for_user(world_id, current_user.id).notes))
+    html_summary = "" if summary_services.find_world_summary_for_user(world_id, current_user.id) is None else (
+        get_markdown(summary_services.find_world_summary_for_user(world_id, current_user.id).notes))
+
+    # (6a) show rendered page
+    if report_format == "html":
+        return flask.render_template('report/full.html', world=my_world, rooms=all_rooms,
+                                     objectives=all_objectives, user_image=user_image, objective_types=objective_services.get_objective_types(),
+                                     www_server=flask.current_app.config.get('app.www_server'), world_image=world_image,
+                                     room_images=room_images, objective_images=objective_images, user=my_user,
+                                     html_challenges=html_challenges, html_solutions=html_solutions,
+                                     html_summary=html_summary)
+
+    if report_format == "markdown":
+        return flask.render_template('report/full.md', world=my_world, rooms=all_rooms,
+                                     objectives=all_objectives, user_image=user_image,
+                                     objective_types=objective_services.get_objective_types(),
+                                     www_server=flask.current_app.config.get('app.www_server'), world_image=world_image,
+                                     room_images=room_images, objective_images=objective_images, user=my_user,
+                                     md_challenges=md_challenges, md_solutions=md_solutions,
+                                     md_summary=md_summary)
