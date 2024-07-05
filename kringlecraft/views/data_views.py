@@ -104,10 +104,11 @@ def worlds():
     world_form.process()
     all_worlds = world_services.find_all_worlds()
     world_images = read_all_files_without_extension("world")
+    highlight = flask.request.args.get('highlight', default=0, type=int)
 
     # (6a) show rendered page
     return flask.render_template('data/worlds.html', world_form=world_form, worlds=all_worlds,
-                                 world_images=world_images, page_mode="init")
+                                 world_images=world_images, page_mode="init", highlight=highlight)
 
 
 # Post a new world - if it doesn't already exist
@@ -262,10 +263,11 @@ def rooms(world_id):
 
     all_rooms = room_services.find_world_rooms(my_world.id)
     room_images = read_all_files_without_extension("room")
+    highlight = flask.request.args.get('highlight', default=0, type=int)
 
     # (6a) show rendered page
     return flask.render_template('data/rooms.html', room_form=room_form, rooms=all_rooms,
-                                 room_images=room_images, world=my_world, page_mode="init")
+                                 room_images=room_images, world=my_world, page_mode="init", highlight=highlight)
 
 
 # Post a new room - if it doesn't already exist
@@ -447,12 +449,13 @@ def objectives(room_id):
 
     objective_form.type.choices = objective_services.get_objective_type_choices()
     objective_form.process()
+    highlight = flask.request.args.get('highlight', default=0, type=int)
 
     # (6a) show rendered page
     return flask.render_template('data/objectives.html', objective_form=objective_form,
                                  objectives=all_objectives, objective_images=objective_images, room=my_room,
                                  world=my_world, page_mode="init",
-                                 objective_types=objective_services.get_objective_types())
+                                 objective_types=objective_services.get_objective_types(), highlight=highlight)
 
 
 # Post a new objective - if it doesn't already exist

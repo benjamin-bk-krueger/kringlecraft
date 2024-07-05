@@ -108,7 +108,11 @@
             {% else %}
                 <div class="row">
                     {% for objective in objectives %}
+                        {% if highlight == objective.id %}
+                        <div class="col-sm c-dashedborder">
+                        {% else %}
                         <div class="col-sm">
+                        {% endif %}
                             <div class="c-title">{{ objective_types[objective.type] }} {{ objective.name }}</div>
                             <figure class="figure c-bigcaption">
                                 <a href="{{ url_for('data.objective', objective_id=objective.id) }}">
@@ -138,7 +142,7 @@
 
         {#  Display action buttons regarding the selected objective  #}
         <div class="col d-flex mt-4">
-            <a class="btn btn-secondary me-3" href="{{ url_for('data.rooms', world_id=room.world_id )}}" role="button"><i class="bi bi-backspace"></i> Back</a>
+            <a class="btn btn-secondary me-3" href="{{ url_for('data.rooms', world_id=room.world_id, highlight=room.id)}}" role="button"><i class="bi bi-backspace"></i> Back</a>
             {% if current_user.role == 0 %}
                 <a class="btn btn-primary me-3" href="#" role="button" data-bs-toggle="modal" data-bs-target="#myModalAdd"><i class="bi bi-plus-square"></i> Create</a>
             {%  endif %}

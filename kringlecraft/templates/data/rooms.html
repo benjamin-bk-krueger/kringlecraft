@@ -89,7 +89,11 @@
             {% else %}
                 <div class="row">
                 {% for room in rooms %}
+                    {% if highlight == room.id %}
+                    <div class="col-sm c-dashedborder">
+                    {% else %}
                     <div class="col-sm">
+                    {% endif %}
                         <div class="c-title">{{ room.name }}</div>
                         <figure class="figure">
                             <a href="{{ url_for('data.objectives', room_id=room.id) }}">
@@ -113,7 +117,7 @@
 
         {#  Display action buttons regarding the selected room  #}
         <div class="col d-flex mt-4">
-            <a class="btn btn-secondary me-3" href="{{ url_for('data.worlds')}}" role="button"><i class="bi bi-backspace"></i> Back</a>
+            <a class="btn btn-secondary me-3" href="{{ url_for('data.worlds', highlight=world.id)}}" role="button"><i class="bi bi-backspace"></i> Back</a>
             {% if current_user.role == 0 %}
                 <a class="btn btn-primary me-3" href="#" role="button" data-bs-toggle="modal" data-bs-target="#myModalAdd"><i class="bi bi-plus-square"></i> Create</a>
             {%  endif %}

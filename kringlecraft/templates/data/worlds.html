@@ -109,7 +109,11 @@
             {% else %}
                 <div class="row">
                     {% for world in worlds %}
+                        {% if highlight == world.id %}
+                        <div class="col-sm c-dashedborder">
+                        {% else %}
                         <div class="col-sm">
+                        {% endif %}
                             <div class="c-title">{{ world.name }}</div>
                             <figure class="figure">
                                 <a href="{{ url_for('data.rooms', world_id=world.id) }}">
