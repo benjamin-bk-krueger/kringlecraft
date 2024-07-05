@@ -29,6 +29,7 @@ def main():
     setup_dropzone()
     setup_mail_logger()
     setup_login_manager()
+    app.jinja_env.globals.update(get_canonical_url=get_canonical_url)
     app.run(debug=True, port=5006)
 
 
@@ -107,6 +108,10 @@ def setup_mail_logger():
             app.logger.addHandler(mail_handler)
 
 
+def get_canonical_url():
+    return app.config["app.www_server"] + flask.request.path
+
+
 def setup_login_manager():
     from kringlecraft.services.user_services import find_active_user_by_id
 
@@ -134,3 +139,4 @@ else:
     setup_dropzone()
     setup_mail_logger()
     setup_login_manager()
+    app.jinja_env.globals.update(get_canonical_url=get_canonical_url)
