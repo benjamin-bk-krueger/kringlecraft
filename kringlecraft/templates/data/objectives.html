@@ -109,9 +109,9 @@
                 <div class="row">
                     {% for objective in objectives %}
                         {% if highlight == objective.id %}
-                        <div class="col-sm c-dashedborder">
+                        <div class="col-md c-dashedborder">
                         {% else %}
-                        <div class="col-sm">
+                        <div class="col-md">
                         {% endif %}
                             <div class="c-title">{{ objective_types[objective.type] }} {{ objective.name }}</div>
                             <figure class="figure c-bigcaption">
