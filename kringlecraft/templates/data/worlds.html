@@ -125,7 +125,8 @@
                                 </a>
                                 <figcaption class="figure-caption c-bigcaption">
                                     {% if current_user.role == 0 %}
-                                        <a href="{{ url_for('data.world', world_id=world.id) }}" data-toggle="tooltip" title="Edit World"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                                        <a href="{{ url_for('data.world', world_id=world.id, page_mode="edit") }}" data-toggle="tooltip" title="Edit World"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                                        <a href="{{ url_for('data.world', world_id=world.id, page_mode="delete") }}" data-toggle="tooltip" title="Delete World"><i class="bi bi-trash"></i></a>&nbsp;
                                     {% endif %}
                                     {% if current_user.role == 0 or current_user.role == 1 %}
                                         <a href="{{ url_for('task.summary', world_id=world.id) }}" data-toggle="tooltip" title="Write Summary"><i class="bi bi-journal-text"></i></a>&nbsp;

@@ -124,7 +124,8 @@
                                 </a>
                                 <figcaption class="figure-caption c-bigcaption">
                                     {% if current_user.role == 0 %}
-                                        <a href="{{ url_for('data.objective', objective_id=objective.id) }}" data-toggle="tooltip" title="Edit Objective"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                                        <a href="{{ url_for('data.objective', objective_id=objective.id, page_mode="edit") }}" data-toggle="tooltip" title="Edit Objective"><i class="bi bi-pencil-square"></i></a>&nbsp;
+                                        <a href="{{ url_for('data.objective', objective_id=objective.id, page_mode="delete") }}" data-toggle="tooltip" title="Delete Objective"><i class="bi bi-trash"></i></a>&nbsp;
                                         <a href="{{ url_for('task.challenge', objective_id=objective.id)}}" data-toggle="tooltip" title="Create Challenge"><i class="bi bi-question-square"></i></a>&nbsp;
                                     {% endif %}
                                     {% if current_user.role == 0 or current_user.role == 1 %}

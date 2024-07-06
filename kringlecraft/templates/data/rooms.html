@@ -105,7 +105,8 @@
                             </a>
                             <figcaption class="figure-caption c-bigcaption">
                                 {% if current_user.role == 0 %}
-                                    <a href="{{ url_for('data.room', room_id=room.id ) }}" data-toggle="tooltip" title="Edit Room"><i class="bi bi-pencil-square"></i></a>
+                                    <a href="{{ url_for('data.room', room_id=room.id, page_mode="edit" ) }}" data-toggle="tooltip" title="Edit Room"><i class="bi bi-pencil-square"></i></a>
+                                    <a href="{{ url_for('data.room', room_id=room.id, page_mode="delete" ) }}" data-toggle="tooltip" title="Delete Room"><i class="bi bi-trash"></i></a>
                                 {% endif %}
                             </figcaption>
                         </figure>

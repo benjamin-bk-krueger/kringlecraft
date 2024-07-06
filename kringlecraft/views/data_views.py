@@ -104,6 +104,7 @@ def worlds():
     world_form.process()
     all_worlds = world_services.find_all_worlds()
     world_images = read_all_files_without_extension("world")
+
     highlight = flask.request.args.get('highlight', default=0, type=int)
 
     # (6a) show rendered page
@@ -171,9 +172,11 @@ def world(world_id):
     world_form = WorldForm(my_world)
     world_form.process()
 
+    page_mode = flask.request.args.get('page_mode', default="init", type=str)
+
     # (6a) show rendered page
     return flask.render_template('data/world.html', world_form=world_form, world=my_world,
-                                 world_image=world_image, page_mode="init")
+                                 world_image=world_image, page_mode=page_mode)
 
 
 # Post a change in the world's data
@@ -211,7 +214,7 @@ def world_post(world_id):
             return flask.render_template('home/error.html', error_message="World could not be edited.")
 
         # (6b) redirect to new page after successful operation
-        return flask.redirect(flask.url_for('data.world', world_id=my_world.id))
+        return flask.redirect(flask.url_for('data.worlds', highlight=world_id))
 
     # (5) preset form with existing data
     world_form.set_field_defaults(conflicting_world is not None and (my_world.name != world_form.name_content))
@@ -263,6 +266,7 @@ def rooms(world_id):
 
     all_rooms = room_services.find_world_rooms(my_world.id)
     room_images = read_all_files_without_extension("room")
+
     highlight = flask.request.args.get('highlight', default=0, type=int)
 
     # (6a) show rendered page
@@ -342,9 +346,11 @@ def room(room_id):
     room_form.world.default = my_room.world_id
     room_form.process()
 
+    page_mode = flask.request.args.get('page_mode', default="init", type=str)
+
     # (6a) show rendered page
     return flask.render_template('data/room.html', room_form=room_form, room=my_room,
-                                 room_image=room_image, world=my_world, page_mode="init")
+                                 room_image=room_image, world=my_world, page_mode=page_mode)
 
 
 # Post a change in a room's data
@@ -383,7 +389,7 @@ def room_post(room_id):
             return flask.render_template('home/error.html', error_message="Room could not be edited.")
 
         # (6b) redirect to new page after successful operation
-        return flask.redirect(flask.url_for('data.room', room_id=my_room.id))
+        return flask.redirect(flask.url_for('data.rooms', world_id=my_room.world_id))
 
     # (5) preset form with existing data
     room_form.set_field_defaults(conflicting_room is not None and ((my_room.name != room_form.name_content) or
@@ -449,6 +455,7 @@ def objectives(room_id):
 
     objective_form.type.choices = objective_services.get_objective_type_choices()
     objective_form.process()
+
     highlight = flask.request.args.get('highlight', default=0, type=int)
 
     # (6a) show rendered page
@@ -554,12 +561,14 @@ def objective(objective_id):
     candidate_solutions = None if len(all_solutions) < 1 else all_solutions
     user_list = {key: value for key, value in user_services.get_user_choices(user_services.find_all_users())}
 
+    page_mode = flask.request.args.get('page_mode', default="init", type=str)
+
     # (6a) show rendered page
     return flask.render_template('data/objective.html', objective_form=objective_form,
                                  objective=my_objective, objective_image=objective_image, room=my_room, world=my_world,
-                                 page_mode="init", objective_types=objective_services.get_objective_types(),
+                                 objective_types=objective_services.get_objective_types(),
                                  md_challenge=md_challenge, md_solution=md_solution,
-                                 candidate_solutions=candidate_solutions, user_list=user_list)
+                                 candidate_solutions=candidate_solutions, user_list=user_list, page_mode=page_mode)
 
 
 # Post a change in an objective's data
@@ -606,7 +615,7 @@ def objective_post(objective_id):
             return flask.render_template('home/error.html', error_message="Objective could not be edited.")
 
         # (6b) redirect to new page after successful operation
-        return flask.redirect(flask.url_for('data.objective', objective_id=my_objective.id))
+        return flask.redirect(flask.url_for('data.objectives', room_id=my_objective.room_id, highlight=my_objective.id))
 
     # (5) preset form with existing data
     objective_form.set_field_defaults(conflicting_objective is not None and ((my_objective.name !=
