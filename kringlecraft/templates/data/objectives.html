@@ -113,7 +113,7 @@
                         {% else %}
                         <div class="col-md-4">
                         {% endif %}
-                            <div class="c-title">{{ objective_types[objective.type] }} {{ objective.name }}</div>
+                            <div class="c-title">{{ objective_types[objective.type] }} {{ objective.name }} {% if objective.visible %}<i class="bi bi-unlock"></i>{% else %}<i class="bi bi-lock"></i>{% endif %} <i class="bi bi-{{ objective.difficulty }}-circle"></i></div>
                             <figure class="figure c-bigcaption">
                                 <a href="{{ url_for('data.objective', objective_id=objective.id) }}">
                                     {% if objective_images[objective.id] %}

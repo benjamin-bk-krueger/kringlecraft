@@ -26,6 +26,14 @@ def get_world_choices(worlds: list[World]) -> list[tuple[int, str]]:
     return get_choices(worlds)
 
 
+def find_active_worlds() -> list[World] | None:
+    session = db_session.create_session()
+    try:
+        return session.query(World).filter(World.archived == False).order_by(World.name.asc()).all()
+    finally:
+        session.close()
+
+
 # ----------- Edit functions -----------
 def edit_world(world_id: int, name: str = None, description: str = None, url: str = None, visible: bool = None,
                archived: bool = None) -> World | None:

@@ -81,7 +81,7 @@ def index():
     import kringlecraft.services.world_services as world_services
 
     # (2) initialize form data
-    all_worlds = world_services.find_all_worlds()
+    all_worlds = world_services.find_active_worlds()
     world_images = read_all_files_without_extension("world")
 
     # (6a) show rendered page

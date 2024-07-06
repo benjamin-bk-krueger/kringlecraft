@@ -114,7 +114,7 @@
                         {% else %}
                         <div class="col-md-4">
                         {% endif %}
-                            <div class="c-title">{{ world.name }}</div>
+                            <div class="c-title">{{ world.name }} {% if world.visible %}<i class="bi bi-unlock"></i>{% else %}<i class="bi bi-lock"></i>{% endif %} {% if world.archived %}<i class="bi bi-archive"></i>{% else %}<i class="bi bi-envelope-open"></i>{% endif %}</div>
                             <figure class="figure">
                                 <a href="{{ url_for('data.rooms', world_id=world.id) }}">
                                     {% if world_images[world.id] %}
