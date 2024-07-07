@@ -169,10 +169,14 @@ def full(report_format, world_id):
                                      html_summary=html_summary)
 
     if report_format == "markdown":
-        return flask.render_template('report/full.md', world=my_world, rooms=all_rooms,
+        md_output = flask.render_template('report/full.md', world=my_world, rooms=all_rooms,
                                      objectives=all_objectives, user_image=user_image,
                                      objective_types=objective_services.get_objective_types(),
                                      www_server=flask.current_app.config.get('app.www_server'), world_image=world_image,
                                      room_images=room_images, objective_images=objective_images, user=my_user,
                                      md_challenges=md_challenges, md_solutions=md_solutions,
                                      md_summary=md_summary)
+
+        local_file = create_markdown_file(f"world-{my_world.id}.md", md_output)
+
+        return flask.send_file(local_file, download_name=f"world-{my_world.id}.md", as_attachment=True)

@@ -131,7 +131,7 @@ def get_temp_file(path: str) -> str | None:
 def create_markdown_file(filename: str, md_output: str) -> str | None:
     local_file = os.path.join(f'static/downloads/', filename)
     try:
-        with open(local_file, 'w') as f:
+        with open(local_file, 'w', encoding='utf-8') as f:
             f.write(md_output)
 
         return local_file
