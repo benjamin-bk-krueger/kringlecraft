@@ -3,28 +3,7 @@
 
 {% block title %}Objectives in {{  room.room_name }}{% endblock %}
 
-{% block additional_css %}
-    {{ dropzone.load_css() }}
-    {{ dropzone.style('border: 2px dashed #0087F7; margin: 10%;') }}
-{% endblock %}
-
 {% block additional_js %}
-    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
-
-    {#  Enable modal window error handling #}
-    {%  if page_mode == "add"  %}
-        <script src="{{ url_for('static', filename='js/func_modal_add.js') }}"></script>
-    {%  endif %}
-
-    {{ dropzone.load_js() }}
-    {{ dropzone.config() }}
-
-    {% if temp_ending %}
-        {#  Mock Dropzone #}
-        <script src="{{ url_for('static', filename='js/func_dropzone.js') }}"></script>
-        <script>MockDropzone("objective", "{{ temp_ending }}")</script>
-    {% endif %}
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var myModalDelete = document.getElementById('myModalDelete');
@@ -55,62 +34,6 @@
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-danger mt-4 btn-space" form="form_deletion"><i class="bi bi-check"></i> Confirm</button>
-                        <button type="button" class="btn btn-secondary mt-4 btn-space" data-bs-dismiss="modal"><i class="bi bi-x"></i> Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {# Modal dialog window - create a new objective #}
-        <div id="myModalAdd" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content c-lightblue c-border c-shadow">
-                    <div class="modal-header c-blue c-bottomborder">
-                        <h4 class="modal-title c-bigtitle">Create Objective</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        {# Upload and view profile image #}
-                        {{ dropzone.create(action='storage.upload_image_post', path="objective", filename_without_extension="_temp", overwrite=1) }}
-
-                        <form action="#" method="POST" id="form_new">
-                            {{ objective_form.csrf_token }}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ objective_form.name.name }}">{{ objective_form.name.label }}</label>
-                                {{ objective_form.name(size=20, class="form-control") }}
-                            </div>
-                           {% for error in objective_form.name.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                           {% endfor %}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ objective_form.description.name }}">{{ objective_form.description.label }}</label>
-                                {{ objective_form.description(size=40, class="form-control") }}
-                            </div>
-                            {% for error in objective_form.description.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ objective_form.difficulty.name }}">{{ objective_form.difficulty.label }}</label>: <label id="difficulty_number"></label>
-                                {{ objective_form.difficulty(class="form-control", oninput="document.getElementById('difficulty_number').innerHTML  = document.getElementById('difficulty').value ") }}
-                            </div>
-                            {% for error in objective_form.difficulty.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ objective_form.type.name }}">{{ objective_form.type.label }}</label>
-                                {{ objective_form.type(class="form-select") }}
-                            </div>
-                            <div class="form-check mt-2 mb-2">
-                                <label class="form-check-label" for="visible">{{ objective_form.visible.label }}</label>
-                                {{ objective_form.visible(class="form-check-input") }}
-                            </div>
-                            {% for error in objective_form.visible.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                       </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary mt-4 btn-space" form="form_new"><i class="bi bi-check"></i> Create</button>
                         <button type="button" class="btn btn-secondary mt-4 btn-space" data-bs-dismiss="modal"><i class="bi bi-x"></i> Cancel</button>
                     </div>
                 </div>
@@ -148,7 +71,7 @@
                         {% endif %}
                             <div class="c-title">{{ objective_types[objective.type] }} {{ objective.name }} {% if objective.visible %}<i class="bi bi-unlock"></i>{% else %}<i class="bi bi-lock"></i>{% endif %} <i class="bi bi-{{ objective.difficulty }}-circle"></i></div>
                             <figure class="figure c-bigcaption">
-                                <a href="{{ url_for('data.objective', objective_id=objective.id) }}">
+                                <a href="{{ url_for('data.answer', objective_id=objective.id) }}">
                                     {% if objective_images[objective.id] %}
                                         <img src="{{ url_for('static', filename='uploads' + "/" + objective_images[objective.id][0] + "/" + objective_images[objective.id][1]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ objective.name }}">
                                     {% else %}
@@ -178,7 +101,7 @@
         <div class="col d-flex mt-4">
             <a class="btn btn-secondary me-3" href="{{ url_for('data.rooms', world_id=room.world_id, highlight=room.id)}}" role="button"><i class="bi bi-backspace"></i> Back</a>
             {% if current_user.role == 0 %}
-                <a class="btn btn-primary me-3" href="#" role="button" data-bs-toggle="modal" data-bs-target="#myModalAdd"><i class="bi bi-plus-square"></i> Create</a>
+                <a class="btn btn-primary me-3" href="{{ url_for('data.objective', objective_id=0, page_mode="add", room_id=room.id) }}" role="button"><i class="bi bi-plus-square"></i> Create</a>
             {%  endif %}
         </div>
     </div>

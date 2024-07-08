@@ -1,0 +1,80 @@
+{# /objective #}
+{% extends 'shared/_layout.html' %}
+
+{% block title %}Solution for Objective {{ objective.name }}{% endblock %}
+
+{% block content %}
+    <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
+        {# Show breadcrumb navigation #}
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('data.worlds') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('data.rooms', world_id=world.id) }}">{{ world.name }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('data.objectives', room_id=room.id) }}">{{ room.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ objective.name }}</li>
+            </ol>
+        </nav>
+
+        {#  Show objective info #}
+        <div class="mb-3 fs-4 c-title">{{ objective.name }}</div>
+        <div class="underline"><span><i class="bi bi-clipboard-data" aria-hidden="true"></i></span></div>
+        {%  if objective.difficulty > 0 %}
+            <div class="fs-5">Difficulty:
+                {% for i in range(objective.difficulty) %}
+                    <i class="bi bi-tree-fill"></i>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {%  if objective.visible == 1  %}
+            <span class="badge bg-secondary">Shown in Report</span>
+        {%  else %}
+            <span class="badge bg-secondary">Hidden in Report</span>
+        {%  endif %}
+        <div class="fs-6 mb-4">{{ objective.description }}</div>
+
+        {# Show fullscreen wallpaper #}
+        {% if objective_image %}
+            <img src="{{ url_for('static', filename='uploads' + "/" + objective_image[0] + "/" + objective_image[1]) }}" class="img-fluid rounded img-restricted-lg" alt="Objective Image">
+        {% else %}
+            <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="img-fluid rounded img-restricted-lg" alt="Objective Image">
+        {% endif %}
+
+        {#  Display action buttons regarding the selected room  #}
+        <div class="col d-flex mt-4">
+            <a class="btn btn-secondary me-3" href="{{ url_for('data.objectives', room_id=room.id, highlight=objective.id) }}" role="button"><i class="bi bi-backspace"></i> Back</a>
+        </div>
+    </div>
+
+    <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
+        {#  Display challenge of the selected objective - the markdown has been converted to HTML #}
+        <div class="fs-3 c-title">Challenge</div>
+        {{ md_challenge|safe }}
+    </div>
+
+    {% if md_solution is none and candidate_solutions is none %}
+        <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
+            <div class="fs-3 c-title">Solution</div>
+            No (public) solutions yet.
+        </div>
+    {% endif %}
+
+    {% if md_solution is not none %}
+        <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
+            {#  Display solution of the selected objective - the markdown has been converted to HTML #}
+            <div class="fs-3 c-title">Solution</div>
+            {{ md_solution|safe }}
+        </div>
+    {% endif %}
+
+    {% if candidate_solutions is not none and md_solution is none %}
+        <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
+            {#  Display solution of the selected objective - the markdown has been converted to HTML #}
+            <div class="fs-3 c-title">All Solutions</div>
+            <ul class="list-group" id="myList">
+                {% for solution in candidate_solutions %}
+                    <li class="list-group-item"><i class="bi bi-eye me-2"></i> <a href="{{ url_for('task.walkthrough', solution_id=solution.id) }}" data-toggle="tooltip" title="View solution">View solution by {{ user_list[solution.user_id] }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -25,7 +25,7 @@
                     {% for objective in objectives %}
                         {% if room.id == objective.room_id %}
                             <li class="list-group-item">
-                                <a href="{{ url_for('data.objective', objective_id=objective.id)}}">{{ objective_types[objective.type] }} {{ objective.name }}</a>
+                                <a href="{{ url_for('data.answer', objective_id=objective.id)}}">{{ objective_types[objective.type] }} {{ objective.name }}</a>
                                 {% if objective.difficulty > 0 %}
                                     - Difficulty {{ objective.difficulty }}
                                     {% for solution in solutions %}

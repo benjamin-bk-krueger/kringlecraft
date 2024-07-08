@@ -161,3 +161,13 @@ class ObjectiveForm(FlaskForm):
         self.visible.default = self.visible.data
         self.type.default = self.type.data
         self.room.default = self.room_content
+
+    def get_objective(self) -> Objective:
+        my_objective = Objective()
+        my_objective.name = self.name_content
+        my_objective.description = self.description_content
+        my_objective.difficulty = self.difficulty_content
+        my_objective.visible = self.visible_content
+        my_objective.type = self.type_content
+        my_objective.room_id = self.room_content
+        return my_objective

@@ -153,6 +153,7 @@ def worlds_post():
 
 # Shows information about a specific world
 @blueprint.route('/world/<int:world_id>', methods=['GET'])
+@login_required
 def world(world_id):
     # (1) import forms and utilities
     from kringlecraft.viewmodels.data_forms import WorldForm
@@ -320,6 +321,7 @@ def rooms_post():
 
 # Shows information about a specific room
 @blueprint.route('/room/<int:room_id>', methods=['GET'])
+@login_required
 def room(room_id):
     # (1) import forms and utilities
     from kringlecraft.viewmodels.data_forms import RoomForm
@@ -431,14 +433,11 @@ def room_delete(room_id):
 @blueprint.route('/objectives/<int:room_id>', methods=['GET'])
 def objectives(room_id):
     # (1) import forms and utilities
-    from kringlecraft.viewmodels.data_forms import ObjectiveForm
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
 
     # (2) initialize form data
-    objective_form = ObjectiveForm()
-    objective_form.process()
     my_room = room_services.find_room_by_id(room_id)
 
     if not my_room:
@@ -448,23 +447,18 @@ def objectives(room_id):
     all_objectives = objective_services.find_room_objectives(my_room.id)
     objective_images = read_all_files_without_extension("objective")
     my_world = world_services.find_world_by_id(my_room.world_id)
-
-    objective_form.type.choices = objective_services.get_objective_type_choices()
-    objective_form.process()
-
     highlight = flask.request.args.get('highlight', default=0, type=int)
 
     # (6a) show rendered page
-    return flask.render_template('data/objectives.html', objective_form=objective_form,
-                                 objectives=all_objectives, objective_images=objective_images, room=my_room,
-                                 world=my_world, page_mode="init",
+    return flask.render_template('data/objectives.html', objectives=all_objectives,
+                                 objective_images=objective_images, room=my_room, world=my_world,
                                  objective_types=objective_services.get_objective_types(), highlight=highlight)
 
 
 # Post a new objective - if it doesn't already exist
-@blueprint.route('/objectives/<int:room_id>', methods=['POST'])
+@blueprint.route('/objectives', methods=['POST'])
 @login_required
-def objectives_post(room_id):
+def objectives_post():
     # (1) import forms and utilities
     from kringlecraft.viewmodels.data_forms import ObjectiveForm
     import kringlecraft.services.world_services as world_services
@@ -477,7 +471,7 @@ def objectives_post(room_id):
 
     # (2) initialize form data
     objective_form = ObjectiveForm()
-    my_room = room_services.find_room_by_id(room_id)
+    my_room = room_services.find_room_by_id(objective_form.room_content)
 
     if not my_room:
         # (6e) show dedicated error page
@@ -506,65 +500,60 @@ def objectives_post(room_id):
     # (5) preset form with existing data
     objective_form.set_field_defaults(conflicting_objective is not None)
     objective_form.process()
-    all_objectives = objective_services.find_room_objectives(my_room.id)
-    objective_images = read_all_files_without_extension("objective")
     my_world = world_services.find_world_by_id(my_room.world_id)
 
     objective_form.type.choices = objective_services.get_objective_type_choices()
     objective_form.type.default = objective_form.type_content
+
+    objective_form.room.choices = room_services.get_room_choices(room_services.find_world_rooms(my_room.world_id))
+    objective_form.room.default = objective_form.room_content
     objective_form.process()
 
+    my_objective = objective_form.get_objective()
+
     # (6c) show rendered page with possible error messages
-    return flask.render_template('data/objectives.html', objective_form=objective_form,
-                                 objectives=all_objectives, objective_images=objective_images, room=my_room,
-                                 world=my_world, page_mode="add",
+    return flask.render_template('data/objective.html', objective_form=objective_form,
+                                 objective=my_objective, room=my_room, world=my_world, page_mode="add",
                                  objective_types=objective_services.get_objective_types(), temp_ending=temp_ending)
 
 
 # Shows information about a specific objective
 @blueprint.route('/objective/<int:objective_id>', methods=['GET'])
+@login_required
 def objective(objective_id):
     # (1) import forms and utilities
     from kringlecraft.viewmodels.data_forms import ObjectiveForm
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
-    import kringlecraft.services.solution_services as solution_services
-    import kringlecraft.services.user_services as user_services
 
     # (2) initialize form data
+    page_mode = flask.request.args.get('page_mode', default="init", type=str)
+    my_room_id = flask.request.args.get('room_id', default=0, type=int)
     my_objective = objective_services.find_objective_by_id(objective_id)
-    if not my_objective:
+    if not my_objective and page_mode == "edit":
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="Objective does not exist.")
 
-    objective_image = read_file_without_extension("objective", my_objective.id)
     objective_form = ObjectiveForm(my_objective)
     objective_form.process()
-    my_room = room_services.find_room_by_id(my_objective.room_id)
+    objective_image = None if my_objective is None else read_file_without_extension("objective", my_objective.id)
+    my_room = room_services.find_room_by_id(my_room_id) if my_objective is None else (
+        room_services.find_room_by_id(my_objective.room_id)
+    )
     my_world = world_services.find_world_by_id(my_room.world_id)
 
     objective_form.type.choices = objective_services.get_objective_type_choices()
-    objective_form.type.default = objective_form.type_content
+    objective_form.type.default = 1 if my_objective is None else objective_form.type_content
 
-    objective_form.room.choices = room_services.get_room_choices(room_services.find_all_rooms())
-    objective_form.room.default = my_objective.room_id
+    objective_form.room.choices = room_services.get_room_choices(room_services.find_world_rooms(my_room.world_id))
+    objective_form.room.default = my_room_id if my_objective is None else my_objective.room_id
     objective_form.process()
-
-    md_challenge = "" if my_objective.challenge is None else get_markdown(my_objective.challenge)
-    all_solutions = solution_services.find_active_solutions(objective_id)
-    md_solution = None if len(all_solutions) != 1 else get_markdown(all_solutions[0].notes)
-    candidate_solutions = None if len(all_solutions) < 1 else all_solutions
-    user_list = {key: value for key, value in user_services.get_user_choices(user_services.find_all_users())}
-
-    page_mode = flask.request.args.get('page_mode', default="init", type=str)
 
     # (6a) show rendered page
     return flask.render_template('data/objective.html', objective_form=objective_form,
                                  objective=my_objective, objective_image=objective_image, room=my_room, world=my_world,
-                                 objective_types=objective_services.get_objective_types(),
-                                 md_challenge=md_challenge, md_solution=md_solution,
-                                 candidate_solutions=candidate_solutions, user_list=user_list, page_mode=page_mode)
+                                 objective_types=objective_services.get_objective_types(), page_mode=page_mode)
 
 
 # Post a change in an objective's data
@@ -576,8 +565,6 @@ def objective_post(objective_id):
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
-    import kringlecraft.services.solution_services as solution_services
-    import kringlecraft.services.user_services as user_services
 
     if current_user.role != 0:
         # (6e) show dedicated error page
@@ -630,18 +617,11 @@ def objective_post(objective_id):
     objective_form.room.default = objective_form.room_content
     objective_form.process()
 
-    md_challenge = "" if my_objective.challenge is None else get_markdown(my_objective.challenge)
-    all_solutions = solution_services.find_active_solutions(objective_id)
-    md_solution = None if len(all_solutions) != 1 else get_markdown(all_solutions[0].notes)
-    candidate_solutions = None if len(all_solutions) < 1 else all_solutions
-    user_list = {key: value for key, value in user_services.get_user_choices(user_services.find_all_users())}
-
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/objective.html', objective_form=objective_form,
                                  objective=my_objective, objective_image=objective_image, room=my_room, world=my_world,
                                  page_mode="edit", objective_types=objective_services.get_objective_types(),
-                                 md_challenge=md_challenge, md_solution=md_solution,
-                                 candidate_solutions=candidate_solutions, user_list=user_list, temp_ending=temp_ending)
+                                 temp_ending=temp_ending)
 
 
 # Delete a specific objective - and all included elements!!!
@@ -666,3 +646,51 @@ def objective_delete(objective_id):
 
     # (6b) redirect to new page after successful operation
     return flask.redirect(flask.url_for('data.objectives', room_id=my_room.id))
+
+
+# Shows information about a specific objective with solutions
+@blueprint.route('/answer/<int:objective_id>', methods=['GET'])
+def answer(objective_id):
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.data_forms import ObjectiveForm
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.room_services as room_services
+    import kringlecraft.services.objective_services as objective_services
+    import kringlecraft.services.solution_services as solution_services
+    import kringlecraft.services.user_services as user_services
+
+    # (2) initialize form data
+    page_mode = flask.request.args.get('page_mode', default="init", type=str)
+    my_room_id = flask.request.args.get('room_id', default=0, type=int)
+    my_objective = objective_services.find_objective_by_id(objective_id)
+    if not my_objective and page_mode == "edit":
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Objective does not exist.")
+
+    objective_form = ObjectiveForm(my_objective)
+    objective_form.process()
+    objective_image = None if my_objective is None else read_file_without_extension("objective", my_objective.id)
+    my_room = room_services.find_room_by_id(my_room_id) if my_objective is None else (
+        room_services.find_room_by_id(my_objective.room_id)
+    )
+    my_world = world_services.find_world_by_id(my_room.world_id)
+
+    objective_form.type.choices = objective_services.get_objective_type_choices()
+    objective_form.type.default = 1 if my_objective is None else objective_form.type_content
+
+    objective_form.room.choices = room_services.get_room_choices(room_services.find_world_rooms(my_room.world_id))
+    objective_form.room.default = my_room_id if my_objective is None else my_objective.room_id
+    objective_form.process()
+
+    md_challenge = "" if my_objective.challenge is None else get_markdown(my_objective.challenge)
+    all_solutions = solution_services.find_active_solutions(objective_id)
+    md_solution = None if len(all_solutions) != 1 else get_markdown(all_solutions[0].notes)
+    candidate_solutions = None if len(all_solutions) < 1 else all_solutions
+    user_list = {key: value for key, value in user_services.get_user_choices(user_services.find_all_users())}
+
+    # (6a) show rendered page
+    return flask.render_template('data/answer.html', objective_form=objective_form,
+                                 objective=my_objective, objective_image=objective_image, room=my_room, world=my_world,
+                                 objective_types=objective_services.get_objective_types(), page_mode=page_mode,
+                                 md_challenge=md_challenge, md_solution=md_solution,
+                                 candidate_solutions=candidate_solutions, user_list=user_list)

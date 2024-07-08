@@ -40,15 +40,13 @@ def sitemap():
     all_urls.append(SitemapURL(www_server + flask.url_for("data.worlds"), sitemap_date, WEEKLY))
     all_worlds = world_services.find_all_worlds()
     for world in all_worlds:
-        all_urls.append(SitemapURL(www_server + flask.url_for("data.world", world_id=world.id), sitemap_date, WEEKLY))
         all_urls.append(SitemapURL(www_server + flask.url_for("data.rooms", world_id=world.id), sitemap_date, WEEKLY))
         all_rooms = room_services.find_world_rooms(world.id)
         for room in all_rooms:
-            all_urls.append(SitemapURL(www_server + flask.url_for("data.room", room_id=room.id), sitemap_date, WEEKLY))
             all_urls.append(SitemapURL(www_server + flask.url_for("data.objectives", room_id=room.id), sitemap_date, WEEKLY))
             all_objectives = objective_services.find_room_objectives(room.id)
             for objective in all_objectives:
-                all_urls.append(SitemapURL(www_server + flask.url_for("data.objective", objective_id=objective.id), sitemap_date, WEEKLY))
+                all_urls.append(SitemapURL(www_server + flask.url_for("data.answer", objective_id=objective.id), sitemap_date, WEEKLY))
 
     # (6a) show rendered page
     template = flask.render_template('report/sitemap.xml', urls=all_urls)
