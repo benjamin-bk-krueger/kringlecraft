@@ -39,7 +39,7 @@ def convert_markdown(notes) -> str:
     return str(bytes(notes), 'utf-8')
 
 
-def search_binary_text(binary_data, search_string: str, context: int = 20) -> str | None:
+def search_binary_text(binary_data, search_string: str, context: int = 50) -> str | None:
     if binary_data is None:
         return None
 
