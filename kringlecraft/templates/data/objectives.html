@@ -24,10 +24,43 @@
         <script src="{{ url_for('static', filename='js/func_dropzone.js') }}"></script>
         <script>MockDropzone("objective", "{{ temp_ending }}")</script>
     {% endif %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var myModalDelete = document.getElementById('myModalDelete');
+            myModalDelete.addEventListener('show.bs.modal', function (event) {
+                var link = event.relatedTarget;
+                var objectiveId = link.getAttribute('data-objective-id');
+                var form = myModalDelete.querySelector('#form_deletion');
+                form.action = `/objective/delete/${objectiveId}`;
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block modal %}
     {% if current_user.role == 0 %}
+        {# Modal dialog window - delete currently selected objective #}
+        <div id="myModalDelete" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content c-lightblue c-border c-shadow">
+                    <div class="modal-header c-blue c-bottomborder">
+                        <h4 class="modal-title c-bigtitle">Delete Objective/Character/Item</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ url_for('data.objective_delete', objective_id='PLACEHOLDER_ID' | int) }}" id="form_deletion">
+                            Are you sure?
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger mt-4 btn-space" form="form_deletion"><i class="bi bi-check"></i> Confirm</button>
+                        <button type="button" class="btn btn-secondary mt-4 btn-space" data-bs-dismiss="modal"><i class="bi bi-x"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {# Modal dialog window - create a new objective #}
         <div id="myModalAdd" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -125,7 +158,7 @@
                                 <figcaption class="figure-caption c-bigcaption">
                                     {% if current_user.role == 0 %}
                                         <a href="{{ url_for('data.objective', objective_id=objective.id, page_mode="edit") }}" data-toggle="tooltip" title="Edit Objective"><i class="bi bi-pencil-square"></i></a>&nbsp;
-                                        <a href="{{ url_for('data.objective', objective_id=objective.id, page_mode="delete") }}" data-toggle="tooltip" title="Delete Objective"><i class="bi bi-trash"></i></a>&nbsp;
+                                        <a href="#" data-toggle="tooltip" title="Delete Objective" data-bs-toggle="modal" data-bs-target="#myModalDelete" data-objective-id="{{ objective.id }}"><i class="bi bi-trash"></i></a>&nbsp;
                                         <a href="{{ url_for('task.challenge', objective_id=objective.id)}}" data-toggle="tooltip" title="Create Challenge"><i class="bi bi-question-square"></i></a>&nbsp;
                                     {% endif %}
                                     {% if current_user.role == 0 or current_user.role == 1 %}

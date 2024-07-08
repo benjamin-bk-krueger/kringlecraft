@@ -24,10 +24,43 @@
         <script src="{{ url_for('static', filename='js/func_dropzone.js') }}"></script>
         <script>MockDropzone("world", "{{ temp_ending }}")</script>
     {% endif %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var myModalDelete = document.getElementById('myModalDelete');
+            myModalDelete.addEventListener('show.bs.modal', function (event) {
+                var link = event.relatedTarget;
+                var worldId = link.getAttribute('data-world-id');
+                var form = myModalDelete.querySelector('#form_deletion');
+                form.action = `/world/delete/${worldId}`;
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block modal %}
     {% if current_user.role == 0 %}
+        {# Modal dialog window - delete currently selected world #}
+        <div id="myModalDelete" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content c-lightblue c-border c-shadow">
+                    <div class="modal-header c-blue c-bottomborder">
+                        <h4 class="modal-title c-bigtitle">Delete World</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ url_for('data.world_delete', world_id='PLACEHOLDER_ID' | int) }}" id="form_deletion">
+                            Are you sure?
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger mt-4 btn-space" form="form_deletion"><i class="bi bi-check"></i> Confirm</button>
+                        <button type="button" class="btn btn-secondary mt-4 btn-space" data-bs-dismiss="modal"><i class="bi bi-x"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {# Modal dialog window - create a new world #}
         <div id="myModalAdd" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -126,7 +159,7 @@
                                 <figcaption class="figure-caption c-bigcaption">
                                     {% if current_user.role == 0 %}
                                         <a href="{{ url_for('data.world', world_id=world.id, page_mode="edit") }}" data-toggle="tooltip" title="Edit World"><i class="bi bi-pencil-square"></i></a>&nbsp;
-                                        <a href="{{ url_for('data.world', world_id=world.id, page_mode="delete") }}" data-toggle="tooltip" title="Delete World"><i class="bi bi-trash"></i></a>&nbsp;
+                                        <a href="#" data-toggle="tooltip" title="Delete World" data-bs-toggle="modal" data-bs-target="#myModalDelete" data-world-id="{{ world.id }}"><i class="bi bi-trash"></i></a>&nbsp;
                                     {% endif %}
                                     {% if current_user.role == 0 or current_user.role == 1 %}
                                         <a href="{{ url_for('task.summary', world_id=world.id) }}" data-toggle="tooltip" title="Write Summary"><i class="bi bi-journal-text"></i></a>&nbsp;

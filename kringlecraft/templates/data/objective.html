@@ -52,27 +52,6 @@
 
 {% block modal %}
     {% if current_user.role == 0 %}
-        {# Modal dialog window - delete currently selected objective #}
-        <div id="myModalDelete" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content c-lightblue c-border c-shadow">
-                    <div class="modal-header c-blue c-bottomborder">
-                        <h4 class="modal-title c-bigtitle">Delete {{ objective_types[objective.type] }}</h4>
-                        <button type="button" class="btn-close" id="modalDeleteCloseButtonOne" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="{{ url_for('data.objective_delete', objective_id=objective.id) }}" id="form_deletion">
-                            Are you sure?
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-danger mt-4 btn-space" form="form_deletion"><i class="bi bi-check"></i> Confirm</button>
-                        <button type="button" class="btn btn-secondary mt-4 btn-space" id="modalDeleteCloseButtonTwo" data-bs-dismiss="modal"><i class="bi bi-x"></i> Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         {# Modal dialog window - edit currently selected objective #}
         <div id="myModalEdit" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
