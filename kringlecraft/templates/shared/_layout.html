@@ -51,6 +51,11 @@
                     </ul>
 
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <form action="/search" method="get" class="d-flex justify-content-center">
+                                <input type="text" name="query" class="form-control" placeholder="Search...">
+                            </form>
+                        </li>
                         {% if current_user.is_authenticated %}
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('account.profile_edit') }}"><i class="bi bi-person-fill"></i> My Account</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('home.logout') }}"><i class="bi bi-door-open-fill"></i> Logout</a></li>

@@ -37,3 +37,28 @@ def get_raw_markdown(notes):
 
 def convert_markdown(notes) -> str:
     return str(bytes(notes), 'utf-8')
+
+
+def search_binary_text(binary_data, search_string: str, context: int = 20) -> str | None:
+    if binary_data is None:
+        return None
+
+    text = binary_data.decode('utf-8', errors='ignore')
+    search_string = search_string.lower()
+
+    start_index = text.lower().find(search_string)
+
+    if start_index == -1:
+        return None
+
+    start = max(0, start_index - context)
+    end = min(len(text), start_index + len(search_string) + context)
+
+    result = text[start:end]
+
+    if start > 0:
+        result = '...' + result
+    if end < len(text):
+        result = result + '...'
+
+    return result

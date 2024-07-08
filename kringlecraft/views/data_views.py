@@ -4,7 +4,7 @@ from flask_login import (login_required, current_user)  # to manage user session
 from kringlecraft.utils.mail_tools import (send_mail)
 from kringlecraft.utils.file_tools import (get_temp_file, file_extension, enable_image, read_file_without_extension,
                                            read_all_files_without_extension)
-from kringlecraft.utils.misc_tools import get_markdown
+from kringlecraft.utils.misc_tools import (get_markdown, search_binary_text)
 
 blueprint = flask.Blueprint('data', __name__, template_folder='templates')
 
@@ -680,3 +680,48 @@ def answer(objective_id):
                                  objective_types=objective_services.get_objective_types(),
                                  md_challenge=md_challenge, md_solution=md_solution,
                                  candidate_solutions=candidate_solutions, user_list=user_list)
+
+
+# Searches all objectives and solutions
+@blueprint.route('/search', methods=['GET'])
+def search():
+    # (1) import forms and utilities
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.room_services as room_services
+    import kringlecraft.services.objective_services as objective_services
+    import kringlecraft.services.solution_services as solution_services
+
+    # (2) initialize form data
+    search_string = flask.request.args.get('query', default="query", type=str)
+    all_hits: list[tuple[str, str]] = []
+
+    all_worlds = world_services.find_all_worlds()
+    for my_world in all_worlds:
+        if search_string.lower() in my_world.name.lower():
+            all_hits.append((flask.url_for('data.worlds', highlight=my_world.id), my_world.name))
+        all_rooms = room_services.find_world_rooms(my_world.id)
+        for my_room in all_rooms:
+            if search_string.lower() in my_room.name.lower():
+                all_hits.append((flask.url_for('data.rooms', world_id=my_world.id, highlight=my_room.id), my_room.name))
+            all_objectives = objective_services.find_room_objectives(my_room.id)
+            for my_objective in all_objectives:
+                if search_string.lower() in my_objective.name.lower():
+                    all_hits.append((flask.url_for('data.objectives', room_id=my_room.id, highlight=my_objective.id), my_objective.name))
+                hit_text = search_binary_text(my_objective.challenge, search_string)
+                if hit_text:
+                    all_hits.append((flask.url_for('data.answer', objective_id=my_objective.id), hit_text))
+
+    all_visible_worlds = world_services.find_visible_worlds()
+    for my_world in all_visible_worlds:
+        all_rooms = room_services.find_world_rooms(my_world.id)
+        for my_room in all_rooms:
+            all_objectives = objective_services.find_room_objectives(my_room.id)
+            for my_objective in all_objectives:
+                all_solutions = solution_services.find_active_solutions(my_objective.id)
+                for solution in all_solutions:
+                    hit_text = search_binary_text(solution.notes, search_string)
+                    if hit_text:
+                        all_hits.append((flask.url_for('data.answer', objective_id=my_objective.id), hit_text))
+
+    # (6a) show rendered page
+    return flask.render_template('data/search.html', search_string=search_string, all_hits=all_hits)

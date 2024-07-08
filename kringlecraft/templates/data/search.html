@@ -1,0 +1,22 @@
+{# /search #}
+{% extends 'shared/_layout.html' %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+    <div class="container-fluid c-restricted-md c-header c-shadow rounded bg-light mt-4 py-4">
+        <div class="container-fluid c-restricted-sm">
+            {#  Show search results in all stored elements in database #}
+            <div class="mb-3 fs-4 c-title">Search Results</div>
+            <div class="underline"><span><i class="bi bi-body-text" aria-hidden="true"></i></span></div>
+            <div>
+                <div class="mb-2 mt-2 fs-5 c-subtitle">Hits for {{ search_string }}</div>
+                <ul class="list-group">
+                    {% for hit in all_hits %}
+                        <li class="list-group-item"><a href="{{ hit[0] }}">{{ hit[1] }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -34,6 +34,14 @@ def find_active_worlds() -> list[World] | None:
         session.close()
 
 
+def find_visible_worlds() -> list[World] | None:
+    session = db_session.create_session()
+    try:
+        return session.query(World).filter(World.visible == True).order_by(World.name.asc()).all()
+    finally:
+        session.close()
+
+
 # ----------- Edit functions -----------
 def edit_world(world_id: int, name: str = None, description: str = None, url: str = None, visible: bool = None,
                archived: bool = None) -> World | None:
