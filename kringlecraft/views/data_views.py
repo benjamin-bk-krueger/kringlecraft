@@ -528,7 +528,7 @@ def objective(objective_id):
     import kringlecraft.services.objective_services as objective_services
 
     # (2) initialize form data
-    page_mode = flask.request.args.get('page_mode', default="init", type=str)
+    page_mode = flask.request.args.get('page_mode', default="add", type=str)
     my_room_id = flask.request.args.get('room_id', default=0, type=int)
     my_objective = objective_services.find_objective_by_id(objective_id)
     if not my_objective and page_mode == "edit":

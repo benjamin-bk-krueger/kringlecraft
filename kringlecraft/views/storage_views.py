@@ -29,11 +29,11 @@ def delete_image(path, filename, redirect, target_id):
     if redirect == "account.profile_edit":
         return flask.redirect(flask.url_for(redirect))
     if redirect == "data.world":
-        return flask.redirect(flask.url_for(redirect, world_id=target_id))
+        return flask.redirect(flask.url_for(redirect, world_id=target_id, page_mode="edit"))
     if redirect == "data.room":
-        return flask.redirect(flask.url_for(redirect, room_id=target_id))
+        return flask.redirect(flask.url_for(redirect, room_id=target_id, page_mode="edit"))
     if redirect == "data.objective":
-        return flask.redirect(flask.url_for(redirect, objective_id=target_id))
+        return flask.redirect(flask.url_for(redirect, objective_id=target_id, page_mode="edit"))
     if redirect == "task.challenge":
         return flask.redirect(flask.url_for(redirect, objective_id=target_id))
     if redirect == "task.solution":

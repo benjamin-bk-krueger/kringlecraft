@@ -204,7 +204,6 @@ def solution(objective_id):
 def solution_post(objective_id):
     # (1) import forms and utilities
     from kringlecraft.viewmodels.task_forms import SolutionForm
-    import kringlecraft.services.world_services as world_services
     import kringlecraft.services.objective_services as objective_services
     import kringlecraft.services.solution_services as solution_services
 
@@ -293,7 +292,6 @@ def solution_delete(objective_id):
 @blueprint.route('/walkthrough/<int:solution_id>', methods=['GET'])
 def walkthrough(solution_id):
     # (1) import forms and utilities
-    from kringlecraft.viewmodels.task_forms import SolutionForm
     import kringlecraft.services.objective_services as objective_services
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.world_services as world_services
