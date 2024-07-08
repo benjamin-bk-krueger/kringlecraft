@@ -3,28 +3,7 @@
 
 {% block title %}All Rooms in {{ world.name }}{% endblock %}
 
-{% block additional_css %}
-    {{ dropzone.load_css() }}
-    {{ dropzone.style('border: 2px dashed #0087F7; margin: 10%;') }}
-{% endblock %}
-
 {% block additional_js %}
-    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
-
-    {#  Enable modal window error handling #}
-    {%  if page_mode == "add"  %}
-        <script src="{{ url_for('static', filename='js/func_modal_add.js') }}"></script>
-    {%  endif %}
-
-    {{ dropzone.load_js() }}
-    {{ dropzone.config() }}
-
-    {% if temp_ending %}
-        {#  Mock Dropzone #}
-        <script src="{{ url_for('static', filename='js/func_dropzone.js') }}"></script>
-        <script>MockDropzone("room", "{{ temp_ending }}")</script>
-    {% endif %}
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var myModalDelete = document.getElementById('myModalDelete');
@@ -55,44 +34,6 @@
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-danger mt-4 btn-space" form="form_deletion"><i class="bi bi-check"></i> Confirm</button>
-                        <button type="button" class="btn btn-secondary mt-4 btn-space" data-bs-dismiss="modal"><i class="bi bi-x"></i> Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {# Modal dialog window - create a new room #}
-        <div id="myModalAdd" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content c-lightblue c-border c-shadow">
-                    <div class="modal-header c-blue c-bottomborder">
-                        <h4 class="modal-title c-bigtitle">Create Room</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        {# Upload and view profile image #}
-                        {{ dropzone.create(action='storage.upload_image_post', path="room", filename_without_extension="_temp", overwrite=1) }}
-
-                        <form action="{{ url_for('data.rooms_post', world_id=world.id)}}" method="POST" id="form_new">
-                            {{ room_form.csrf_token }}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ room_form.name.name }}">{{ room_form.name.label }}</label>
-                                {{ room_form.name(size=20, class="form-control") }}
-                            </div>
-                           {% for error in room_form.name.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                           {% endfor %}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ room_form.description.name }}">{{ room_form.description.label }}</label>
-                                {{ room_form.description(size=40, class="form-control") }}
-                            </div>
-                            {% for error in room_form.description.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary mt-4 btn-space" form="form_new"><i class="bi bi-check"></i> Create</button>
                         <button type="button" class="btn btn-secondary mt-4 btn-space" data-bs-dismiss="modal"><i class="bi bi-x"></i> Cancel</button>
                     </div>
                 </div>
@@ -153,7 +94,7 @@
         <div class="col d-flex mt-4">
             <a class="btn btn-secondary me-3" href="{{ url_for('data.worlds', highlight=world.id)}}" role="button"><i class="bi bi-backspace"></i> Back</a>
             {% if current_user.role == 0 %}
-                <a class="btn btn-primary me-3" href="#" role="button" data-bs-toggle="modal" data-bs-target="#myModalAdd"><i class="bi bi-plus-square"></i> Create</a>
+                <a class="btn btn-primary me-3" href="{{ url_for('data.room', room_id=0, page_mode="add", world_id=world.id) }}" role="button"><i class="bi bi-plus-square"></i> Create</a>
             {%  endif %}
         </div>
     </div>

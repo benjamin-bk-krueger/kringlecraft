@@ -63,11 +63,11 @@ class WorldForm(FlaskForm):
 
     def get_world(self) -> World:
         my_world = World()
-        my_world.name = str(escape(self.name.data))
-        my_world.description = str(self.description.data)
-        my_world.visible = bool(self.visible.data)
-        my_world.url = str(escape(self.url.data))
-        my_world.archived = bool(self.archived.data)
+        my_world.name = self.name_content
+        my_world.description = self.description_content
+        my_world.visible = self.visible_content
+        my_world.url = self.url_content
+        my_world.archived = self.archived_content
         return my_world
 
 
@@ -101,6 +101,13 @@ class RoomForm(FlaskForm):
             self.name.errors.append(FILE_ALT_WARNING)
         self.description.default = self.description_content
         self.world.default = self.world_content
+
+    def get_room(self) -> Room:
+        my_room = Room()
+        my_room.name = self.name_content
+        my_room.description = self.description_content
+        my_room.world_id = self.world_content
+        return my_room
 
 
 class ObjectiveForm(FlaskForm):

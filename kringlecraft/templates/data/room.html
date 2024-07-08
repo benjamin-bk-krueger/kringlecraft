@@ -11,15 +11,6 @@
 {% block additional_js %}
     <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
 
-    {#  Enable modal window error handling #}
-    {%  if page_mode == "edit"  %}
-        <script src="{{ url_for('static', filename='js/func_modal_edit.js') }}"></script>
-    {%  endif %}
-
-    {%  if page_mode == "delete"  %}
-        <script src="{{ url_for('static', filename='js/func_modal_delete.js') }}"></script>
-    {%  endif %}
-
     {{ dropzone.load_js() }}
     {{ dropzone.config() }}
 
@@ -28,95 +19,69 @@
         <script src="{{ url_for('static', filename='js/func_dropzone.js') }}"></script>
         <script>MockDropzone("room", "{{ temp_ending }}")</script>
     {% endif %}
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            function handleCloseAndRedirect(event) {
-                // Prevent the default action
-                event.preventDefault();
-
-                // Redirect after a short delay to ensure the modal is hidden
-                setTimeout(function() {
-                    window.location.href = "{{ url_for('data.rooms', world_id=room.world_id, highlight=room.id) }}";
-                }, 300);
-            }
-
-            const buttonIDs = ['modalDeleteCloseButtonOne', 'modalDeleteCloseButtonTwo', 'modalEditCloseButtonOne', 'modalEditCloseButtonTwo'];
-            for (const buttonID of buttonIDs) {
-                var button = document.getElementById(buttonID);
-                button.addEventListener('click', handleCloseAndRedirect);
-            }
-        });
-    </script>
-{% endblock %}
-
-{% block modal %}
-    {% if current_user.role == 0 %}
-        {# Modal dialog window - edit currently selected room #}
-        <div id="myModalEdit" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content c-lightblue c-border c-shadow">
-                    <div class="modal-header c-blue c-bottomborder">
-                        <h4 class="modal-title c-bigtitle">Edit Room</h4>
-                        <button type="button" class="btn-close" id="modalEditCloseButtonOne" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        {# Upload and view profile image #}
-                        {{ dropzone.create(action='storage.upload_image_post', path="room", filename_without_extension="_temp", overwrite=1) }}
-
-                        <form action="{{ url_for('data.room_post', room_id=room.id)}}" method="POST" id="form_edit">
-                            {{ room_form.csrf_token }}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ room_form.name.name }}">{{ room_form.name.label }}</label>
-                                {{ room_form.name(size=20, class="form-control") }}
-                            </div>
-                           {% for error in room_form.name.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                           {% endfor %}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ room_form.description.name }}">{{ room_form.description.label }}</label>
-                                {{ room_form.description(size=40, class="form-control") }}
-                            </div>
-                            {% for error in room_form.description.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ room_form.world.name }}">{{ room_form.world.label }}</label>
-                                {{ room_form.world(class="form-select") }}
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary mt-4 btn-space" form="form_edit"><i class="bi bi-check"></i> Update</button>
-                        <button type="button" class="btn btn-secondary mt-4 btn-space" id="modalEditCloseButtonTwo" data-bs-dismiss="modal"><i class="bi bi-x"></i> Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
-        {# Show breadcrumb navigation #}
-        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url_for('data.worlds') }}">Home</a></li>
-                <li class="breadcrumb-item"><a href="{{ url_for('data.rooms', world_id=world.id) }}">{{ world.name }}</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ room.name }}</li>
-            </ol>
-        </nav>
+    <div class="container-fluid c-restricted-md c-header c-shadow rounded bg-light mt-4 py-4">
+        <div class="container-fluid c-restricted-sm">
+            {# Show breadcrumb navigation #}
+            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('data.worlds') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('data.rooms', world_id=world.id) }}">{{ world.name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ room.name }}</li>
+                </ol>
+            </nav>
 
-        {#  Show room info #}
-        <div class="mb-3 fs-4 c-title">{{ room.name }}</div>
-        <div class="underline"><span><i class="bi bi-building" aria-hidden="true"></i></span></div>
-        <div class="fs-6 mb-4">{{ room.description }}</div>
+            {# Show world editor #}
+            <div class="my-2 fs-4 c-title">
+                {% if page_mode == "edit" %}Edit Room{% else %}Add Room{% endif %}
+            </div>
+            <div class="underline"><span><i class="bi bi-building" aria-hidden="true"></i></span></div>
 
-        {# Show fullscreen wallpaper #}
-        {% if room_image %}
-            <img src="{{ url_for('static', filename='uploads' + "/" + room_image[0] + "/" + room_image[1]) }}" class="img-fluid rounded img-restricted-lg" alt="Room Image">
-        {% else %}
-            <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="img-fluid rounded img-restricted-lg" alt="Room Image">
-        {% endif %}
+            {# Upload and view room image #}
+            <div class="row">
+                <div class="col-sm">
+                    {% if room_image %}
+                        <img src="{{ url_for('static', filename='uploads' + "/" + room_image[0] + "/" + room_image[1]) }}" class="img-fluid rounded img-restricted-lg" alt="Room Image">
+                        <a href="{{ url_for('storage.delete_image', path="room", filename=room_image[1], redirect="data.room", target_id=0) }}" title="Delete image" class="btn btn-danger mt-4"><i class="bi bi-trash"></i> Clear Image</a>
+                    {% else %}
+                        <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="img-fluid rounded img-restricted-lg" alt="Room Image">
+                    {% endif %}
+                </div>
+                <div class="col-sm">
+                    {{ dropzone.create(action='storage.upload_image_post', path="room", filename_without_extension="_temp", overwrite=1) }}
+                </div>
+            </div>
+
+            {% if page_mode == "edit" %}
+            <form action="{{ url_for('data.room_post', room_id=room.id) }}" method="POST" id="form_edit">
+            {% else %}
+            <form action="{{ url_for('data.rooms_post', world_id=world.id) }}" method="POST" id="form_edit">
+            {% endif %}
+                {{ room_form.csrf_token }}
+                <div class="form-group mt-2 mb-2">
+                    <label for="{{ room_form.name.name }}">{{ room_form.name.label }}</label>
+                    {{ room_form.name(size=20, class="form-control") }}
+                </div>
+               {% for error in room_form.name.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+               {% endfor %}
+                <div class="form-group mt-2 mb-2">
+                    <label for="{{ room_form.description.name }}">{{ room_form.description.label }}</label>
+                    {{ room_form.description(size=40, class="form-control") }}
+                </div>
+                {% for error in room_form.description.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+                <div class="form-group mt-2 mb-2">
+                    <label for="{{ room_form.world.name }}">{{ room_form.world.label }}</label>
+                    {{ room_form.world(class="form-select") }}
+                </div>
+            </form>
+
+            <button type="submit" class="btn btn-primary mt-4 btn-space" form="form_edit"><i class="bi bi-check"></i> {% if page_mode == "edit" %}Update{% else %}Create{% endif %}</button>
+            <a href="{{ url_for('data.rooms', world_id=world.id, highlight=room.id) }}" class="btn btn-secondary mt-4 btn-space"><i class="bi bi-x"></i> Cancel</a>
+        </div>
     </div>
 {% endblock %}

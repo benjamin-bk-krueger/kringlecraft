@@ -96,19 +96,16 @@ def user_approve(user_id):
 @blueprint.route('/worlds', methods=['GET'])
 def worlds():
     # (1) import forms and utilities
-    from kringlecraft.viewmodels.data_forms import WorldForm
     import kringlecraft.services.world_services as world_services
 
     # (2) initialize form data
-    world_form = WorldForm()
-    world_form.process()
     all_worlds = world_services.find_all_worlds()
     world_images = read_all_files_without_extension("world")
     highlight = flask.request.args.get('highlight', default=0, type=int)
 
     # (6a) show rendered page
-    return flask.render_template('data/worlds.html', world_form=world_form, worlds=all_worlds,
-                                 world_images=world_images, page_mode="init", highlight=highlight)
+    return flask.render_template('data/worlds.html', worlds=all_worlds, world_images=world_images,
+                                 highlight=highlight)
 
 
 # Post a new world - if it doesn't already exist
@@ -146,11 +143,12 @@ def worlds_post():
     # (5) preset form with existing data
     world_form.set_field_defaults(conflicting_world is not None)
     world_form.process()
+
     my_world = world_form.get_world()
 
     # (6c) show rendered page with possible error messages
-    return flask.render_template('data/world.html', world_form=world_form,
-                                 world=my_world, page_mode="add", temp_ending=temp_ending)
+    return flask.render_template('data/world.html', world_form=world_form, world=my_world,
+                                 page_mode="add", temp_ending=temp_ending)
 
 
 # Shows information about a specific world
@@ -248,13 +246,10 @@ def world_delete(world_id):
 @blueprint.route('/rooms/<int:world_id>', methods=['GET'])
 def rooms(world_id):
     # (1) import forms and utilities
-    from kringlecraft.viewmodels.data_forms import RoomForm
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
 
     # (2) initialize form data
-    room_form = RoomForm()
-    room_form.process()
     my_world = world_services.find_world_by_id(world_id)
 
     if not my_world:
@@ -263,18 +258,17 @@ def rooms(world_id):
 
     all_rooms = room_services.find_world_rooms(my_world.id)
     room_images = read_all_files_without_extension("room")
-
     highlight = flask.request.args.get('highlight', default=0, type=int)
 
     # (6a) show rendered page
-    return flask.render_template('data/rooms.html', room_form=room_form, rooms=all_rooms,
-                                 room_images=room_images, world=my_world, page_mode="init", highlight=highlight)
+    return flask.render_template('data/rooms.html', rooms=all_rooms, room_images=room_images,
+                                 world=my_world, highlight=highlight)
 
 
 # Post a new room - if it doesn't already exist
-@blueprint.route('/rooms/<int:world_id>', methods=['POST'])
+@blueprint.route('/rooms', methods=['POST'])
 @login_required
-def rooms_post(world_id):
+def rooms_post():
     # (1) import forms and utilities
     from kringlecraft.viewmodels.data_forms import RoomForm
     import kringlecraft.services.world_services as world_services
@@ -286,7 +280,7 @@ def rooms_post(world_id):
 
     # (2) initialize form data
     room_form = RoomForm()
-    my_world = world_services.find_world_by_id(world_id)
+    my_world = world_services.find_world_by_id(room_form.world_content)
 
     if not my_world:
         # (6e) show dedicated error page
@@ -312,12 +306,16 @@ def rooms_post(world_id):
     # (5) preset form with existing data
     room_form.set_field_defaults(conflicting_room is not None)
     room_form.process()
-    all_rooms = room_services.find_world_rooms(my_world.id)
-    room_images = read_all_files_without_extension("room")
+
+    room_form.world.choices = world_services.get_world_choices(world_services.find_all_worlds())
+    room_form.world.default = room_form.world_content
+    room_form.process()
+
+    my_room = room_form.get_room()
 
     # (6c) show rendered page with possible error messages
-    return flask.render_template('data/rooms.html', room_form=room_form, rooms=all_rooms,
-                                 room_images=room_images, world=my_world, page_mode="add", temp_ending=temp_ending)
+    return flask.render_template('data/room.html', room_form=room_form, world=my_world, room=my_room,
+                                 page_mode="add", temp_ending=temp_ending)
 
 
 # Shows information about a specific room
@@ -329,21 +327,22 @@ def room(room_id):
     import kringlecraft.services.room_services as room_services
 
     # (2) initialize form data
+    page_mode = flask.request.args.get('page_mode', default="add", type=str)
+    my_world_id = flask.request.args.get('world_id', default=0, type=int)
     my_room = room_services.find_room_by_id(room_id)
-    if not my_room:
+    if not my_room and page_mode == "edit":
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="Room does not exist.")
 
-    room_image = read_file_without_extension("room", my_room.id)
     room_form = RoomForm(my_room)
     room_form.process()
-    my_world = world_services.find_world_by_id(my_room.world_id)
+    room_image = None if my_room is None else read_file_without_extension("room", my_room.id)
+    my_world = world_services.find_world_by_id(my_world_id) if my_room is None else (
+        world_services.find_world_by_id(my_room.world_id))
 
     room_form.world.choices = world_services.get_world_choices(world_services.find_all_worlds())
-    room_form.world.default = my_room.world_id
+    room_form.world.default = my_world_id if my_room is None else my_room.world_id
     room_form.process()
-
-    page_mode = flask.request.args.get('page_mode', default="init", type=str)
 
     # (6a) show rendered page
     return flask.render_template('data/room.html', room_form=room_form, room=my_room,

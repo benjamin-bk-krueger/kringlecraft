@@ -32,7 +32,7 @@
                 </ol>
             </nav>
 
-            {# Display form and possible error message - set a password for currently logged in user #}
+            {# Show world editor #}
             <div class="my-2 fs-4 c-title">
                 {% if page_mode == "edit" %}Edit World{% else %}Add World{% endif %}
             </div>
@@ -96,7 +96,7 @@
                 {% endfor %}
             </form>
 
-            <button type="submit" class="btn btn-primary mt-4 btn-space" form="form_edit"><i class="bi bi-check"></i> Update</button>
+            <button type="submit" class="btn btn-primary mt-4 btn-space" form="form_edit"><i class="bi bi-check"></i> {% if page_mode == "edit" %}Update{% else %}Create{% endif %}</button>
             <a href="{{ url_for('data.worlds', highlight=world.id) }}" class="btn btn-secondary mt-4 btn-space"><i class="bi bi-x"></i> Cancel</a>
         </div>
     </div>
