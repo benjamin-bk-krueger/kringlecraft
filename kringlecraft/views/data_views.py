@@ -104,7 +104,6 @@ def worlds():
     world_form.process()
     all_worlds = world_services.find_all_worlds()
     world_images = read_all_files_without_extension("world")
-
     highlight = flask.request.args.get('highlight', default=0, type=int)
 
     # (6a) show rendered page
@@ -147,12 +146,11 @@ def worlds_post():
     # (5) preset form with existing data
     world_form.set_field_defaults(conflicting_world is not None)
     world_form.process()
-    all_worlds = world_services.find_all_worlds()
-    world_images = read_all_files_without_extension("world")
+    my_world = world_form.get_world()
 
     # (6c) show rendered page with possible error messages
-    return flask.render_template('data/worlds.html', world_form=world_form, worlds=all_worlds,
-                                 world_images=world_images, page_mode="add", temp_ending=temp_ending)
+    return flask.render_template('data/world.html', world_form=world_form,
+                                 world=my_world, page_mode="add", temp_ending=temp_ending)
 
 
 # Shows information about a specific world
@@ -163,16 +161,15 @@ def world(world_id):
     import kringlecraft.services.world_services as world_services
 
     # (2) initialize form data
+    page_mode = flask.request.args.get('page_mode', default="add", type=str)
     my_world = world_services.find_world_by_id(world_id)
-    if not my_world:
+    if not my_world and page_mode == "edit":
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="World does not exist.")
 
-    world_image = read_file_without_extension("world", my_world.id)
     world_form = WorldForm(my_world)
     world_form.process()
-
-    page_mode = flask.request.args.get('page_mode', default="init", type=str)
+    world_image = None if my_world is None else read_file_without_extension("world", my_world.id)
 
     # (6a) show rendered page
     return flask.render_template('data/world.html', world_form=world_form, world=my_world,

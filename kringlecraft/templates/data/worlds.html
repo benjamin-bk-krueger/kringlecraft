@@ -3,28 +3,7 @@
 
 {% block title %}All Worlds{% endblock %}
 
-{% block additional_css %}
-    {{ dropzone.load_css() }}
-    {{ dropzone.style('border: 2px dashed #0087F7; margin: 10%;') }}
-{% endblock %}
-
 {% block additional_js %}
-    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
-
-    {# Enable modal window error handling #}
-    {% if page_mode == "add" %}
-        <script src="{{ url_for('static', filename='js/func_modal_add.js') }}"></script>
-    {% endif %}
-
-    {{ dropzone.load_js() }}
-    {{ dropzone.config() }}
-
-    {% if temp_ending %}
-        {#  Mock Dropzone #}
-        <script src="{{ url_for('static', filename='js/func_dropzone.js') }}"></script>
-        <script>MockDropzone("world", "{{ temp_ending }}")</script>
-    {% endif %}
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var myModalDelete = document.getElementById('myModalDelete');
@@ -55,65 +34,6 @@
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-danger mt-4 btn-space" form="form_deletion"><i class="bi bi-check"></i> Confirm</button>
-                        <button type="button" class="btn btn-secondary mt-4 btn-space" data-bs-dismiss="modal"><i class="bi bi-x"></i> Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {# Modal dialog window - create a new world #}
-        <div id="myModalAdd" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content c-lightblue c-border c-shadow">
-                    <div class="modal-header c-blue c-bottomborder">
-                        <h4 class="modal-title c-bigtitle">Create World</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        {# Upload and view profile image #}
-                        {{ dropzone.create(action='storage.upload_image_post', path="world", filename_without_extension="_temp", overwrite=1) }}
-
-                        <form action="{{ url_for('data.worlds_post') }}" method="POST" id="form_new">
-                            {{ world_form.csrf_token }}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ world_form.name.name }}">{{ world_form.name.label }}</label>
-                                {{ world_form.name(size=20, class="form-control") }}
-                            </div>
-                            {% for error in world_form.name.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ world_form.description.name }}">{{ world_form.description.label }}</label>
-                                {{ world_form.description(size=40, class="form-control") }}
-                            </div>
-                            {% for error in world_form.description.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ world_form.url.name }}">{{ world_form.url.label }}</label>
-                                {{ world_form.url(size=20, class="form-control") }}
-                            </div>
-                            {% for error in world_form.url.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                            <div class="form-check mt-2 mb-2">
-                                <label class="form-check-label" for="visible">{{ world_form.visible.label }}</label>
-                                {{ world_form.visible(class="form-check-input") }}
-                            </div>
-                            {% for error in world_form.visible.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                            <div class="form-check mt-2 mb-2">
-                                <label class="form-check-label" for="archived">{{ world_form.archived.label }}</label>
-                                {{ world_form.archived(class="form-check-input") }}
-                            </div>
-                            {% for error in world_form.archived.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary mt-4 btn-space" form="form_new"><i class="bi bi-check"></i> Create</button>
                         <button type="button" class="btn btn-secondary mt-4 btn-space" data-bs-dismiss="modal"><i class="bi bi-x"></i> Cancel</button>
                     </div>
                 </div>
@@ -178,7 +98,7 @@
         {#  Display action buttons regarding the selected world  #}
         <div class="col d-flex mt-4">
             {% if current_user.role == 0 %}
-                <a class="btn btn-primary me-3" href="#" role="button" data-bs-toggle="modal" data-bs-target="#myModalAdd"><i class="bi bi-plus-square"></i> Create</a>
+                <a class="btn btn-primary me-3" href="{{ url_for('data.world', world_id=0, page_mode="add") }}" role="button"><i class="bi bi-plus-square"></i> Create</a>
             {% endif %}
         </div>
     </div>

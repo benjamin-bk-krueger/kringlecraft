@@ -61,6 +61,15 @@ class WorldForm(FlaskForm):
         self.url.default = self.url_content
         self.archived.default = self.archived_content
 
+    def get_world(self) -> World:
+        my_world = World()
+        my_world.name = str(escape(self.name.data))
+        my_world.description = str(self.description.data)
+        my_world.visible = bool(self.visible.data)
+        my_world.url = str(escape(self.url.data))
+        my_world.archived = bool(self.archived.data)
+        return my_world
+
 
 class RoomForm(FlaskForm):
     name = StringField('Name', validators=[InputRequired(), Length(max=100), space_ascii_validator])

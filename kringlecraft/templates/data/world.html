@@ -11,15 +11,6 @@
 {% block additional_js %}
     <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
 
-    {#  Enable modal window error handling #}
-    {%  if page_mode == "edit"  %}
-        <script src="{{ url_for('static', filename='js/func_modal_edit.js') }}"></script>
-    {%  endif %}
-
-    {%  if page_mode == "delete"  %}
-        <script src="{{ url_for('static', filename='js/func_modal_delete.js') }}"></script>
-    {%  endif %}
-
     {{ dropzone.load_js() }}
     {{ dropzone.config() }}
 
@@ -28,124 +19,85 @@
         <script src="{{ url_for('static', filename='js/func_dropzone.js') }}"></script>
         <script>MockDropzone("world", "{{ temp_ending }}")</script>
     {% endif %}
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            function handleCloseAndRedirect(event) {
-                // Prevent the default action
-                event.preventDefault();
-
-                // Redirect after a short delay to ensure the modal is hidden
-                setTimeout(function() {
-                    window.location.href = "{{ url_for('data.worlds', highlight=world.id) }}";
-                }, 300);
-            }
-
-            const buttonIDs = ['modalDeleteCloseButtonOne', 'modalDeleteCloseButtonTwo', 'modalEditCloseButtonOne', 'modalEditCloseButtonTwo'];
-            for (const buttonID of buttonIDs) {
-                var button = document.getElementById(buttonID);
-                button.addEventListener('click', handleCloseAndRedirect);
-            }
-        });
-    </script>
-{% endblock %}
-
-{% block modal %}
-    {% if current_user.role == 0 %}
-        {# Modal dialog window - edit currently selected world #}
-        <div id="myModalEdit" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content c-lightblue c-border c-shadow">
-                    <div class="modal-header c-blue c-bottomborder">
-                        <h4 class="modal-title c-bigtitle">Edit World</h4>
-                        <button type="button" class="btn-close" id="modalEditCloseButtonOne" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        {# Upload and view profile image #}
-                        {{ dropzone.create(action='storage.upload_image_post', path="world", filename_without_extension="_temp", overwrite=1) }}
-
-                        <form action="{{ url_for('data.world_post', world_id=world.id) }}" method="POST" id="form_edit">
-                            {{ world_form.csrf_token }}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ world_form.name.name }}">{{ world_form.name.label }}</label>
-                                {{ world_form.name(size=20, class="form-control") }}
-                            </div>
-                            {% for error in world_form.name.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ world_form.description.name }}">{{ world_form.description.label }}</label>
-                                {{ world_form.description(size=40, class="form-control") }}
-                            </div>
-                            {% for error in world_form.description.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                            <div class="form-group mt-2 mb-2">
-                                <label for="{{ world_form.url.name }}">{{ world_form.url.label }}</label>
-                                {{ world_form.url(size=20, class="form-control") }}
-                            </div>
-                            {% for error in world_form.url.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                            <div class="form-check mt-2 mb-2">
-                                <label class="form-check-label" for="visible">{{ world_form.visible.label }}</label>
-                                {{ world_form.visible(class="form-check-input") }}
-                            </div>
-                            {% for error in world_form.visible.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                            <div class="form-check mt-2 mb-2">
-                                <label class="form-check-label" for="archived">{{ world_form.archived.label }}</label>
-                                {{ world_form.archived(class="form-check-input") }}
-                            </div>
-                            {% for error in world_form.archived.errors %}
-                                <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
-                            {% endfor %}
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary mt-4 btn-space" form="form_edit"><i class="bi bi-check"></i> Update</button>
-                        <button type="button" class="btn btn-secondary mt-4 btn-space" id="modalEditCloseButtonTwo" data-bs-dismiss="modal"><i class="bi bi-x"></i> Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
-        {# Show breadcrumb navigation #}
-        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url_for('data.worlds') }}">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ world.name }}</li>
-            </ol>
-        </nav>
+    <div class="container-fluid c-restricted-md c-header c-shadow rounded bg-light mt-4 py-4">
+        <div class="container-fluid c-restricted-sm">
+            {# Show breadcrumb navigation #}
+            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('data.worlds') }}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ world.name }}</li>
+                </ol>
+            </nav>
 
-        {#  Show world info #}
-        <div class="mb-3 fs-4 c-title">All Worlds</div>
-        <div class="underline"><span><i class="bi bi-globe" aria-hidden="true"></i></span></div>
-        <div class="fs-5">More information here <a href="{{ world.url }}">{{ world.url }}</a></div>
+            {# Display form and possible error message - set a password for currently logged in user #}
+            <div class="my-2 fs-4 c-title">
+                {% if page_mode == "edit" %}Edit World{% else %}Add World{% endif %}
+            </div>
+            <div class="underline"><span><i class="bi bi-globe" aria-hidden="true"></i></span></div>
 
-        {%  if world.visible == 1  %}
-            <span class="badge bg-secondary">Visible</span>
-        {%  else %}
-            <span class="badge bg-secondary">Hidden</span>
-        {%  endif %}
-        &nbsp;&nbsp;
-        {%  if world.archived == 1  %}
-            <span class="badge bg-secondary">Archived</span>
-        {%  else %}
-            <span class="badge bg-secondary">Active</span>
-        {%  endif %}
-        <div class="fs-6 mb-4">{{ world.description }}</div>
+            {# Upload and view world image #}
+            <div class="row">
+                <div class="col-sm">
+                    {% if world_image %}
+                        <img src="{{ url_for('static', filename='uploads' + "/" + world_image[0] + "/" + world_image[1]) }}" class="img-fluid rounded img-restricted-lg" alt="World Image">
+                        <a href="{{ url_for('storage.delete_image', path="world", filename=world_image[1], redirect="data.world", target_id=0) }}" title="Delete image" class="btn btn-danger mt-4"><i class="bi bi-trash"></i> Clear Image</a>
+                    {% else %}
+                        <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="img-fluid rounded img-restricted-lg" alt="World Image">
+                    {% endif %}
+                </div>
+                <div class="col-sm">
+                    {{ dropzone.create(action='storage.upload_image_post', path="world", filename_without_extension="_temp", overwrite=1) }}
+                </div>
+            </div>
 
-        {# Show fullscreen wallpaper #}
-        {% if world_image %}
-            <img src="{{ url_for('static', filename='uploads' + "/" + world_image[0] + "/" + world_image[1]) }}" class="img-fluid rounded img-restricted-lg" alt="World Image">
-        {% else %}
-            <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="img-fluid rounded img-restricted-lg" alt="World Image">
-        {% endif %}
+            {% if page_mode == "edit" %}
+            <form action="{{ url_for('data.world_post', world_id=world.id) }}" method="POST" id="form_edit">
+            {% else %}
+            <form action="{{ url_for('data.worlds_post') }}" method="POST" id="form_edit">
+            {% endif %}
+                {{ world_form.csrf_token }}
+                <div class="form-group mt-2 mb-2">
+                    <label for="{{ world_form.name.name }}">{{ world_form.name.label }}</label>
+                    {{ world_form.name(size=20, class="form-control") }}
+                </div>
+                {% for error in world_form.name.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+                <div class="form-group mt-2 mb-2">
+                    <label for="{{ world_form.description.name }}">{{ world_form.description.label }}</label>
+                    {{ world_form.description(size=40, class="form-control") }}
+                </div>
+                {% for error in world_form.description.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+                <div class="form-group mt-2 mb-2">
+                    <label for="{{ world_form.url.name }}">{{ world_form.url.label }}</label>
+                    {{ world_form.url(size=20, class="form-control") }}
+                </div>
+                {% for error in world_form.url.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+                <div class="form-check mt-2 mb-2">
+                    <label class="form-check-label" for="visible">{{ world_form.visible.label }}</label>
+                    {{ world_form.visible(class="form-check-input") }}
+                </div>
+                {% for error in world_form.visible.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+                <div class="form-check mt-2 mb-2">
+                    <label class="form-check-label" for="archived">{{ world_form.archived.label }}</label>
+                    {{ world_form.archived(class="form-check-input") }}
+                </div>
+                {% for error in world_form.archived.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+            </form>
+
+            <button type="submit" class="btn btn-primary mt-4 btn-space" form="form_edit"><i class="bi bi-check"></i> Update</button>
+            <a href="{{ url_for('data.worlds', highlight=world.id) }}" class="btn btn-secondary mt-4 btn-space"><i class="bi bi-x"></i> Cancel</a>
+        </div>
     </div>
 {% endblock %}
