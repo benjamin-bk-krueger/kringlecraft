@@ -652,7 +652,6 @@ def objective_delete(objective_id):
 @blueprint.route('/answer/<int:objective_id>', methods=['GET'])
 def answer(objective_id):
     # (1) import forms and utilities
-    from kringlecraft.viewmodels.data_forms import ObjectiveForm
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
@@ -660,27 +659,14 @@ def answer(objective_id):
     import kringlecraft.services.user_services as user_services
 
     # (2) initialize form data
-    page_mode = flask.request.args.get('page_mode', default="init", type=str)
-    my_room_id = flask.request.args.get('room_id', default=0, type=int)
     my_objective = objective_services.find_objective_by_id(objective_id)
-    if not my_objective and page_mode == "edit":
+    if not my_objective:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="Objective does not exist.")
 
-    objective_form = ObjectiveForm(my_objective)
-    objective_form.process()
     objective_image = None if my_objective is None else read_file_without_extension("objective", my_objective.id)
-    my_room = room_services.find_room_by_id(my_room_id) if my_objective is None else (
-        room_services.find_room_by_id(my_objective.room_id)
-    )
+    my_room = room_services.find_room_by_id(my_objective.room_id)
     my_world = world_services.find_world_by_id(my_room.world_id)
-
-    objective_form.type.choices = objective_services.get_objective_type_choices()
-    objective_form.type.default = 1 if my_objective is None else objective_form.type_content
-
-    objective_form.room.choices = room_services.get_room_choices(room_services.find_world_rooms(my_room.world_id))
-    objective_form.room.default = my_room_id if my_objective is None else my_objective.room_id
-    objective_form.process()
 
     md_challenge = "" if my_objective.challenge is None else get_markdown(my_objective.challenge)
     all_solutions = solution_services.find_active_solutions(objective_id)
@@ -689,8 +675,8 @@ def answer(objective_id):
     user_list = {key: value for key, value in user_services.get_user_choices(user_services.find_all_users())}
 
     # (6a) show rendered page
-    return flask.render_template('data/answer.html', objective_form=objective_form,
+    return flask.render_template('data/answer.html',
                                  objective=my_objective, objective_image=objective_image, room=my_room, world=my_world,
-                                 objective_types=objective_services.get_objective_types(), page_mode=page_mode,
+                                 objective_types=objective_services.get_objective_types(),
                                  md_challenge=md_challenge, md_solution=md_solution,
                                  candidate_solutions=candidate_solutions, user_list=user_list)
