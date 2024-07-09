@@ -88,6 +88,14 @@ def index():
     return flask.render_template('home/index.html', worlds=all_worlds, world_images=world_images)
 
 
+# Backwards compatibility
+@blueprint.route('/web', defaults={'path': ''})
+@blueprint.route('/web/<path:path>')
+def web(path):
+    # (6b) redirect to new page after successful operation
+    return flask.redirect(flask.url_for('home.index'))
+
+
 # Show user log-in page
 @blueprint.route('/login', methods=['GET'])
 def login():
