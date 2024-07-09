@@ -9,11 +9,11 @@ from flask_wtf.csrf import CSRFProtect  # CSRF protection
 from flask_mail import Mail  # to send mails
 from flask_dropzone import Dropzone  # to allow file upload via dropzone
 
-import kringlecraft.data.db_session as db_session
-from kringlecraft.utils import config_tools
-
 folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, folder)
+
+import kringlecraft.data.db_session as db_session
+from kringlecraft.utils import config_tools
 
 
 app = flask.Flask(__name__)
