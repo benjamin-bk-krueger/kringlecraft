@@ -10,7 +10,7 @@ from flask_mail import Mail  # to send mails
 from flask_dropzone import Dropzone  # to allow file upload via dropzone
 
 import kringlecraft.data.db_session as db_session
-from utils import config_tools
+from kringlecraft.utils import config_tools
 
 folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, folder)
@@ -36,7 +36,7 @@ def main():
 
 
 def configure_defaults():
-    cfg = config_tools.parse_config('cfg/kringle.json')
+    cfg = config_tools.parse_config(os.path.join(os.path.dirname(__file__), 'cfg', 'kringle.json'))
     for key in cfg['app']:
         app.config[f"app.{key}"] = cfg['app'][key]
         print(f"CONFIG key: {key}, value: {cfg['app'][key]}")
