@@ -30,6 +30,8 @@ def main():
     setup_mail_logger()
     setup_login_manager()
     app.jinja_env.globals.update(get_canonical_url=get_canonical_url)
+    app.jinja_env.globals['ROLE_ADMIN'] = 0
+    app.jinja_env.globals['ROLE_USER'] = 1
     app.run(debug=True, port=5006)
 
 
@@ -139,4 +141,6 @@ else:
     setup_dropzone()
     setup_mail_logger()
     setup_login_manager()
+    app.jinja_env.globals['ROLE_ADMIN'] = 0
+    app.jinja_env.globals['ROLE_USER'] = 1
     app.jinja_env.globals.update(get_canonical_url=get_canonical_url)

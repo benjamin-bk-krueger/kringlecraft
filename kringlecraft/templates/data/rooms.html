@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block modal %}
-    {% if current_user.role == 0 %}
+    {% if current_user.role == ROLE_ADMIN %}
         {# Modal dialog window - delete currently selected room #}
         <div id="myModalDelete" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -78,7 +78,7 @@
                                 {% endif %}
                             </a>
                             <figcaption class="figure-caption c-bigcaption">
-                                {% if current_user.role == 0 %}
+                                {% if current_user.role == ROLE_ADMIN %}
                                     <a href="{{ url_for('data.room', room_id=room.id, page_mode="edit" ) }}" data-toggle="tooltip" title="Edit Room"><i class="bi bi-pencil-square"></i></a>
                                     <a href="#" data-toggle="tooltip" title="Delete Room" data-bs-toggle="modal" data-bs-target="#myModalDelete" data-room-id="{{ room.id }}"><i class="bi bi-trash"></i></a>
                                 {% endif %}
@@ -93,7 +93,7 @@
         {#  Display action buttons regarding the selected room  #}
         <div class="col d-flex mt-4">
             <a class="btn btn-secondary me-3" href="{{ url_for('data.worlds', highlight=world.id)}}" role="button"><i class="bi bi-backspace"></i> Back</a>
-            {% if current_user.role == 0 %}
+            {% if current_user.role == ROLE_ADMIN %}
                 <a class="btn btn-primary me-3" href="{{ url_for('data.room', room_id=0, page_mode="add", world_id=world.id) }}" role="button"><i class="bi bi-plus-square"></i> Create</a>
             {%  endif %}
         </div>

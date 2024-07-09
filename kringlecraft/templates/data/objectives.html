@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block modal %}
-    {% if current_user.role == 0 %}
+    {% if current_user.role == ROLE_ADMIN %}
         {# Modal dialog window - delete currently selected objective #}
         <div id="myModalDelete" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -79,12 +79,12 @@
                                     {% endif %}
                                 </a>
                                 <figcaption class="figure-caption c-bigcaption">
-                                    {% if current_user.role == 0 %}
+                                    {% if current_user.role == ROLE_ADMIN %}
                                         <a href="{{ url_for('data.objective', objective_id=objective.id, page_mode="edit") }}" data-toggle="tooltip" title="Edit Objective"><i class="bi bi-pencil-square"></i></a>&nbsp;
                                         <a href="#" data-toggle="tooltip" title="Delete Objective" data-bs-toggle="modal" data-bs-target="#myModalDelete" data-objective-id="{{ objective.id }}"><i class="bi bi-trash"></i></a>&nbsp;
                                         <a href="{{ url_for('task.challenge', objective_id=objective.id)}}" data-toggle="tooltip" title="Create Challenge"><i class="bi bi-question-square"></i></a>&nbsp;
                                     {% endif %}
-                                    {% if current_user.role == 0 or current_user.role == 1 %}
+                                    {% if current_user.role == ROLE_ADMIN or current_user.role == ROLE_USER %}
                                         <a href="{{ url_for('task.solution', objective_id=objective.id) }}" data-toggle="tooltip" title="Create Solution"><i class="bi bi-exclamation-square"></i></a>&nbsp;
                                         <a href="{{ url_for('report.single', report_format="markdown", objective_id=objective.id) }}" data-toggle="tooltip" title="Create Markdown Report"><i class="bi bi-filetype-md"></i></a>&nbsp;
                                         <a href="{{ url_for('report.single', report_format="html", objective_id=objective.id) }}" data-toggle="tooltip" title="Create HTML Report"><i class="bi bi-filetype-html"></i></a>
@@ -100,7 +100,7 @@
         {#  Display action buttons regarding the selected objective  #}
         <div class="col d-flex mt-4">
             <a class="btn btn-secondary me-3" href="{{ url_for('data.rooms', world_id=room.world_id, highlight=room.id)}}" role="button"><i class="bi bi-backspace"></i> Back</a>
-            {% if current_user.role == 0 %}
+            {% if current_user.role == ROLE_ADMIN %}
                 <a class="btn btn-primary me-3" href="{{ url_for('data.objective', objective_id=0, page_mode="add", room_id=room.id) }}" role="button"><i class="bi bi-plus-square"></i> Create</a>
             {%  endif %}
         </div>

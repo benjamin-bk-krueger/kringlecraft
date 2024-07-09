@@ -6,7 +6,7 @@
 {% block content %}
     <div class="container-fluid c-restricted-xxl c-header c-shadow rounded bg-light mt-4 py-4">
         {#  Show user info #}
-        <div class="mb-3 fs-4 c-title">{{ user.name }} ({% if user.role == 0 %}<i class="bi bi-mortarboard"></i> Admin{% else %}User{% endif %})</div>
+        <div class="mb-3 fs-4 c-title">{{ user.name }} ({% if user.role == ROLE_ADMIN %}<i class="bi bi-mortarboard"></i> Admin{% else %}User{% endif %})</div>
         <div class="underline"><span><i class="bi bi-body-text" aria-hidden="true"></i></span></div>
         <div class="fs-6">{{ user.description }}</div>
 
@@ -19,7 +19,7 @@
         {#  Display action buttons regarding the selected user  #}
         <div class="col d-flex mt-4">
             <a class="btn btn-secondary me-3" href="{{ url_for('data.users') }}" role="button"><i class="bi bi-backspace"></i> Back</a>
-            {% if current_user.role == 0 and user.active == 0 %}
+            {% if current_user.role == ROLE_ADMIN and user.active == 0 %}
                 <a class="btn btn-primary me-3" href="{{ url_for('data.user_approve', user_id=user.id) }}" role="button"><i class="bi bi-person-check"></i> Approve</a>
             {% endif %}
         </div>

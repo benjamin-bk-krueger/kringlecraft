@@ -25,7 +25,7 @@
                                         <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ user.name }}">
                                     {% endif %}
                                 </a>
-                                <figcaption class="figure-caption c-title">{{ user.name }}{% if user.role == 0 %} <i class="bi bi-mortarboard"></i>{% endif %}{% if user.active == 0 %} <i class="bi bi-star"></i>{% endif %}</figcaption>
+                                <figcaption class="figure-caption c-title">{{ user.name }}{% if user.role == ROLE_ADMIN %} <i class="bi bi-mortarboard"></i>{% endif %}{% if user.active == 0 %} <i class="bi bi-star"></i>{% endif %}</figcaption>
                             </figure>
                         </div>
                     {% endfor %}

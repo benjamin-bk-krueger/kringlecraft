@@ -4,6 +4,7 @@ import sys
 import kringlecraft.data.db_session as db_session
 from kringlecraft.data.users import User
 from kringlecraft.utils.misc_tools import hash_text
+from kringlecraft.utils.constants import Roles  # Import the constants
 
 # Make it run more easily outside PyCharm
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
@@ -20,7 +21,7 @@ def insert_admin_user():
     u.email = input('Email: ').strip()
     u.hashed_password = hash_text(input('Password: ').strip())
     u.active = 1
-    u.role = 0
+    u.role = Roles.ADMIN
     u.notification = 0
 
     session = db_session.create_session()

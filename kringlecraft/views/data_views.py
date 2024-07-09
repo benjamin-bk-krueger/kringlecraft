@@ -5,6 +5,7 @@ from kringlecraft.utils.mail_tools import (send_mail)
 from kringlecraft.utils.file_tools import (get_temp_file, file_extension, enable_image, read_file_without_extension,
                                            read_all_files_without_extension)
 from kringlecraft.utils.misc_tools import (get_markdown, search_binary_text)
+from kringlecraft.utils.constants import Roles  # Import the constants
 
 blueprint = flask.Blueprint('data', __name__, template_folder='templates')
 
@@ -39,7 +40,7 @@ def users():
     import kringlecraft.services.user_services as user_services
 
     # (2) initialize form data
-    all_users = user_services.find_all_users() if current_user.role == 0 else user_services.find_active_users()
+    all_users = user_services.find_all_users() if current_user.role == Roles.ADMIN else user_services.find_active_users()
     user_images = read_all_files_without_extension("profile")
 
     # (6a) show rendered page
@@ -54,7 +55,7 @@ def user(user_id):
     import kringlecraft.services.user_services as user_services
 
     # (2) initialize form data
-    my_user = user_services.find_user_by_id(user_id) if current_user.role == 0 else (
+    my_user = user_services.find_user_by_id(user_id) if current_user.role == Roles.ADMIN else (
         user_services.find_active_user_by_id(user_id))
     if not my_user:
         # (6e) show dedicated error page
@@ -73,7 +74,7 @@ def user_approve(user_id):
     # (1) import forms and utilities
     import kringlecraft.services.user_services as user_services
 
-    if current_user.role != 0:
+    if current_user.role != Roles.ADMIN:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to approve users.")
 
@@ -116,7 +117,7 @@ def worlds_post():
     from kringlecraft.viewmodels.data_forms import WorldForm
     import kringlecraft.services.world_services as world_services
 
-    if current_user.role != 0:
+    if current_user.role != Roles.ADMIN:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to create worlds.")
 
@@ -183,7 +184,7 @@ def world_post(world_id):
     from kringlecraft.viewmodels.data_forms import WorldForm
     import kringlecraft.services.world_services as world_services
 
-    if current_user.role != 0:
+    if current_user.role != Roles.ADMIN:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to edit worlds.")
 
@@ -229,7 +230,7 @@ def world_delete(world_id):
     # (1) import forms and utilities
     import kringlecraft.services.world_services as world_services
 
-    if current_user.role != 0:
+    if current_user.role != Roles.ADMIN:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to delete worlds.")
 
@@ -275,7 +276,7 @@ def rooms_post():
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
 
-    if current_user.role != 0:
+    if current_user.role != Roles.ADMIN:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to create rooms.")
 
@@ -360,7 +361,7 @@ def room_post(room_id):
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
 
-    if current_user.role != 0:
+    if current_user.role != Roles.ADMIN:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to edit rooms.")
 
@@ -413,7 +414,7 @@ def room_delete(room_id):
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
 
-    if current_user.role != 0:
+    if current_user.role != Roles.ADMIN:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to delete rooms.")
 
@@ -465,7 +466,7 @@ def objectives_post():
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
 
-    if current_user.role != 0:
+    if current_user.role != Roles.ADMIN:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to create objectives.")
 
@@ -566,7 +567,7 @@ def objective_post(objective_id):
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
 
-    if current_user.role != 0:
+    if current_user.role != Roles.ADMIN:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to edit objectives.")
 
@@ -632,7 +633,7 @@ def objective_delete(objective_id):
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
 
-    if current_user.role != 0:
+    if current_user.role != Roles.ADMIN:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to delete objectives.")
 
@@ -693,6 +694,11 @@ def search():
 
     # (2) initialize form data
     search_string = flask.request.args.get('query', default="query", type=str)
+
+    if len(search_string) < 4:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Search string is too short.")
+
     all_hits: list[tuple[str, str]] = []
 
     all_worlds = world_services.find_all_worlds()
@@ -709,19 +715,14 @@ def search():
                     all_hits.append((flask.url_for('data.objectives', room_id=my_room.id, highlight=my_objective.id), my_objective.name))
                 hit_text = search_binary_text(my_objective.challenge, search_string)
                 if hit_text:
-                    all_hits.append((flask.url_for('data.answer', objective_id=my_objective.id), hit_text))
-
-    all_visible_worlds = world_services.find_visible_worlds()
-    for my_world in all_visible_worlds:
-        all_rooms = room_services.find_world_rooms(my_world.id)
-        for my_room in all_rooms:
-            all_objectives = objective_services.find_room_objectives(my_room.id)
-            for my_objective in all_objectives:
-                all_solutions = solution_services.find_active_solutions(my_objective.id)
-                for solution in all_solutions:
-                    hit_text = search_binary_text(solution.notes, search_string)
-                    if hit_text:
-                        all_hits.append((flask.url_for('data.answer', objective_id=my_objective.id), hit_text))
+                    all_hits.append((flask.url_for('data.answer', objective_id=my_objective.id), my_objective.name + ": " + hit_text))
+                if my_world.visible == 1:
+                    all_solutions = solution_services.find_active_solutions(my_objective.id)
+                    for solution in all_solutions:
+                        hit_text = search_binary_text(solution.notes, search_string)
+                        if hit_text:
+                            all_hits.append((flask.url_for('data.answer', objective_id=my_objective.id),
+                                             my_objective.name + ": " + hit_text))
 
     # (6a) show rendered page
     return flask.render_template('data/search.html', search_string=search_string, all_hits=all_hits)

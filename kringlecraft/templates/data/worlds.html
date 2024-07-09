@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block modal %}
-    {% if current_user.role == 0 %}
+    {% if current_user.role == ROLE_ADMIN %}
         {# Modal dialog window - delete currently selected world #}
         <div id="myModalDelete" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -77,11 +77,11 @@
                                     {% endif %}
                                 </a>
                                 <figcaption class="figure-caption c-bigcaption">
-                                    {% if current_user.role == 0 %}
+                                    {% if current_user.role == ROLE_ADMIN %}
                                         <a href="{{ url_for('data.world', world_id=world.id, page_mode="edit") }}" data-toggle="tooltip" title="Edit World"><i class="bi bi-pencil-square"></i></a>&nbsp;
                                         <a href="#" data-toggle="tooltip" title="Delete World" data-bs-toggle="modal" data-bs-target="#myModalDelete" data-world-id="{{ world.id }}"><i class="bi bi-trash"></i></a>&nbsp;
                                     {% endif %}
-                                    {% if current_user.role == 0 or current_user.role == 1 %}
+                                    {% if current_user.role == ROLE_ADMIN or current_user.role == ROLE_USER %}
                                         <a href="{{ url_for('task.summary', world_id=world.id) }}" data-toggle="tooltip" title="Write Summary"><i class="bi bi-journal-text"></i></a>&nbsp;
                                         <a href="{{ url_for('report.full', report_format="markdown", world_id=world.id) }}" data-toggle="tooltip" title="Create Markdown Report"><i class="bi bi-filetype-md"></i></a>&nbsp;
                                         <a href="{{ url_for('report.full', report_format="html", world_id=world.id) }}" data-toggle="tooltip" title="Create HTML Report"><i class="bi bi-filetype-html"></i></a>&nbsp;
@@ -97,7 +97,7 @@
 
         {#  Display action buttons regarding the selected world  #}
         <div class="col d-flex mt-4">
-            {% if current_user.role == 0 %}
+            {% if current_user.role == ROLE_ADMIN %}
                 <a class="btn btn-primary me-3" href="{{ url_for('data.world', world_id=0, page_mode="add") }}" role="button"><i class="bi bi-plus-square"></i> Create</a>
             {% endif %}
         </div>

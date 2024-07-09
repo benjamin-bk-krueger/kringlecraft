@@ -3,6 +3,7 @@ from flask_login import (login_required, current_user)  # to manage user session
 
 from kringlecraft.utils.file_tools import read_all_files_without_extension
 from kringlecraft.utils.misc_tools import get_markdown, convert_markdown
+from kringlecraft.utils.constants import Roles  # Import the constants
 
 blueprint = flask.Blueprint('task', __name__, template_folder='templates')
 
@@ -17,7 +18,7 @@ def challenge(objective_id):
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
 
-    if current_user.role != 0:
+    if current_user.role != Roles.ADMIN:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to edit challenges.")
 
@@ -51,7 +52,7 @@ def challenge_post(objective_id):
     from kringlecraft.viewmodels.data_forms import ObjectiveForm
     import kringlecraft.services.objective_services as objective_services
 
-    if current_user.role != 0:
+    if current_user.role != Roles.ADMIN:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to edit objectives.")
 
@@ -82,7 +83,7 @@ def challenge_continue(objective_id):
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
 
-    if current_user.role != 0:
+    if current_user.role != Roles.ADMIN:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to edit challenges.")
 

@@ -17,7 +17,7 @@
 
         <!-- Own functions and stylesheets, overrides -->
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
-        {% if current_user.role == 0 %}
+        {% if current_user.role == ROLE_ADMIN %}
             <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/background_admin.css') }}">
         {% else %}
             <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/background.css') }}">
@@ -53,7 +53,7 @@
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item">
                             <form action="/search" method="get" class="d-flex justify-content-center">
-                                <input type="text" name="query" class="form-control" placeholder="Search...">
+                                <input type="text" name="query" class="form-control" placeholder="Search..." minlength="4" required pattern=".{4,}">
                             </form>
                         </li>
                         {% if current_user.is_authenticated %}

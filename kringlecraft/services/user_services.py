@@ -2,6 +2,7 @@ import kringlecraft.data.db_session as db_session
 from kringlecraft.data.users import User
 from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete, get_choices)
 from kringlecraft.utils.misc_tools import (random_hash, hash_text, verify_hash)
+from kringlecraft.utils.constants import Roles  # Import the constants
 
 
 # ----------- Login functions -----------
@@ -154,7 +155,7 @@ def create_user(name: str, email: str, password: str) -> User | None:
     user.email = email
     user.name = name
     user.hashed_password = hash_text(password)
-    user.role = 1
+    user.role = Roles.USER
     user.active = 0
     user.notification = 0
 
