@@ -160,7 +160,8 @@ def full(report_format, world_id):
     # (6a) show rendered page
     if report_format == "html":
         return flask.render_template('report/full.html', world=my_world, rooms=all_rooms,
-                                     objectives=all_objectives, user_image=user_image, objective_types=objective_services.get_objective_types(),
+                                     objectives=all_objectives, user_image=user_image,
+                                     objective_types=objective_services.get_objective_types(),
                                      www_server=flask.current_app.config.get('app.www_server'), world_image=world_image,
                                      room_images=room_images, objective_images=objective_images, user=my_user,
                                      html_challenges=html_challenges, html_solutions=html_solutions,
@@ -168,13 +169,75 @@ def full(report_format, world_id):
 
     if report_format == "markdown":
         md_output = flask.render_template('report/full.md', world=my_world, rooms=all_rooms,
-                                     objectives=all_objectives, user_image=user_image,
-                                     objective_types=objective_services.get_objective_types(),
-                                     www_server=flask.current_app.config.get('app.www_server'), world_image=world_image,
-                                     room_images=room_images, objective_images=objective_images, user=my_user,
-                                     md_challenges=md_challenges, md_solutions=md_solutions,
-                                     md_summary=md_summary)
+                                          objectives=all_objectives, user_image=user_image,
+                                          objective_types=objective_services.get_objective_types(),
+                                          www_server=flask.current_app.config.get('app.www_server'),
+                                          world_image=world_image, room_images=room_images,
+                                          objective_images=objective_images, user=my_user, md_challenges=md_challenges,
+                                          md_solutions=md_solutions, md_summary=md_summary)
 
         local_file = create_markdown_file(f"world-{my_world.id}.md", md_output)
 
         return flask.send_file(local_file, download_name=f"world-{my_world.id}.md", as_attachment=True)
+
+
+# Shows a full report containing information about the world, its objectives and solutions in different formats - via link
+@blueprint.route('/link/<string:invitation_code>', methods=['GET'])
+def link(invitation_code):
+    # (1) import forms and utilities
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.room_services as room_services
+    import kringlecraft.services.objective_services as objective_services
+    import kringlecraft.services.solution_services as solution_services
+    import kringlecraft.services.user_services as user_services
+    import kringlecraft.services.summary_services as summary_services
+    import kringlecraft.services.invitation_services as invitation_services
+
+    # (2) initialize form data
+    my_invitation = invitation_services.find_invitation_for_code(invitation_code)
+    if not my_invitation:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Link does not exist.")
+
+    my_world = world_services.find_world_by_id(my_invitation.world_id)
+    if not my_world:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="World does not exist.")
+
+    world_image = read_file_without_extension("world", my_world.id)
+    user_image = read_file_without_extension("profile", my_invitation.user_id)
+    room_images = read_all_files_without_extension("room")
+    objective_images = read_all_files_without_extension("objective")
+
+    my_user = user_services.find_user_by_id(my_invitation.user_id)
+
+    all_rooms = room_services.find_world_rooms(my_world.id)
+    all_objectives = list()
+    for room in all_rooms:
+        all_objectives.extend(objective_services.find_room_objectives(room.id))
+
+    html_challenges = dict()
+    html_solutions = dict()
+
+    for objective in all_objectives:
+        html_challenge = "" if objective.challenge is None else get_markdown(objective.challenge)
+        html_challenges[objective.id] = html_challenge
+
+        html_solution = "" if (solution_services.find_objective_solution_for_user(objective.id, my_user.id) is
+                               None) else get_markdown(
+            solution_services.find_objective_solution_for_user(objective.id, my_user.id).notes)
+        html_solutions[objective.id] = html_solution
+
+    html_summary = "" if summary_services.find_world_summary_for_user(my_world.id, my_user.id) is None else (
+        get_markdown(summary_services.find_world_summary_for_user(my_world.id, my_user.id).notes))
+
+    my_invitation = invitation_services.update_counter(my_invitation.id)
+
+    # (6a) show rendered page
+    return flask.render_template('report/full.html', world=my_world, rooms=all_rooms,
+                                 objectives=all_objectives, user_image=user_image,
+                                 objective_types=objective_services.get_objective_types(),
+                                 www_server=flask.current_app.config.get('app.www_server'), world_image=world_image,
+                                 room_images=room_images, objective_images=objective_images, user=my_user,
+                                 html_challenges=html_challenges, html_solutions=html_solutions,
+                                 html_summary=html_summary)

@@ -1,0 +1,46 @@
+{# /invitation #}
+{% extends 'shared/_layout.html' %}
+
+{% block title %}Invitations{% endblock %}
+
+{% block content %}
+    <div class="container-fluid c-restricted-md c-header c-shadow rounded bg-light mt-4 py-4">
+        <div class="container-fluid c-restricted-sm">
+            {#  Show all stored invitations #}
+            <div class="mb-3 fs-4 c-title">Current Invitations</div>
+            <div class="underline"><span><i class="bi bi-body-text" aria-hidden="true"></i></span></div>
+            <ul class="list-group">
+                {% for invitation in all_invitations %}
+                    <li class="list-group-item">
+                        <span class="badge bg-secondary">{{ invitation.counter }}</span>&nbsp;&nbsp;<b>{{ invitation.usage }}</b><br>
+                        <a href="{{ url_for('report.link', invitation_code=invitation.code) }}">{{ world_choices[invitation.world_id] }}</a>&nbsp;&nbsp;<a href="{{ url_for('task.invitations_delete', invitation_id=invitation.id) }}" data-toggle="tooltip" title="Remove Link"><i class="bi bi-trash"></i></a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container-fluid c-restricted-md c-header c-shadow rounded bg-light mt-4 py-4">
+        <div class="container-fluid c-restricted-sm">
+            {#  Show all stored invitations #}
+            <div class="mb-3 fs-4 c-title">Create new Invitation</div>
+            <div class="underline"><span><i class="bi bi-body-text" aria-hidden="true"></i></span></div>
+            <form action="{{ url_for('task.invitations_post') }}" method="POST" id="form_edit">
+                {{ invitation_form.csrf_token }}
+                <div class="form-group mt-2 mb-2">
+                    <label for="{{ invitation_form.world.name }}">{{ invitation_form.world.label }}</label>
+                    {{ invitation_form.world(class="form-select") }}
+                </div>
+                <div class="form-group mt-2 mb-2">
+                <label for="{{ invitation_form.usage.name }}">{{ invitation_form.usage.label }}</label>
+                    {{ invitation_form.usage(size=20, class="form-control") }}
+                </div>
+                {% for error in invitation_form.usage.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+            </form>
+
+            <button type="submit" class="btn btn-primary mt-4 btn-space" form="form_edit"><i class="bi bi-plus-square"></i> Create</button>
+        </div>
+    </div>
+{% endblock %}

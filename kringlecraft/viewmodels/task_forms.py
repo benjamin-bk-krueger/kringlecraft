@@ -1,11 +1,12 @@
 from flask_wtf import FlaskForm  # integration with WTForms, data validation and CSRF protection
-from wtforms import (BooleanField, StringField)
+from wtforms import (BooleanField, StringField, SelectField)
 from wtforms.validators import (Length)
 from markupsafe import escape  # to safely escape form data
 
 from kringlecraft.viewmodels.__validators import (space_ascii_validator)
 from kringlecraft.data.summaries import Summary
 from kringlecraft.data.solutions import Solution
+from kringlecraft.data.invitations import Invitation
 
 # Every form used both in the Flask/Jinja templates as well the main Python app is defined here.
 # Not all fields have full validators as they are used in modal windows.
@@ -55,3 +56,31 @@ class SolutionForm(FlaskForm):
         self.visible.default = self.visible.data
         self.completed.default = self.completed.data
         self.ctf_flag.default = self.ctf_flag.data
+
+
+class InvitationForm(FlaskForm):
+    world = SelectField('Select World', choices=[(1, "none")], validate_choice=False)
+    # objective = SelectField('Select Objective', choices=[(1, "none")], validate_choice=False)
+    usage = StringField('Usage', validators=[Length(max=100), space_ascii_validator])
+
+    @property
+    def world_content(self):
+        return str(escape(self.world.data))
+
+    # @property
+    # def objective_content(self):
+    #     return str(escape(self.objective.data))
+
+    @property
+    def usage_content(self):
+        return str(escape(self.usage.data))
+
+    def __init__(self, invitation: Invitation = None):
+        super().__init__()
+        if invitation is not None:
+            self.usage.default = invitation.usage
+
+    def set_field_defaults(self):
+        self.world.default = self.world_content
+        # self.objective.default = self.objective_content
+        self.usage.default = self.usage.data

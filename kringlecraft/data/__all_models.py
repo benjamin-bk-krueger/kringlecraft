@@ -20,3 +20,6 @@ import kringlecraft.data.summaries
 
 # noinspection PyUnresolvedReferences
 import kringlecraft.data.solutions
+
+# noinspection PyUnresolvedReferences
+import kringlecraft.data.invitations

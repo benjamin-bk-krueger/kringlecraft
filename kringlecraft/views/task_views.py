@@ -355,3 +355,90 @@ def progress(world_id):
     return flask.render_template('task/progress.html', world=my_world, rooms=all_rooms,
                                  objectives=objectives, solutions=solutions, solved_percentage=solved_percentage,
                                  objective_types=objective_services.get_objective_types())
+
+
+# Show all stored invitation links
+@blueprint.route('/invitations', methods=['GET'])
+@login_required
+def invitations():
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.task_forms import InvitationForm
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.invitation_services as invitation_services
+
+    # (2) initialize form data
+    all_invitations = invitation_services.find_all_invitations_for_user(current_user.id)
+
+    invitation_form = InvitationForm()
+    invitation_form.process()
+
+    world_choices = dict(world_services.get_world_choices(world_services.find_all_worlds()))
+    invitation_form.world.choices = world_services.get_world_choices(world_services.find_all_worlds())
+    invitation_form.process()
+
+    # (6a) show rendered page
+    return flask.render_template('task/invitation.html', invitation_form=invitation_form,
+                                 all_invitations=all_invitations, world_choices=world_choices)
+
+
+# Create a new invitation link
+@blueprint.route('/invitations_post', methods=['POST'])
+@login_required
+def invitations_post():
+    # (1) import forms and utilities
+    from kringlecraft.viewmodels.task_forms import InvitationForm
+    import kringlecraft.services.world_services as world_services
+    import kringlecraft.services.invitation_services as invitation_services
+
+    # (2) initialize form data
+    invitation_form = InvitationForm()
+    my_world = world_services.find_world_by_id(invitation_form.world_content)
+    if not my_world:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="World does not exist.")
+
+    # (3) check valid form data
+    if invitation_form.validate_on_submit():
+        # (4a) perform operations
+        my_invitation = invitation_services.create_link_for_world(invitation_form.world_content,
+                                                                  invitation_form.usage_content, current_user.id)
+
+        if not my_invitation:
+            # (6e) show dedicated error page
+            return flask.render_template('home/error.html', error_message="Invitation could not be created.")
+
+        # (6b) redirect to new page after successful operation
+        return flask.redirect(flask.url_for('task.invitations'))
+
+    # (5) preset form with existing data
+    all_invitations = invitation_services.find_all_invitations_for_user(current_user.id)
+
+    invitation_form.set_field_defaults()
+    invitation_form.process()
+
+    world_choices = dict(world_services.get_world_choices(world_services.find_all_worlds()))
+    invitation_form.world.choices = world_services.get_world_choices(world_services.find_all_worlds())
+    invitation_form.world.default = invitation_form.world_content
+    invitation_form.process()
+
+    # (6c) show rendered page with possible error messages
+    return flask.render_template('task/invitation.html', invitation_form=invitation_form,
+                                 all_invitations=all_invitations, world_choices=world_choices)
+
+
+# Delete an invitation link
+@blueprint.route('/invitations_delete/<int:invitation_id>', methods=['GET'])
+@login_required
+def invitations_delete(invitation_id):
+    # (1) import forms and utilities
+    import kringlecraft.services.invitation_services as invitation_services
+
+    # (2) initialize form data
+    my_invitation = invitation_services.delete_invitation_for_user(invitation_id, current_user.id)
+
+    if not my_invitation:
+        # (6e) show dedicated error page
+        return flask.render_template('home/error.html', error_message="Invitation does not exist.")
+
+    # (6b) redirect to new page after successful operation
+    return flask.redirect(flask.url_for('task.invitations'))
