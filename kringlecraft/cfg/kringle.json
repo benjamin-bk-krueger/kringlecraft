@@ -2,8 +2,8 @@
   "version": 1,
   "app": {
     "mode": "standalone",
-    "release": "1.0.0",
-    "date": "2024-07-02",
+    "release": "1.2.0",
+    "date": "2024-07-10",
     "mail_enable": "false",
     "mail_sender": "mail@localhost",
     "mail_admin": "admin@localhost",
