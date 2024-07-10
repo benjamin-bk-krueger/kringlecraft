@@ -4,6 +4,11 @@ site_dir: ./kringlecraft/static/doc
 use_directory_urls: false
 nav:
     - Home: index.md
+    - Navigation: navigation.md
+    - Account Management: account.md
+    - Enter Data: data.md
+    - Report Creation: report.md
+    - Invitation Links: invitation.md
     - Exit Help: 'https://www.kringlecraft.com/'
 theme: readthedocs
 markdown_extensions:
