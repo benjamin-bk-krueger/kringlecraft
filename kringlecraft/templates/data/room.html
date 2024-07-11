@@ -14,10 +14,11 @@
     {{ dropzone.load_js() }}
     {{ dropzone.config() }}
 
-    {% if temp_ending %}
-        {#  Mock Dropzone #}
-        <script src="{{ url_for('static', filename='js/func_dropzone.js') }}"></script>
-        <script>MockDropzone("room", "{{ temp_ending }}")</script>
+    <script src="{{ url_for('static', filename='js/func_dropzone.js') }}"></script>
+    {% if page_mode == "edit" %}
+        <script>QueueDropzone_Room("{{ csrf_token() }}", "{{ url_for('data.room_post', room_id=room.id, force_check=1) | safe}}")</script>
+    {% else %}
+        <script>QueueDropzone_Room("{{ csrf_token() }}", "{{ url_for('data.rooms_post', world_id=world.id, force_check=1) | safe}}")</script>
     {% endif %}
 {% endblock %}
 
@@ -43,14 +44,20 @@
             <div class="row">
                 <div class="col-sm">
                     {% if room_image %}
-                        <img src="{{ url_for('static', filename='uploads' + "/" + room_image[0] + "/" + room_image[1]) }}" class="img-fluid rounded img-restricted-lg" alt="Room Image">
-                        <a href="{{ url_for('storage.delete_image', path="room", filename=room_image[1], redirect="data.room", target_id=room.id) }}" title="Delete image" class="btn btn-danger mt-4"><i class="bi bi-trash"></i> Clear Image</a>
+                        <img src="{{ url_for('static', filename='uploads/' + room_image[0] + "/" + room_image[1]) }}" class="img-fluid rounded img-restricted-lg" alt="Room Image">
+                        {% if page_mode == "edit" %}
+                            <a href="{{ url_for('storage.delete_image', path="room", sub_path = "logo-" + room.id | string, filename=room_image[1], redirect="data.room", target_id=room.id) }}" title="Delete image" class="btn btn-danger mt-4"><i class="bi bi-trash"></i> Clear Image</a>
+                        {% endif %}
                     {% else %}
                         <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="img-fluid rounded img-restricted-lg" alt="Room Image">
                     {% endif %}
                 </div>
                 <div class="col-sm">
-                    {{ dropzone.create(action='storage.upload_image_post', path="room", filename_without_extension="_temp", overwrite=1) }}
+                    {% if page_mode == "edit" %}
+                        {{ dropzone.create(action='storage.upload_image_post', path="room", sub_path = "logo-" + room.id | string, overwrite=1) }}
+                    {% else %}
+                        {{ dropzone.create(action='storage.upload_image_post', path="room", sub_path = "logo-0", overwrite=1) }}
+                    {% endif %}
                 </div>
             </div>
 

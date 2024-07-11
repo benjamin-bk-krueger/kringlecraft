@@ -73,7 +73,7 @@
                             <figure class="figure c-bigcaption">
                                 <a href="{{ url_for('data.answer', objective_id=objective.id) }}">
                                     {% if objective_images[objective.id] %}
-                                        <img src="{{ url_for('static', filename='uploads' + "/" + objective_images[objective.id][0] + "/" + objective_images[objective.id][1]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ objective.name }}">
+                                        <img src="{{ url_for('static', filename='uploads/' + objective_images[objective.id][0] + "/" + objective_images[objective.id][1]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ objective.name }}">
                                     {% else %}
                                         <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ objective.name }}">
                                     {% endif %}

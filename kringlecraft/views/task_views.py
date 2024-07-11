@@ -1,7 +1,7 @@
 import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
-from kringlecraft.utils.file_tools import read_all_files_without_extension
+from kringlecraft.utils.file_tools import read_all_files
 from kringlecraft.utils.misc_tools import get_markdown, convert_markdown
 from kringlecraft.utils.constants import Roles  # Import the constants
 
@@ -34,7 +34,7 @@ def challenge(objective_id):
     my_world = world_services.find_world_by_id(my_room.world_id)
     my_challenge = objective_services.get_objective_challenge(my_objective.id)
 
-    image_files = read_all_files_without_extension("objective" + "/" + str(my_objective.id))
+    image_files = read_all_files(f"objective/challenge-{my_objective.id}")
 
     www_server = flask.current_app.config['app.www_server']
 
@@ -99,7 +99,7 @@ def challenge_continue(objective_id):
     my_world = world_services.find_world_by_id(my_room.world_id)
     my_challenge = flask.request.form["challenge"]
 
-    image_files = read_all_files_without_extension("objective" + "/" + str(my_objective.id))
+    image_files = read_all_files(f"objective/challenge-{my_objective.id}")
 
     www_server = flask.current_app.config['app.www_server']
 
@@ -187,7 +187,7 @@ def solution(objective_id):
     solution_form.process()
     my_notes = "New notes" if my_solution is None else convert_markdown(my_solution.notes)
 
-    image_files = read_all_files_without_extension("profile" + "/" + str(current_user.id) + "/" + str(my_objective.id))
+    image_files = read_all_files(f"objective/solution-{my_objective.id}-{current_user.id}")
 
     www_server = flask.current_app.config['app.www_server']
 
@@ -254,7 +254,7 @@ def solution_continue(objective_id):
     solution_form.process()
     my_notes = flask.request.form["notes"]
 
-    image_files = read_all_files_without_extension("profile" + "/" + str(current_user.id) + "/" + str(my_objective.id))
+    image_files = read_all_files(f"objective/solution-{my_objective.id}-{current_user.id}")
 
     www_server = flask.current_app.config['app.www_server']
 

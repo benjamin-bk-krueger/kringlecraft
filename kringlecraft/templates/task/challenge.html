@@ -48,18 +48,18 @@
                     {% for image in image_files %}
                         <figure class="figure col-auto px-1 image-item">
                             <a href="#">
-                                <img src="{{ url_for('static', filename='uploads' + "/" + image_files[image][0] + "/" + image_files[image][1]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="Image">
+                                <img src="{{ url_for('static', filename='uploads/' + image_files[image][0] + "/" + image_files[image][1]) }}" class="figure-img img-fluid rounded img-restricted-sm" alt="Image">
                             </a>
                             <figcaption class="figure-caption c-title">
                                 <a href="#" onclick="InsertMDE('![{{ image_files[image][1] }}]({{ www_server }}/static/uploads/{{ image_files[image][0] }}/{{ image_files[image][1] }})');return false;" data-toggle="tooltip" title="Copy Markdown Link"><i class="bi bi-markdown me-2"></i></a>
-                                <a href="{{ url_for('storage.delete_image', path=image_files[image][0].replace("/","_"), filename=image_files[image][1], redirect="task.challenge", target_id=objective.id) }}" data-toggle="tooltip" title="Delete Image"><i class="bi bi-trash"></i></a>
+                                <a href="{{ url_for('storage.delete_image', path="objective", sub_path = "challenge-" + objective.id | string, filename=image_files[image][1], redirect="task.challenge", target_id=objective.id) }}" data-toggle="tooltip" title="Delete Image"><i class="bi bi-trash"></i></a>
                             </figcaption>
                         </figure>
                     {% endfor %}
                 </div>
                 </div>
                 <div class="col-sm-2">
-                    {{ dropzone.create(action='storage.upload_image_post', path="objective_" + objective.id | string, filename_without_extension="_temp", overwrite=0) }}
+                    {{ dropzone.create(action='storage.upload_image_post', path="objective", sub_path = "challenge-" + objective.id | string, overwrite=0) }}
                 </div>
             </div>
         </div>

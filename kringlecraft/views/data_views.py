@@ -2,8 +2,7 @@ import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
 from kringlecraft.utils.mail_tools import (send_mail)
-from kringlecraft.utils.file_tools import (get_temp_file, file_extension, enable_image, read_file_without_extension,
-                                           read_all_files_without_extension)
+from kringlecraft.utils.file_tools import (read_file, read_all_files_recursive, enable_image)
 from kringlecraft.utils.misc_tools import (get_markdown, search_binary_text)
 from kringlecraft.utils.constants import Roles  # Import the constants
 
@@ -40,8 +39,9 @@ def users():
     import kringlecraft.services.user_services as user_services
 
     # (2) initialize form data
-    all_users = user_services.find_all_users() if current_user.role == Roles.ADMIN else user_services.find_active_users()
-    user_images = read_all_files_without_extension("profile")
+    all_users = user_services.find_all_users() if current_user.role == Roles.ADMIN else (
+        user_services.find_active_users())
+    user_images = read_all_files_recursive("profile/logo-*")
 
     # (6a) show rendered page
     return flask.render_template('account/users.html', users=all_users, user_images=user_images)
@@ -61,7 +61,7 @@ def user(user_id):
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="User does not exist.")
 
-    user_image = read_file_without_extension("profile", my_user.id)
+    user_image = read_file(f"profile/logo-{my_user.id}")
 
     # (6a) show rendered page
     return flask.render_template('account/user.html', user=my_user, user_image=user_image)
@@ -100,9 +100,9 @@ def worlds():
     import kringlecraft.services.world_services as world_services
 
     # (2) initialize form data
-    all_worlds = world_services.find_all_worlds()
-    world_images = read_all_files_without_extension("world")
     highlight = flask.request.args.get('highlight', default=0, type=int)
+    all_worlds = world_services.find_all_worlds()
+    world_images = read_all_files_recursive("world/logo-*")
 
     # (6a) show rendered page
     return flask.render_template('data/worlds.html', worlds=all_worlds, world_images=world_images,
@@ -122,21 +122,22 @@ def worlds_post():
         return flask.render_template('home/error.html', error_message="You are not authorized to create worlds.")
 
     # (2) initialize form data
+    force_check = flask.request.args.get('force_check', default=0, type=int)
     world_form = WorldForm()
     conflicting_world = world_services.find_world_by_name(world_form.name_content)
-    temp_ending = None if get_temp_file("world") is None else (file_extension(get_temp_file("world")))
 
     # (3) check valid form data
-    if world_form.validate_on_submit() and conflicting_world is None:
+    if world_form.validate_on_submit() and conflicting_world is None and force_check == 0:
         # (4a) perform operations
         my_world = world_services.create_world(world_form.name_content, world_form.description_content,
                                                world_form.url_content, world_form.visible_content,
                                                world_form.archived_content, current_user.id)
-        enable_image("world", my_world.id)
 
         if not my_world:
             # (6e) show dedicated error page
             return flask.render_template('home/error.html', error_message="World could not be created.")
+
+        enable_image("world", my_world.id)
 
         # (6b) redirect to new page after successful operation
         return flask.redirect(flask.url_for('data.worlds'))
@@ -144,12 +145,13 @@ def worlds_post():
     # (5) preset form with existing data
     world_form.set_field_defaults(conflicting_world is not None)
     world_form.process()
+    world_image = read_file(f"world/logo-0")
 
     my_world = world_form.get_world()
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/world.html', world_form=world_form, world=my_world,
-                                 page_mode="add", temp_ending=temp_ending)
+                                 world_image=world_image, page_mode="add")
 
 
 # Shows information about a specific world
@@ -169,7 +171,7 @@ def world(world_id):
 
     world_form = WorldForm(my_world)
     world_form.process()
-    world_image = None if my_world is None else read_file_without_extension("world", my_world.id)
+    world_image = None if my_world is None else read_file(f"world/logo-{my_world.id}")
 
     # (6a) show rendered page
     return flask.render_template('data/world.html', world_form=world_form, world=my_world,
@@ -189,6 +191,7 @@ def world_post(world_id):
         return flask.render_template('home/error.html', error_message="You are not authorized to edit worlds.")
 
     # (2) initialize form data
+    force_check = flask.request.args.get('force_check', default=0, type=int)
     world_form = WorldForm()
     my_world = world_services.find_world_by_id(world_id)
     if not my_world:
@@ -196,19 +199,20 @@ def world_post(world_id):
         return flask.render_template('home/error.html', error_message="World does not exist.")
 
     conflicting_world = world_services.find_world_by_name(world_form.name_content)
-    temp_ending = None if get_temp_file("world") is None else (file_extension(get_temp_file("world")))
 
     # (3) check valid form data
-    if world_form.validate_on_submit() and (my_world.name == world_form.name_content or conflicting_world is None):
+    if (world_form.validate_on_submit() and (my_world.name == world_form.name_content or conflicting_world is None) and
+            force_check == 0):
         # (4a) perform operations
         my_world = world_services.edit_world(world_id, world_form.name_content, world_form.description_content,
                                              world_form.url_content, world_form.visible_content,
                                              world_form.archived_content)
-        enable_image("world", my_world.id)
 
         if not my_world:
             # (6e) show dedicated error page
             return flask.render_template('home/error.html', error_message="World could not be edited.")
+
+        enable_image("world", my_world.id)
 
         # (6b) redirect to new page after successful operation
         return flask.redirect(flask.url_for('data.worlds', highlight=world_id))
@@ -216,11 +220,11 @@ def world_post(world_id):
     # (5) preset form with existing data
     world_form.set_field_defaults(conflicting_world is not None and (my_world.name != world_form.name_content))
     world_form.process()
-    world_image = read_file_without_extension("world", my_world.id)
+    world_image = read_file(f"world/logo-{my_world.id}")
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/world.html', world_form=world_form, world=my_world,
-                                 world_image=world_image, page_mode="edit", temp_ending=temp_ending)
+                                 world_image=world_image, page_mode="edit")
 
 
 # Delete a specific world - and all included elements!!!
@@ -252,6 +256,7 @@ def rooms(world_id):
     import kringlecraft.services.room_services as room_services
 
     # (2) initialize form data
+    highlight = flask.request.args.get('highlight', default=0, type=int)
     my_world = world_services.find_world_by_id(world_id)
 
     if not my_world:
@@ -259,8 +264,7 @@ def rooms(world_id):
         return flask.render_template('home/error.html', error_message="World does not exist.")
 
     all_rooms = room_services.find_world_rooms(my_world.id)
-    room_images = read_all_files_without_extension("room")
-    highlight = flask.request.args.get('highlight', default=0, type=int)
+    room_images = read_all_files_recursive("room/logo-*")
 
     # (6a) show rendered page
     return flask.render_template('data/rooms.html', rooms=all_rooms, room_images=room_images,
@@ -281,6 +285,7 @@ def rooms_post():
         return flask.render_template('home/error.html', error_message="You are not authorized to create rooms.")
 
     # (2) initialize form data
+    force_check = flask.request.args.get('force_check', default=0, type=int)
     room_form = RoomForm()
     my_world = world_services.find_world_by_id(room_form.world_content)
 
@@ -289,18 +294,18 @@ def rooms_post():
         return flask.render_template('home/error.html', error_message="World does not exist.")
 
     conflicting_room = room_services.find_world_room_by_name(my_world.id, room_form.name_content)
-    temp_ending = None if get_temp_file("room") is None else (file_extension(get_temp_file("room")))
 
     # (3) check valid form data
-    if room_form.validate_on_submit() and conflicting_room is None:
+    if room_form.validate_on_submit() and conflicting_room is None and force_check == 0:
         # (4a) perform operations
         my_room = room_services.create_room(room_form.name_content, room_form.description_content,
                                             my_world.id, current_user.id)
-        enable_image("room", my_room.id)
 
         if not my_room:
             # (6e) show dedicated error page
             return flask.render_template('home/error.html', error_message="Room could not be created.")
+
+        enable_image("room", my_room.id)
 
         # (6b) redirect to new page after successful operation
         return flask.redirect(flask.url_for('data.rooms', world_id=my_world.id))
@@ -308,6 +313,7 @@ def rooms_post():
     # (5) preset form with existing data
     room_form.set_field_defaults(conflicting_room is not None)
     room_form.process()
+    room_image = read_file(f"room/logo-0")
 
     room_form.world.choices = world_services.get_world_choices(world_services.find_all_worlds())
     room_form.world.default = room_form.world_content
@@ -317,7 +323,7 @@ def rooms_post():
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/room.html', room_form=room_form, world=my_world, room=my_room,
-                                 page_mode="add", temp_ending=temp_ending)
+                                 room_image=room_image, page_mode="add")
 
 
 # Shows information about a specific room
@@ -339,7 +345,7 @@ def room(room_id):
 
     room_form = RoomForm(my_room)
     room_form.process()
-    room_image = None if my_room is None else read_file_without_extension("room", my_room.id)
+    room_image = None if my_room is None else read_file(f"room/logo-{my_room.id}")
     my_world = world_services.find_world_by_id(my_world_id) if my_room is None else (
         world_services.find_world_by_id(my_room.world_id))
 
@@ -366,6 +372,7 @@ def room_post(room_id):
         return flask.render_template('home/error.html', error_message="You are not authorized to edit rooms.")
 
     # (2) initialize form data
+    force_check = flask.request.args.get('force_check', default=0, type=int)
     room_form = RoomForm()
     my_room = room_services.find_room_by_id(room_id)
     if not my_room:
@@ -373,19 +380,19 @@ def room_post(room_id):
         return flask.render_template('home/error.html', error_message="Room does not exist.")
 
     conflicting_room = room_services.find_world_room_by_name(room_form.world_content, room_form.name_content)
-    temp_ending = None if get_temp_file("room") is None else (file_extension(get_temp_file("room")))
 
     # (3) check valid form data
     if room_form.validate_on_submit() and (conflicting_room is None or my_room.world_id == conflicting_room.world_id and
-                                           my_room.name == room_form.name_content):
+                                           my_room.name == room_form.name_content) and force_check == 0:
         # (4a) perform operations
         my_room = room_services.edit_room(room_id, room_form.world_content, room_form.name_content,
                                           room_form.description_content)
-        enable_image("room", my_room.id)
 
         if not my_room:
             # (6e) show dedicated error page
             return flask.render_template('home/error.html', error_message="Room could not be edited.")
+
+        enable_image("room", my_room.id)
 
         # (6b) redirect to new page after successful operation
         return flask.redirect(flask.url_for('data.rooms', world_id=my_room.world_id))
@@ -394,7 +401,7 @@ def room_post(room_id):
     room_form.set_field_defaults(conflicting_room is not None and ((my_room.name != room_form.name_content) or
                                                                    (my_room.world_id != conflicting_room.world_id)))
     room_form.process()
-    room_image = read_file_without_extension("room", my_room.id)
+    room_image = read_file(f"room/logo-{my_room.id}")
     my_world = world_services.find_world_by_id(my_room.world_id)
 
     room_form.world.choices = world_services.get_world_choices(world_services.find_all_worlds())
@@ -403,7 +410,7 @@ def room_post(room_id):
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/room.html', room_form=room_form, room=my_room,
-                                 room_image=room_image, page_mode="edit", world=my_world, temp_ending=temp_ending)
+                                 room_image=room_image, page_mode="edit", world=my_world)
 
 
 # Delete a specific room - and all included elements!!!
@@ -439,6 +446,7 @@ def objectives(room_id):
     import kringlecraft.services.objective_services as objective_services
 
     # (2) initialize form data
+    highlight = flask.request.args.get('highlight', default=0, type=int)
     my_room = room_services.find_room_by_id(room_id)
 
     if not my_room:
@@ -446,9 +454,8 @@ def objectives(room_id):
         return flask.render_template('home/error.html', error_message="Room does not exist.")
 
     all_objectives = objective_services.find_room_objectives(my_room.id)
-    objective_images = read_all_files_without_extension("objective")
+    objective_images = read_all_files_recursive("objective/logo-*")
     my_world = world_services.find_world_by_id(my_room.world_id)
-    highlight = flask.request.args.get('highlight', default=0, type=int)
 
     # (6a) show rendered page
     return flask.render_template('data/objectives.html', objectives=all_objectives,
@@ -471,6 +478,7 @@ def objectives_post():
         return flask.render_template('home/error.html', error_message="You are not authorized to create objectives.")
 
     # (2) initialize form data
+    force_check = flask.request.args.get('force_check', default=0, type=int)
     objective_form = ObjectiveForm()
     my_room = room_services.find_room_by_id(objective_form.room_content)
 
@@ -479,21 +487,20 @@ def objectives_post():
         return flask.render_template('home/error.html', error_message="Room does not exist.")
 
     conflicting_objective = objective_services.find_room_objective_by_name(my_room.id, objective_form.name_content)
-    temp_ending = None if get_temp_file("objective") is None else (file_extension(get_temp_file("objective")))
 
     # (3) check valid form data
-    if objective_form.validate_on_submit() and conflicting_objective is None:
+    if objective_form.validate_on_submit() and conflicting_objective is None and force_check == 0:
         # (4a) perform operations
         my_objective = objective_services.create_objective(objective_form.name_content,
                                                            objective_form.description_content,
                                                            objective_form.difficulty_content,
                                                            objective_form.visible_content,
                                                            objective_form.type_content, my_room.id, current_user.id)
-        enable_image("objective", my_objective.id)
-
         if not my_objective:
             # (6e) show dedicated error page
             return flask.render_template('home/error.html', error_message="Objective could not be created.")
+
+        enable_image("objective", my_objective.id)
 
         # (6b) redirect to new page after successful operation
         return flask.redirect(flask.url_for('data.objectives', room_id=my_room.id))
@@ -501,6 +508,7 @@ def objectives_post():
     # (5) preset form with existing data
     objective_form.set_field_defaults(conflicting_objective is not None)
     objective_form.process()
+    objective_image = read_file(f"objective/logo-0")
     my_world = world_services.find_world_by_id(my_room.world_id)
 
     objective_form.type.choices = objective_services.get_objective_type_choices()
@@ -514,8 +522,8 @@ def objectives_post():
 
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/objective.html', objective_form=objective_form,
-                                 objective=my_objective, room=my_room, world=my_world, page_mode="add",
-                                 objective_types=objective_services.get_objective_types(), temp_ending=temp_ending)
+                                 objective=my_objective, room=my_room, world=my_world, objective_image=objective_image,
+                                 page_mode="add", objective_types=objective_services.get_objective_types())
 
 
 # Shows information about a specific objective
@@ -538,7 +546,7 @@ def objective(objective_id):
 
     objective_form = ObjectiveForm(my_objective)
     objective_form.process()
-    objective_image = None if my_objective is None else read_file_without_extension("objective", my_objective.id)
+    objective_image = None if my_objective is None else read_file(f"objective/logo-{my_objective.id}")
     my_room = room_services.find_room_by_id(my_room_id) if my_objective is None else (
         room_services.find_room_by_id(my_objective.room_id)
     )
@@ -572,6 +580,7 @@ def objective_post(objective_id):
         return flask.render_template('home/error.html', error_message="You are not authorized to edit objectives.")
 
     # (2) initialize form data
+    force_check = flask.request.args.get('force_check', default=0, type=int)
     objective_form = ObjectiveForm()
     my_objective = objective_services.find_objective_by_id(objective_id)
     if not my_objective:
@@ -580,23 +589,23 @@ def objective_post(objective_id):
 
     conflicting_objective = objective_services.find_room_objective_by_name(objective_form.room_content,
                                                                            objective_form.name_content)
-    temp_ending = None if get_temp_file("objective") is None else (file_extension(get_temp_file("objective")))
 
     # (3) check valid form data
     if objective_form.validate_on_submit() and (conflicting_objective is None or my_objective.room_id ==
                                                 conflicting_objective.room_id and my_objective.name ==
-                                                objective_form.name_content):
+                                                objective_form.name_content) and force_check == 0:
         # (4a) perform operations
         my_objective = objective_services.edit_objective(objective_id, objective_form.room_content,
                                                          objective_form.name_content,
                                                          objective_form.description_content,
                                                          objective_form.difficulty_content,
                                                          objective_form.visible_content, objective_form.type_content)
-        enable_image("objective", my_objective.id)
 
         if not my_objective:
             # (6e) show dedicated error page
             return flask.render_template('home/error.html', error_message="Objective could not be edited.")
+
+        enable_image("objective", my_objective.id)
 
         # (6b) redirect to new page after successful operation
         return flask.redirect(flask.url_for('data.objectives', room_id=my_objective.room_id, highlight=my_objective.id))
@@ -607,7 +616,7 @@ def objective_post(objective_id):
                                                                              (my_objective.room_id !=
                                                                               conflicting_objective.room_id)))
     objective_form.process()
-    objective_image = read_file_without_extension("objective", my_objective.id)
+    objective_image = read_file(f"objective/logo-{my_objective.id}")
     my_room = room_services.find_room_by_id(my_objective.room_id)
     my_world = world_services.find_world_by_id(my_room.world_id)
 
@@ -621,8 +630,7 @@ def objective_post(objective_id):
     # (6c) show rendered page with possible error messages
     return flask.render_template('data/objective.html', objective_form=objective_form,
                                  objective=my_objective, objective_image=objective_image, room=my_room, world=my_world,
-                                 page_mode="edit", objective_types=objective_services.get_objective_types(),
-                                 temp_ending=temp_ending)
+                                 page_mode="edit", objective_types=objective_services.get_objective_types())
 
 
 # Delete a specific objective - and all included elements!!!
@@ -665,7 +673,7 @@ def answer(objective_id):
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="Objective does not exist.")
 
-    objective_image = None if my_objective is None else read_file_without_extension("objective", my_objective.id)
+    objective_image = None if my_objective is None else read_file(f"objective/logo-{my_objective.id}")
     my_room = room_services.find_room_by_id(my_objective.room_id)
     my_world = world_services.find_world_by_id(my_room.world_id)
 

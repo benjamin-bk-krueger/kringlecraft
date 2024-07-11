@@ -5,7 +5,7 @@
 ### Objective Details
 
 {% if objective_image %}
-![{{ objective_types[objective.objective_type] }} Image]({{www_server}}{{ url_for('static', filename='uploads' + "/" + objective_image[0] + "/" + objective_image[1]) }})
+![{{ objective_types[objective.objective_type] }} Image]({{www_server}}{{ url_for('static', filename='uploads/' + objective_image[0] + "/" + objective_image[1]) }})
 {% else %}
 ![Objective Image]({{www_server}}{{ url_for('static', filename='img/not_found.jpg') }})
 {% endif %}

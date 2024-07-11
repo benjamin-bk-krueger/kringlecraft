@@ -24,7 +24,7 @@
             <div class="row g-0">
                 <div class="col-md-4">
                     {%  if objective_image %}
-                        <img src="{{ url_for('static', filename='uploads' + "/" + objective_image[0] + "/" + objective_image[1]) }}" class="img-fluid img-restricted-sm" alt="{{ objective_types[objective.objective_type] }} Image">
+                        <img src="{{ url_for('static', filename='uploads/' + objective_image[0] + "/" + objective_image[1]) }}" class="img-fluid img-restricted-sm" alt="{{ objective_types[objective.objective_type] }} Image">
                     {% else %}
                         <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="img-fluid img-restricted-sm" alt="Objective Image">
                     {% endif %}

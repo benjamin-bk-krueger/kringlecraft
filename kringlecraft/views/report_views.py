@@ -1,8 +1,7 @@
 import flask
 from flask_login import (login_required, current_user)  # to manage user sessions
 
-from kringlecraft.utils.file_tools import (read_file_without_extension, read_all_files_without_extension,
-                                           create_markdown_file)
+from kringlecraft.utils.file_tools import (read_file, read_all_files_recursive, create_markdown_file)
 from kringlecraft.utils.misc_tools import get_markdown, get_raw_markdown
 
 blueprint = flask.Blueprint('report', __name__, template_folder='templates')
@@ -71,7 +70,7 @@ def single(report_format, objective_id):
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="Objective does not exist.")
 
-    objective_image = read_file_without_extension("objective", my_objective.id)
+    objective_image = read_file(f"objective/logo-{my_objective.id}")
     my_room = room_services.find_room_by_id(my_objective.room_id)
     my_world = world_services.find_world_by_id(my_room.world_id)
 
@@ -120,10 +119,10 @@ def full(report_format, world_id):
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="World does not exist.")
 
-    world_image = read_file_without_extension("world", my_world.id)
-    user_image = read_file_without_extension("profile", current_user.id)
-    room_images = read_all_files_without_extension("room")
-    objective_images = read_all_files_without_extension("objective")
+    world_image = read_file(f"world/logo-{my_world.id}")
+    user_image = read_file(f"profile/logo-{current_user.id}")
+    room_images = read_all_files_recursive("room/logo-*")
+    objective_images = read_all_files_recursive("objective/logo-*")
 
     my_user = user_services.find_user_by_id(current_user.id)
 
@@ -181,7 +180,7 @@ def full(report_format, world_id):
         return flask.send_file(local_file, download_name=f"world-{my_world.id}.md", as_attachment=True)
 
 
-# Shows a full report containing information about the world, its objectives and solutions in different formats - via link
+# Shows a full report containing information about the world, its objectives and solutions in different formats - via a link
 @blueprint.route('/link/<string:invitation_code>', methods=['GET'])
 def link(invitation_code):
     # (1) import forms and utilities
@@ -204,10 +203,10 @@ def link(invitation_code):
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="World does not exist.")
 
-    world_image = read_file_without_extension("world", my_world.id)
-    user_image = read_file_without_extension("profile", my_invitation.user_id)
-    room_images = read_all_files_without_extension("room")
-    objective_images = read_all_files_without_extension("objective")
+    world_image = read_file(f"world/logo-{my_world.id}")
+    user_image = read_file(f"profile/logo-{my_invitation.user_id}")
+    room_images = read_all_files_recursive("room/logo-*")
+    objective_images = read_all_files_recursive("objective/logo-*")
 
     my_user = user_services.find_user_by_id(my_invitation.user_id)
 

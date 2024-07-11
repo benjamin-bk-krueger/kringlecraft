@@ -11,7 +11,7 @@
         <div class="fs-6">{{ user.description }}</div>
 
         {% if user_image  %}
-            <img src="{{ url_for('static', filename='uploads' + "/" + user_image[0] + "/" + user_image[1]) }}" class="img-fluid rounded img-restricted-lg" alt="User Image">
+            <img src="{{ url_for('static', filename='uploads/' + user_image[0] + "/" + user_image[1]) }}" class="img-fluid rounded img-restricted-lg" alt="User Image">
         {% else %}
             <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="img-fluid rounded img-restricted-lg" alt="User Image">
         {% endif %}

@@ -1,7 +1,7 @@
 import flask
 from flask_login import (login_required, current_user, logout_user)  # to manage user sessions
 
-from kringlecraft.utils.file_tools import read_file_without_extension
+from kringlecraft.utils.file_tools import read_file
 from kringlecraft.utils.mail_tools import (send_admin_mail, send_mail)
 
 blueprint = flask.Blueprint('account', __name__, template_folder='templates')
@@ -68,7 +68,7 @@ def profile_edit():
 
     # (2) initialize form data
     user = user_services.find_user_by_id(current_user.id)
-    user_image = read_file_without_extension("profile", current_user.id)
+    user_image = read_file(f"profile/logo-{current_user.id}")
     mail_form = MailForm(user)
     password_form = PasswordForm()
     deletion_form = DeletionForm()
@@ -112,7 +112,7 @@ def profile_edit_mail_post():
 
     # (5) preset form with existing data
     mail_form.set_field_defaults()
-    user_image = read_file_without_extension("profile", current_user.id)
+    user_image = read_file(f"profile/logo-{current_user.id}")
     mail_form.process()
     password_form.process()
     deletion_form.process()
@@ -152,7 +152,7 @@ def profile_edit_password_post():
         return flask.redirect(flask.url_for('home.index'))
 
     # (5) preset form with existing data
-    user_image = read_file_without_extension("profile", current_user.id)
+    user_image = read_file(f"profile/logo-{current_user.id}")
     mail_form.process()
     password_form.process()
     deletion_form.process()
@@ -191,7 +191,7 @@ def profile_edit_deletion_post():
         return flask.redirect(flask.url_for('home.index'))
 
     # (5) preset form with existing data
-    user_image = read_file_without_extension("profile", current_user.id)
+    user_image = read_file(f"profile/logo-{current_user.id}")
     mail_form.process()
     password_form.process()
     deletion_form.process()

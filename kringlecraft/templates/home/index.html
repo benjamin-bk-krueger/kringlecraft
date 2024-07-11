@@ -28,7 +28,7 @@
                 {% for world in worlds %}
                     <div class="carousel-item">
                         {% if world_images[world.id] %}
-                            <a href="{{ url_for('data.rooms', world_id=world.id) }}"><img class="img-fluid d-block mx-auto rounded img-restricted-lg" src="{{ url_for('static', filename='uploads' + "/" + world_images[world.id][0] + "/" + world_images[world.id][1]) }}" alt="World Logo"></a>
+                            <a href="{{ url_for('data.rooms', world_id=world.id) }}"><img class="img-fluid d-block mx-auto rounded img-restricted-lg" src="{{ url_for('static', filename='uploads/' + world_images[world.id][0] + "/" + world_images[world.id][1]) }}" alt="World Logo"></a>
                         {% else %}
                             <img src="{{ url_for('static', filename='img/not_found.jpg') }}" class="figure-img img-fluid rounded img-restricted-sm" alt="{{ world.name }}">
                         {% endif %}
