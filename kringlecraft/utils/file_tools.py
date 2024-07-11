@@ -70,7 +70,7 @@ def read_all_files_recursive(path: str) -> dict[int, list[str]] | None:
         for root, _, files in os.walk(dir_path):
             for filename in files:
                 if any(filename.endswith(ext) for ext in EXTENSIONS):
-                    relative_path = os.path.relpath(root, base_path)
+                    relative_path = os.path.relpath(root, base_path).replace('\\', '/')
                     all_files[extract_number(relative_path)] = [relative_path, filename]
                     count += 1
 
