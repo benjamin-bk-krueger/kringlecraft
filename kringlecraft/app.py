@@ -32,7 +32,7 @@ def main():
     app.jinja_env.globals.update(get_canonical_url=get_canonical_url)
     app.jinja_env.globals['ROLE_ADMIN'] = 0
     app.jinja_env.globals['ROLE_USER'] = 1
-    app.run(debug=True, port=5006)
+    app.run(debug=False, port=5006)
 
 
 def configure_defaults():
