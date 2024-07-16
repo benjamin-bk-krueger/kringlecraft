@@ -79,3 +79,125 @@ It can be terminated simply by pressing CTRL-C.
 
 Now you can navigate to http://127.0.0.1:5006 to get things started.
 
+## Server mode
+
+The application can also be made available on the internet. This means that it also has the full range of functions (multi-user, shared links, mails, etc.)
+
+### 1. Create user
+
+On a server, processes should not run under root, so we create a separate user for the application.
+
+``` bash
+# as root
+useradd -g kringle -m -u 3000 kringle
+groupadd -g 3000 kringle
+```
+
+### 2. Clone GIT repository
+
+``` bash
+# as root
+su - kringle
+# as user kringle
+git clone https://github.com/benjamin-bk-krueger/kringlecraft
+```
+
+### 3. Create services
+
+A suitable service config must be created so that the application starts up every time.
+
+``` bash
+# as root
+# the paths in the service file need to be changed if you want to use a different user/path
+cp kringlecraft/srv/uwsgi-kringlecraft.service /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable uwsgi-kringlecraft
+```
+
+### 4. Modify Apache config
+
+The application requires a web server that acts as a proxy.  
+The file kringlecraft/srv/apache.conf shows how the configuration can look. Paths, domain names and SSL certificates must be adapted to your own setup.  
+
+### 5. Configure the application
+
+The following configuration parameters must be customized:  
+
+``` bash
+cat kringlecraft/cfg/kringle.json
+{
+  "version": 1,
+  "app": {
+    "mode": "server",
+    "release": "1.2.0",
+    "date": "2024-07-10",
+    "mail_enable": "true",
+    "mail_sender": "mail@www.kringlecraft.com",
+    "mail_admin": "admin-mailbox@kringlecraft.com",
+    "mail_server": "localhost",
+    "www_server": "https://www.kringlecraft.com"
+  },
+  "secret": {
+    "key": "secret-key-goes-here"
+  }
+}
+```
+
+- mail_enable: Set to true or false if a mail server is to be used.
+- mail_sender: Enter sender address - customize to your own domain
+- mail_admin: Enter recipient's address - this is where e-mails, e.g. from the contact form, are sent
+- mail_server: IP or hostname of mail server
+- www_server: Customize to your own domain (necessary to build valid links)
+- key: Choose your own private and secret key (used for CSRF protection for example)
+
+### 6. Install package dependencies
+
+The application requires a few libraries that can be easily installed using pip (in the venv).
+
+``` bash
+# as user kringle
+kringle@www:~$ cd kringlecraft/
+kringle@www:~/kringlecraft$
+
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 7. Create admin user
+
+A first user can be created as follows:
+
+``` cmd
+# as user kringle
+python3 bin/basic_inserts.py
+
+(see local installation)
+```
+
+### 8. Start the application
+
+The application should now be ready. First, the application must be started and, if necessary (the first time), the modified Apache config loaded
+
+``` bash
+# as root
+systemctl reload apache2
+systemctl start  uwsgi-kringlecraft
+```
+
+### 9. Troubleshooting
+
+If something is not working, it is worth analyzing the Apache logs or the wsgi logs
+
+``` bash
+tail /var/log/apache2/kringle_error.log
+systemctl -f status  uwsgi-kringlecraft
+```
+
+### 10. Backup 
+
+All data is either stored in the SQLite database or as static files in the file system. These should be backed up and can also be copied to another location.
+
+``` bash
+kringle@www:~/kringlecraft$ ls -l kringlecraft/db/ kringlecraft/static/uploads/
+```
