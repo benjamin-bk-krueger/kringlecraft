@@ -1,13 +1,13 @@
 import os
 import sys
 
+# Make it run more easily outside PyCharm
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
 import kringlecraft.data.db_session as db_session
 from kringlecraft.data.users import User
 from kringlecraft.utils.misc_tools import hash_text
 from kringlecraft.utils.constants import Roles  # Import the constants
-
-# Make it run more easily outside PyCharm
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 
 def main():
