@@ -1,0 +1,18 @@
+[Unit]
+Description=uWSGI KringleCraft server instance
+After=syslog.target
+
+[Service]
+User=kringle
+Environment="PYTHONPATH=/home/kringle/kringlecraft/kringlecraft:/home/kringle/kringlecraft"
+ExecStart=/home/kringle/kringlecraft/venv/bin/uwsgi -H /home/kringle/kringlecraft/venv --master --processes 4 --threads 2 --http :5000 --manage-script-name --mount /=wsgi:app
+RuntimeDirectory=/home/kringle/kringlecraft/kringlecraft
+WorkingDirectory=/home/kringle/kringlecraft/kringlecraft
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
