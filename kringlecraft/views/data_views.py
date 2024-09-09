@@ -4,7 +4,7 @@ from flask_login import (login_required, current_user)  # to manage user session
 from kringlecraft.utils.mail_tools import (send_mail)
 from kringlecraft.utils.file_tools import (read_file, read_all_files_recursive, enable_image)
 from kringlecraft.utils.misc_tools import (get_markdown, search_binary_text)
-from kringlecraft.utils.constants import Roles  # Import the constants
+from kringlecraft.utils.constants import Role  # Import the constants
 
 blueprint = flask.Blueprint('data', __name__, template_folder='templates')
 
@@ -39,7 +39,7 @@ def users():
     import kringlecraft.services.user_services as user_services
 
     # (2) initialize form data
-    all_users = user_services.find_all_users() if current_user.role == Roles.ADMIN else (
+    all_users = user_services.find_all_users() if current_user.role == Role.ADMIN.value else (
         user_services.find_active_users())
     user_images = read_all_files_recursive("profile/logo-*")
 
@@ -55,7 +55,7 @@ def user(user_id):
     import kringlecraft.services.user_services as user_services
 
     # (2) initialize form data
-    my_user = user_services.find_user_by_id(user_id) if current_user.role == Roles.ADMIN else (
+    my_user = user_services.find_user_by_id(user_id) if current_user.role == Role.ADMIN.value else (
         user_services.find_active_user_by_id(user_id))
     if not my_user:
         # (6e) show dedicated error page
@@ -74,7 +74,7 @@ def user_approve(user_id):
     # (1) import forms and utilities
     import kringlecraft.services.user_services as user_services
 
-    if current_user.role != Roles.ADMIN:
+    if current_user.role != Role.ADMIN.value:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to approve users.")
 
@@ -117,7 +117,7 @@ def worlds_post():
     from kringlecraft.viewmodels.data_forms import WorldForm
     import kringlecraft.services.world_services as world_services
 
-    if current_user.role != Roles.ADMIN:
+    if current_user.role != Role.ADMIN.value:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to create worlds.")
 
@@ -186,7 +186,7 @@ def world_post(world_id):
     from kringlecraft.viewmodels.data_forms import WorldForm
     import kringlecraft.services.world_services as world_services
 
-    if current_user.role != Roles.ADMIN:
+    if current_user.role != Role.ADMIN.value:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to edit worlds.")
 
@@ -234,7 +234,7 @@ def world_delete(world_id):
     # (1) import forms and utilities
     import kringlecraft.services.world_services as world_services
 
-    if current_user.role != Roles.ADMIN:
+    if current_user.role != Role.ADMIN.value:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to delete worlds.")
 
@@ -280,7 +280,7 @@ def rooms_post():
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
 
-    if current_user.role != Roles.ADMIN:
+    if current_user.role != Role.ADMIN.value:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to create rooms.")
 
@@ -367,7 +367,7 @@ def room_post(room_id):
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
 
-    if current_user.role != Roles.ADMIN:
+    if current_user.role != Role.ADMIN.value:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to edit rooms.")
 
@@ -421,7 +421,7 @@ def room_delete(room_id):
     import kringlecraft.services.world_services as world_services
     import kringlecraft.services.room_services as room_services
 
-    if current_user.role != Roles.ADMIN:
+    if current_user.role != Role.ADMIN.value:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to delete rooms.")
 
@@ -473,7 +473,7 @@ def objectives_post():
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
 
-    if current_user.role != Roles.ADMIN:
+    if current_user.role != Role.ADMIN.value:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to create objectives.")
 
@@ -575,7 +575,7 @@ def objective_post(objective_id):
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
 
-    if current_user.role != Roles.ADMIN:
+    if current_user.role != Role.ADMIN.value:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to edit objectives.")
 
@@ -641,7 +641,7 @@ def objective_delete(objective_id):
     import kringlecraft.services.room_services as room_services
     import kringlecraft.services.objective_services as objective_services
 
-    if current_user.role != Roles.ADMIN:
+    if current_user.role != Role.ADMIN.value:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="You are not authorized to delete objectives.")
 

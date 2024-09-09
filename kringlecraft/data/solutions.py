@@ -6,6 +6,8 @@ from kringlecraft.data.modelbase import SqlAlchemyBase
 
 
 class Solution(SqlAlchemyBase):
+    """Represents a solution. A solution belongs to a challenge of an objective.
+    """
     __tablename__ = 'solutions'
     __table_args__ = (
         sa.UniqueConstraint('user_id', 'objective_id', name='uix_user_id_objective_id'),

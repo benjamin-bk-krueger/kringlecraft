@@ -4,24 +4,27 @@ from sqlalchemy.orm import Session
 
 from kringlecraft.data.modelbase import SqlAlchemyBase
 
-__factory = None
+__factory = None  # implement factory pattern this way
 
 
-def global_init(db_file: str, echo: bool = False) -> None:
+def global_init(db_file: str, echo: bool = False):
+    """Initializes the database using the factory pattern.
+    :param str db_file: Path to the database file.
+    :param bool echo: Print SQL statements to the console.
+    """
     global __factory
 
     if __factory:
-        return
+        pass
 
     if not db_file or not db_file.strip():
-        raise Exception('You must specify a db file.')
+        raise FileNotFoundError('You must specify a db file.')
 
     conn_str = 'sqlite:///' + db_file.strip()
     print('INFO: Connecting to DB with {}'.format(conn_str))
 
-    # Adding check_same_thread = False after the recording. This can be an issue about
-    # creating / owner thread when cleaning up sessions, etc. This is a sqlite restriction
-    # that we probably don't care about in this example.
+    # Set check_same_thread = False. This can be an issue about creating / owner thread when cleaning up sessions, etc.
+    # This is a sqlite restriction that we don't care about here.
     engine = sa.create_engine(conn_str, echo=echo, connect_args={'check_same_thread': False})
     __factory = orm.sessionmaker(bind=engine)
 
@@ -32,9 +35,12 @@ def global_init(db_file: str, echo: bool = False) -> None:
 
 
 def create_session() -> Session:
+    """Create a new DB session using the factory pattern.
+    :return: A new DB session.
+    """
     global __factory
 
-    session: Session = __factory()
+    session: Session = __factory()  # NOQA
 
     session.expire_on_commit = False
 

@@ -6,6 +6,8 @@ from kringlecraft.data.modelbase import SqlAlchemyBase
 
 
 class World(SqlAlchemyBase):
+    """Represents a world. A world can contain several rooms.
+    """
     __tablename__ = 'worlds'
 
     id: int = sa.Column(sa.Integer, primary_key=True, autoincrement=True)

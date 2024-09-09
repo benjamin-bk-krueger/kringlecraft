@@ -6,6 +6,8 @@ from kringlecraft.data.modelbase import SqlAlchemyBase
 
 
 class Invitation(SqlAlchemyBase):
+    """Represents an invitation. An invitation can be distributed to share a solution.
+    """
     __tablename__ = 'invitations'
 
     id: int = sa.Column(sa.Integer, primary_key=True, autoincrement=True)

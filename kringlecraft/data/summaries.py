@@ -6,6 +6,8 @@ from kringlecraft.data.modelbase import SqlAlchemyBase
 
 
 class Summary(SqlAlchemyBase):
+    """Represents a summary. A summary can be added to the solutions of a whole world.
+    """
     __tablename__ = 'summaries'
     __table_args__ = (
         sa.UniqueConstraint('user_id', 'world_id', name='uix_user_id_world_id'),

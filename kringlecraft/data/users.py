@@ -6,6 +6,8 @@ from kringlecraft.data.modelbase import SqlAlchemyBase
 
 
 class User(UserMixin, SqlAlchemyBase):
+    """Represents a user. A user is identified by their email.
+    """
     __tablename__ = 'users'
 
     id: int = sa.Column(sa.Integer, primary_key=True, autoincrement=True)

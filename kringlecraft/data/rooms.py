@@ -6,6 +6,8 @@ from kringlecraft.data.modelbase import SqlAlchemyBase
 
 
 class Room(SqlAlchemyBase):
+    """Represents a room. A room can contain several objectives.
+    """
     __tablename__ = 'rooms'
     __table_args__ = (
         sa.UniqueConstraint('name', 'world_id', name='uix_room_name_world_id'),
