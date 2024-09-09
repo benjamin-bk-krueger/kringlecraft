@@ -1,7 +1,7 @@
-import datetime
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
+from datetime import datetime
 from kringlecraft.data.modelbase import SqlAlchemyBase
 
 
@@ -17,8 +17,8 @@ class Invitation(SqlAlchemyBase):
     code: str = sa.Column(sa.String, nullable=False)
     usage: str = sa.Column(sa.String, nullable=True)
     counter: int = sa.Column(sa.Integer, nullable=False, default=0)
-    created_date: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
-    modified_date: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
+    created_date: datetime = sa.Column(sa.DateTime, default=datetime.now, index=True)
+    modified_date: datetime = sa.Column(sa.DateTime, default=datetime.now, index=True)
 
     user = orm.relationship('User', backref='invitation_to_users', passive_deletes=True)
     world = orm.relationship('World', backref='invitation_to_worlds', passive_deletes=True)

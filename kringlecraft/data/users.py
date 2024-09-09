@@ -1,6 +1,6 @@
-import datetime
 import sqlalchemy as sa
 
+from datetime import datetime
 from flask_login import UserMixin  # to manage user sessions
 from kringlecraft.data.modelbase import SqlAlchemyBase
 
@@ -19,9 +19,9 @@ class User(UserMixin, SqlAlchemyBase):
     role: int = sa.Column(sa.Integer, nullable=False, default=1)
     active: bool = sa.Column(sa.Boolean, nullable=False, default=False)
     notification: bool = sa.Column(sa.Boolean, nullable=False, default=False)
-    created_date: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
-    modified_date: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
-    last_login: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
+    created_date: datetime = sa.Column(sa.DateTime, default=datetime.now, index=True)
+    modified_date: datetime = sa.Column(sa.DateTime, default=datetime.now, index=True)
+    last_login: datetime = sa.Column(sa.DateTime, default=datetime.now, index=True)
 
     def __repr__(self):
         return '<User {}>'.format(self.name)

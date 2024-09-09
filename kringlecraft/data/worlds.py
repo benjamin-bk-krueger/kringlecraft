@@ -1,7 +1,7 @@
-import datetime
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
+from datetime import datetime
 from kringlecraft.data.modelbase import SqlAlchemyBase
 
 
@@ -17,8 +17,8 @@ class World(SqlAlchemyBase):
     url: str = sa.Column(sa.String, nullable=True)
     visible: bool = sa.Column(sa.Boolean, nullable=False, default=False)
     archived: bool = sa.Column(sa.Boolean, nullable=False, default=False)
-    created_date: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
-    modified_date: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
+    created_date: datetime = sa.Column(sa.DateTime, default=datetime.now, index=True)
+    modified_date: datetime = sa.Column(sa.DateTime, default=datetime.now, index=True)
 
     user = orm.relationship('User', backref='worlds_to_users', passive_deletes=True)
 

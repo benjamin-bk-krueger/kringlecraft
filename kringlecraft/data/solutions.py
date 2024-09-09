@@ -1,7 +1,7 @@
-import datetime
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
+from datetime import datetime
 from kringlecraft.data.modelbase import SqlAlchemyBase
 
 
@@ -20,8 +20,8 @@ class Solution(SqlAlchemyBase):
     visible: bool = sa.Column(sa.Boolean, nullable=False, default=False)
     completed: bool = sa.Column(sa.Boolean, nullable=False, default=False)
     ctf_flag: str = sa.Column(sa.String, nullable=True)
-    created_date: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
-    modified_date: datetime.datetime = sa.Column(sa.DateTime, default=datetime.datetime.now, index=True)
+    created_date: datetime = sa.Column(sa.DateTime, default=datetime.now, index=True)
+    modified_date: datetime = sa.Column(sa.DateTime, default=datetime.now, index=True)
 
     user = orm.relationship('User', backref='solutions_to_users', passive_deletes=True)
     objective = orm.relationship('Objective', backref='solutions_to_objectives', passive_deletes=True)
