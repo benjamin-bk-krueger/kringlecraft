@@ -15,7 +15,7 @@ def global_init(db_file: str, echo: bool = False):
     global __factory
 
     if __factory:
-        pass
+        return None
 
     if not db_file or not db_file.strip():
         raise FileNotFoundError('You must specify a db file.')
