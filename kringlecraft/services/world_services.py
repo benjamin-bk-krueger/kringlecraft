@@ -40,6 +40,9 @@ def edit_world(world_id: int, name: str = None, description: str = None, url: st
 
 # ----------- Create functions -----------
 def create_world(name: str, description: str, url: str, visible: bool, archived: bool, user_id: int) -> World | None:
+    if find_world_by_name(name):
+        return None
+
     return create(World, name, description=description, url=url, visible=visible, archived=archived, user_id=user_id)
 
 

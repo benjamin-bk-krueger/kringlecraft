@@ -39,6 +39,9 @@ def edit_room(room_id: int, world_id: int, name: str = None, description: str = 
 
 # ----------- Create functions -----------
 def create_room(name: str, description: str, world_id: int, user_id: int) -> Room | None:
+    if find_world_room_by_name(world_id, name):
+        return None
+
     return create(Room, name, description=description, world_id=world_id, user_id=user_id)
 
 

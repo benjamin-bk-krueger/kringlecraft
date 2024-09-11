@@ -1,5 +1,4 @@
 import sqlalchemy as sa
-import sqlalchemy.orm as orm
 import kringlecraft.data.db_session as db_session
 
 from kringlecraft.data.modelbase import SqlAlchemyBase
@@ -100,9 +99,6 @@ def create(model: Type[S], entity_name=str, **kwargs) -> S | None:
     :param kwargs: Keyword arguments to create object fields.
     :return: Object of given type.
     """
-    if find_one(model, name=entity_name):
-        return None
-
     entity = model()
     setattr(entity, "name", entity_name)
     for key, value in kwargs.items():

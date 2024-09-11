@@ -59,6 +59,9 @@ def set_objective_challenge(objective_id: int, challenge: bytes) -> Objective | 
 # ----------- Create functions -----------
 def create_objective(name: str, description: str, difficulty: int, visible: bool, objective_type: int, room_id: int,
                      user_id: int) -> Objective | None:
+    if find_room_objective_by_name(room_id, name):
+        return None
+
     return create(Objective, name, description=description, difficulty=difficulty, visible=visible,
                   type=objective_type, room_id=room_id, user_id=user_id)
 
