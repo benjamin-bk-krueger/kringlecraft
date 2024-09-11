@@ -92,15 +92,13 @@ def edit(model: Type[S], entity_id=int, **kwargs) -> S | None:
 
 
 # ----------- Create functions -----------
-def create(model: Type[S], entity_name=str, **kwargs) -> S | None:
+def create(model: Type[S], **kwargs) -> S | None:
     """Create one object of given type in the database.
     :param model: Type of object.
-    :param entity_name: Name of object to create.
     :param kwargs: Keyword arguments to create object fields.
     :return: Object of given type.
     """
     entity = model()
-    setattr(entity, "name", entity_name)
     for key, value in kwargs.items():
         setattr(entity, key, value)
 
@@ -109,7 +107,7 @@ def create(model: Type[S], entity_name=str, **kwargs) -> S | None:
         session.add(entity)
         session.commit()
 
-        print(f"INFO: A new {model.__name__} named {entity_name} has been created with values {kwargs}")
+        print(f"INFO: A new {model.__name__} has been created with values {kwargs}")
 
         return entity
     finally:

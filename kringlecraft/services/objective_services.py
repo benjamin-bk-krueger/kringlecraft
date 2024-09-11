@@ -62,7 +62,7 @@ def create_objective(name: str, description: str, difficulty: int, visible: bool
     if find_room_objective_by_name(room_id, name):
         return None
 
-    return create(Objective, name, description=description, difficulty=difficulty, visible=visible,
+    return create(Objective, name=name, description=description, difficulty=difficulty, visible=visible,
                   type=objective_type, room_id=room_id, user_id=user_id)
 
 

@@ -43,7 +43,7 @@ def create_world(name: str, description: str, url: str, visible: bool, archived:
     if find_world_by_name(name):
         return None
 
-    return create(World, name, description=description, url=url, visible=visible, archived=archived, user_id=user_id)
+    return create(World, name=name, description=description, url=url, visible=visible, archived=archived, user_id=user_id)
 
 
 # ----------- Delete functions -----------
