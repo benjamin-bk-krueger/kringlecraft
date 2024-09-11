@@ -18,10 +18,10 @@ def get_count(model: Type[S], **kwargs) -> int | None:
     """
     session = db_session.create_session()
     try:
-        results: orm.Query = session.query(model)
+        entities = session.query(model)
         for key, value in kwargs.items():
-            results = results.filter(getattr(model, key) == value)
-        return results.count()
+            entities = entities.filter(getattr(model, key) == value)
+        return entities.count()
     finally:
         session.close()
 
@@ -36,10 +36,10 @@ def find_all(model: Type[S], order: str, **kwargs) -> list[S] | None:
     """
     session = db_session.create_session()
     try:
-        results: orm.Query = session.query(model)
+        entities = session.query(model)
         for key, value in kwargs.items():
-            results = results.filter(getattr(model, key) == value)
-        return results.order_by(sa.asc(getattr(model, order))).all()
+            entities = entities.filter(getattr(model, key) == value)
+        return entities.order_by(sa.asc(getattr(model, order))).all()
     finally:
         session.close()
 
@@ -51,22 +51,73 @@ def find_one(model: Type[S], **kwargs) -> S | None:
     :return: Object of given type."""
     session = db_session.create_session()
     try:
-        results: orm.Query = session.query(model)
+        entities = session.query(model)
         for key, value in kwargs.items():
-            results = results.filter(getattr(model, key) == value)
-        return results.first()
+            entities = entities.filter(getattr(model, key) == value)
+        return entities.first()
     finally:
         session.close()
 
 
-def get_choices(models: list[S], field_id: str = 'id', field_name: str = 'name') -> list[tuple[int, str]]:
+def get_choices(entities: list[S], field_id: str = 'id', field_name: str = 'name') -> list[tuple[int, str]]:
     """Get HTML compatible choices for given models.
-    :param models: List of models.
+    :param entities: List of entities.
     :param field_id: Field name containing ID.
     :param field_name: Field name containing Name.
     :return: List of choices.
     """
-    return [(getattr(model, field_id), getattr(model, field_name)) for model in models]
+    return [(getattr(entity, field_id), getattr(entity, field_name)) for entity in entities]
+
+
+# ----------- Edit functions -----------
+def edit(model: Type[S], entity_id=int, **kwargs) -> S | None:
+    """Edit one object of given type in the database.
+    :param model: Type of object.
+    :param entity_id: ID of object to edit.
+    :param kwargs: Keyword arguments to edit object fields.
+    :return: Object of given type.
+    """
+    session = db_session.create_session()
+    try:
+        entity = session.query(model).filter(getattr(model, 'id') == entity_id).first()
+        if entity:
+            for key, value in kwargs.items():
+                setattr(entity, key, value)
+
+            session.commit()
+            print(f"INFO: Existing {model.__name__} information changed for ID {entity_id} with values {kwargs}")
+
+            return entity
+    finally:
+        session.close()
+
+
+# ----------- Create functions -----------
+def create(model: Type[S], entity_name=str, **kwargs) -> S | None:
+    """Create one object of given type in the database.
+    :param model: Type of object.
+    :param entity_name: Name of object to create.
+    :param kwargs: Keyword arguments to create object fields.
+    :return: Object of given type.
+    """
+    if find_one(model, name=entity_name):
+        return None
+
+    entity = model()
+    setattr(entity, "name", entity_name)
+    for key, value in kwargs.items():
+        setattr(entity, key, value)
+
+    session = db_session.create_session()
+    try:
+        session.add(entity)
+        session.commit()
+
+        print(f"INFO: A new {model.__name__} named {entity_name} has been created with values {kwargs}")
+
+        return entity
+    finally:
+        session.close()
 
 
 # ----------- Delete functions -----------
@@ -78,11 +129,11 @@ def delete(model: Type[S], **kwargs) -> S | None:
     """
     session = db_session.create_session()
     try:
-        results: orm.Query = session.query(model)
+        entities = session.query(model)
         for key, value in kwargs.items():
-            results = results.filter(getattr(model, key) == value)
+            entities = entities.filter(getattr(model, key) == value)
 
-        entity = results.first()
+        entity = entities.first()
         session.delete(entity)
         session.commit()
         print(f"INFO: {model.__name__} {kwargs} deleted")

@@ -1,7 +1,5 @@
-import kringlecraft.data.db_session as db_session
-
 from kringlecraft.data.objectives import Objective
-from kringlecraft.services.__all_services import (get_count, find_all, find_one, delete, get_choices)
+from kringlecraft.services.__all_services import (get_count, find_one, find_all, create, edit, delete, get_choices)
 
 
 # ----------- Count functions -----------
@@ -43,77 +41,26 @@ def get_objective_types() -> dict[int, str]:
 
 
 def get_objective_challenge(objective_id: int) -> str | None:
-    session = db_session.create_session()
-    try:
-        objective = session.query(Objective).filter(Objective.id == objective_id).first()
-        return "New challenge" if objective.challenge is None else str(bytes(objective.challenge), 'utf-8')
-    finally:
-        session.close()
+    entity = find_one(Objective, id=objective_id)
+    return "New challenge" if entity.challenge is None else str(bytes(entity.challenge), 'utf-8')
 
 
 # ----------- Edit functions -----------
 def edit_objective(objective_id: int, room_id: int, name: str = None, description: str = None, difficulty: int = None,
                    visible: bool = None, objective_type: int = None) -> Objective | None:
-    session = db_session.create_session()
-    try:
-        objective = session.query(Objective).filter(Objective.id == objective_id).first()
-        if objective:
-            objective.name = name if name is not None else objective.name
-            objective.description = description if description is not None else objective.description
-            objective.difficulty = difficulty if difficulty is not None else objective.difficulty
-            objective.visible = visible if visible is not None else objective.visible
-            objective.type = objective_type if objective_type is not None else objective.type
-            objective.room_id = room_id if room_id is not None else objective.room_id
-
-            session.commit()
-
-            print(f"INFO: Objective information changed for objective {objective.name}")
-
-            return objective
-    finally:
-        session.close()
+    return edit(Objective, objective_id, room_id=room_id, name=name, description=description, difficulty=difficulty,
+                visible=visible, type=objective_type)
 
 
 def set_objective_challenge(objective_id: int, challenge: bytes) -> Objective | None:
-    session = db_session.create_session()
-    try:
-        objective = session.query(Objective).filter(Objective.id == objective_id).first()
-        if objective:
-            objective.challenge = challenge
-            session.commit()
-
-            print(f"INFO: Challenge changed for {objective.name}")
-
-            return objective
-    finally:
-        session.close()
+    return edit(Objective, objective_id, challenge=challenge)
 
 
 # ----------- Create functions -----------
 def create_objective(name: str, description: str, difficulty: int, visible: bool, objective_type: int, room_id: int,
                      user_id: int) -> Objective | None:
-    if find_room_objective_by_name(room_id, name):
-        return None
-
-    objective = Objective()
-    objective.name = name
-    objective.description = description
-    objective.difficulty = difficulty
-    objective.visible = visible
-    objective.type = objective_type
-    objective.room_id = room_id
-    objective.user_id = user_id
-
-    session = db_session.create_session()
-    try:
-        session.add(objective)
-        session.commit()
-
-        print(f"INFO: A new objective {objective.name} has been created")
-
-        return objective
-    finally:
-        session.close()
+    return create(Objective, name, description=description, difficulty=difficulty, visible=visible,
+                  type=objective_type, room_id=room_id, user_id=user_id)
 
 
 # ----------- Delete functions -----------
