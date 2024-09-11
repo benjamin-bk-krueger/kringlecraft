@@ -1,42 +1,25 @@
 import kringlecraft.data.db_session as db_session
+
 from kringlecraft.data.solutions import Solution
+from kringlecraft.services.__all_services import (get_count, find_one, find_all)
 
 
 # ----------- Count functions -----------
 def get_active_count() -> int | None:
-    session = db_session.create_session()
-    try:
-        return session.query(Solution).filter(Solution.visible == True).filter(Solution.completed == True).count()
-    finally:
-        session.close()
+    return get_count(Solution, visible=True, completed=True)
 
 
 # ----------- Find functions -----------
 def find_active_solution_by_id(solution_id: int) -> Solution | None:
-    session = db_session.create_session()
-    try:
-        return (session.query(Solution).filter(Solution.id == solution_id).filter(Solution.visible == True).
-                filter(Solution.completed == True).first())
-    finally:
-        session.close()
+    return find_one(Solution, id=solution_id, visible=True, completed=True)
 
 
 def find_objective_solution_for_user(objective_id: int, user_id: int) -> Solution | None:
-    session = db_session.create_session()
-    try:
-        return session.query(Solution).filter(Solution.user_id == user_id).filter(Solution.objective_id ==
-                                                                                  objective_id).first()
-    finally:
-        session.close()
+    return find_one(Solution, user_id=user_id, objective_id=objective_id)
 
 
 def find_active_solutions(objective_id: int) -> list[Solution] | None:
-    session = db_session.create_session()
-    try:
-        return (session.query(Solution).filter(Solution.objective_id == objective_id).filter(Solution.visible == True).
-                filter(Solution.completed == True).order_by(Solution.created_date.asc()).all())
-    finally:
-        session.close()
+    return find_all(Solution, 'created_date', objective_id=objective_id, visible=True, completed=True)
 
 
 # ----------- Edit functions -----------

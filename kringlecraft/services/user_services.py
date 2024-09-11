@@ -1,6 +1,7 @@
 import kringlecraft.data.db_session as db_session
+
 from kringlecraft.data.users import User
-from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete, get_choices)
+from kringlecraft.services.__all_services import (get_count, find_all, find_one, delete, get_choices)
 from kringlecraft.utils.misc_tools import (random_hash, hash_text, verify_hash)
 from kringlecraft.utils.constants import Role  # Import the constants
 
@@ -31,15 +32,15 @@ def get_user_count() -> int | None:
 
 # ----------- Find functions -----------
 def find_all_users() -> list[User] | None:
-    return find_all(User)
+    return find_all(User, 'name')
 
 
 def find_user_by_id(user_id: int) -> User | None:
-    return find_by_id(User, user_id)
+    return find_one(User, id=user_id)
 
 
 def find_user_by_email(email: str) -> User | None:
-    return find_by_field(User, 'email', email)
+    return find_one(User, email=email)
 
 
 def get_user_choices(users: list[User]) -> list[tuple[int, str]]:
@@ -47,19 +48,11 @@ def get_user_choices(users: list[User]) -> list[tuple[int, str]]:
 
 
 def find_active_users() -> list[User] | None:
-    session = db_session.create_session()
-    try:
-        return session.query(User).filter(User.active == True).order_by(User.name.asc()).all()
-    finally:
-        session.close()
+    return find_all(User, 'name', active=True)
 
 
 def find_active_user_by_id(user_id: int) -> User | None:
-    session = db_session.create_session()
-    try:
-        return session.query(User).filter(User.active == True).filter(User.id == user_id).first()
-    finally:
-        session.close()
+    return find_one(User, active=True, id=user_id)
 
 
 # ----------- Edit functions -----------
@@ -173,4 +166,4 @@ def create_user(name: str, email: str, password: str) -> User | None:
 
 # ----------- Delete functions -----------
 def delete_user(user_id: int) -> User | None:
-    return delete(User, user_id, name_field='email')
+    return delete(User, id=user_id)

@@ -1,7 +1,7 @@
 import kringlecraft.data.db_session as db_session
+
 from kringlecraft.data.rooms import Room
-from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete,
-                                                  get_choices)
+from kringlecraft.services.__all_services import (get_count, find_all, find_one, delete, get_choices)
 
 
 # ----------- Count functions -----------
@@ -11,15 +11,15 @@ def get_room_count() -> int | None:
 
 # ----------- Find functions -----------
 def find_all_rooms() -> list[Room] | None:
-    return find_all(Room)
+    return find_all(Room, 'name')
 
 
 def find_room_by_id(room_id: int) -> Room | None:
-    return find_by_id(Room, room_id)
+    return find_one(Room, id=room_id)
 
 
 def find_room_by_name(name: str) -> Room | None:
-    return find_by_field(Room, 'name', name)
+    return find_one(Room, name=name)
 
 
 def get_room_choices(rooms: list[Room]) -> list[tuple[int, str]]:
@@ -27,19 +27,11 @@ def get_room_choices(rooms: list[Room]) -> list[tuple[int, str]]:
 
 
 def find_world_rooms(world_id: int) -> list[Room] | None:
-    session = db_session.create_session()
-    try:
-        return session.query(Room).filter(Room.world_id == world_id).order_by(Room.name.asc()).all()
-    finally:
-        session.close()
+    return find_all(Room, 'name', world_id=world_id)
 
 
 def find_world_room_by_name(world_id: int, name: str) -> Room | None:
-    session = db_session.create_session()
-    try:
-        return session.query(Room).filter(Room.world_id == world_id).filter(Room.name == name).first()
-    finally:
-        session.close()
+    return find_one(Room, world_id=world_id, name=name)
 
 
 # ----------- Edit functions -----------
@@ -86,4 +78,4 @@ def create_room(name: str, description: str, world_id: int, user_id: int) -> Roo
 
 # ----------- Delete functions -----------
 def delete_room(room_id: int) -> Room | None:
-    return delete(Room, room_id)
+    return delete(Room, id=room_id)

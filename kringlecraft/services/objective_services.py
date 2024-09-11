@@ -1,7 +1,7 @@
 import kringlecraft.data.db_session as db_session
+
 from kringlecraft.data.objectives import Objective
-from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete,
-                                                  get_choices)
+from kringlecraft.services.__all_services import (get_count, find_all, find_one, delete, get_choices)
 
 
 # ----------- Count functions -----------
@@ -11,15 +11,15 @@ def get_objective_count() -> int | None:
 
 # ----------- Find functions -----------
 def find_all_objectives() -> list[Objective] | None:
-    return find_all(Objective)
+    return find_all(Objective, 'name')
 
 
 def find_objective_by_id(objective_id: int) -> Objective | None:
-    return find_by_id(Objective, objective_id)
+    return find_one(Objective, id=objective_id)
 
 
 def find_objective_by_name(name: str) -> Objective | None:
-    return find_by_field(Objective, 'name', name)
+    return find_one(Objective, name=name)
 
 
 def get_objective_choices(objectives: list[Objective]) -> list[tuple[int, str]]:
@@ -27,19 +27,11 @@ def get_objective_choices(objectives: list[Objective]) -> list[tuple[int, str]]:
 
 
 def find_room_objectives(room_id: int) -> list[Objective] | None:
-    session = db_session.create_session()
-    try:
-        return session.query(Objective).filter(Objective.room_id == room_id).order_by(Objective.name.asc()).all()
-    finally:
-        session.close()
+    return find_all(Objective, 'name', room_id=room_id)
 
 
 def find_room_objective_by_name(room_id: int, name: str) -> Objective | None:
-    session = db_session.create_session()
-    try:
-        return session.query(Objective).filter(Objective.room_id == room_id).filter(Objective.name == name).first()
-    finally:
-        session.close()
+    return find_one(Objective, room_id=room_id, name=name)
 
 
 def get_objective_type_choices() -> list[tuple[int, str]]:
@@ -126,4 +118,4 @@ def create_objective(name: str, description: str, difficulty: int, visible: bool
 
 # ----------- Delete functions -----------
 def delete_objective(objective_id: int) -> Objective | None:
-    return delete(Objective, objective_id)
+    return delete(Objective, id=objective_id)

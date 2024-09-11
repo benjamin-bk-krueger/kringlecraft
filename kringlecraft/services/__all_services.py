@@ -1,61 +1,92 @@
-from sqlalchemy import asc
-from typing import TypeVar, Type
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 import kringlecraft.data.db_session as db_session
 
+from kringlecraft.data.modelbase import SqlAlchemyBase
+from typing import TypeVar, Type
 
-T = TypeVar('T')
+
+S = TypeVar('S', bound=SqlAlchemyBase) # Can be any subtype of str
 
 
 # ----------- Count functions -----------
-def get_count(model: Type[T]) -> int | None:
+def get_count(model: Type[S], **kwargs) -> int | None:
+    """Count all objects of given type in the database.
+    :param model: Type of object.
+    :param kwargs: Keyword arguments to filter results.
+    :return: Number of all objects of given type.
+    """
     session = db_session.create_session()
     try:
-        return session.query(model).count()
+        results: orm.Query = session.query(model)
+        for key, value in kwargs.items():
+            results = results.filter(getattr(model, key) == value)
+        return results.count()
     finally:
         session.close()
 
 
 # ----------- Find functions -----------
-def find_all(model: Type[T], order_by_field: str = 'name') -> list[T] | None:
+def find_all(model: Type[S], order: str, **kwargs) -> list[S] | None:
+    """Find all objects of given type in the database.
+    :param model: Type of object.
+    :param order: Field name to sort by.
+    :param kwargs: Keyword arguments to filter results.
+    :return: List of all objects of given type.
+    """
     session = db_session.create_session()
     try:
-        return session.query(model).order_by(asc(getattr(model, order_by_field))).all()
+        results: orm.Query = session.query(model)
+        for key, value in kwargs.items():
+            results = results.filter(getattr(model, key) == value)
+        return results.order_by(sa.asc(getattr(model, order))).all()
     finally:
         session.close()
 
 
-def find_by_id(model: Type[T], entity_id: int) -> T | None:
+def find_one(model: Type[S], **kwargs) -> S | None:
+    """Find one object of given type in the database.
+    :param model: Type of object.
+    :param kwargs: Keyword arguments to filter results.
+    :return: Object of given type."""
     session = db_session.create_session()
     try:
-        return session.query(model).filter(model.id == entity_id).first()
+        results: orm.Query = session.query(model)
+        for key, value in kwargs.items():
+            results = results.filter(getattr(model, key) == value)
+        return results.first()
     finally:
         session.close()
 
 
-def find_by_field(model: Type[T], field: str, value) -> T | None:
-    session = db_session.create_session()
-    try:
-        return session.query(model).filter(getattr(model, field) == value).first()
-    finally:
-        session.close()
-
-
-def get_choices(entities: list[T], id_field: str = 'id', name_field: str = 'name') -> list[tuple[int, str]]:
-    return [(getattr(entity, id_field), getattr(entity, name_field)) for entity in entities]
+def get_choices(models: list[S], field_id: str = 'id', field_name: str = 'name') -> list[tuple[int, str]]:
+    """Get HTML compatible choices for given models.
+    :param models: List of models.
+    :param field_id: Field name containing ID.
+    :param field_name: Field name containing Name.
+    :return: List of choices.
+    """
+    return [(getattr(model, field_id), getattr(model, field_name)) for model in models]
 
 
 # ----------- Delete functions -----------
-def delete(model: Type[T], entity_id: int, id_field: str = 'id', name_field: str = 'name') -> T | None:
+def delete(model: Type[S], **kwargs) -> S | None:
+    """Delete all objects of given type in the database.
+    :param model: Type of object.
+    :param kwargs: Keyword arguments to filter results.
+    :return: Objects of given type.
+    """
     session = db_session.create_session()
     try:
-        entity = session.query(model).filter(getattr(model, id_field) == entity_id).first()
-        if entity:
-            session.query(model).filter(getattr(model, id_field) == entity_id).delete()
-            session.commit()
+        results: orm.Query = session.query(model)
+        for key, value in kwargs.items():
+            results = results.filter(getattr(model, key) == value)
 
-            entity_name = getattr(entity, name_field)
-            print(f"INFO: {model.__name__} {entity_name} deleted")
+        entity = results.first()
+        session.delete(entity)
+        session.commit()
+        print(f"INFO: {model.__name__} {kwargs} deleted")
 
-            return entity
+        return entity
     finally:
         session.close()

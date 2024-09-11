@@ -1,7 +1,7 @@
 import kringlecraft.data.db_session as db_session
+
 from kringlecraft.data.worlds import World
-from kringlecraft.services.__all_services import (get_count, find_all, find_by_id, find_by_field, delete,
-                                                  get_choices)
+from kringlecraft.services.__all_services import (get_count, find_all, find_one, delete, get_choices)
 
 
 # ----------- Count functions -----------
@@ -11,15 +11,15 @@ def get_world_count() -> int | None:
 
 # ----------- Find functions -----------
 def find_all_worlds() -> list[World] | None:
-    return find_all(World)
+    return find_all(World, 'name')
 
 
 def find_world_by_id(world_id: int) -> World | None:
-    return find_by_id(World, world_id)
+    return find_one(World, id=world_id)
 
 
 def find_world_by_name(name: str) -> World | None:
-    return find_by_field(World, 'name', name)
+    return find_one(World, name=name)
 
 
 def get_world_choices(worlds: list[World]) -> list[tuple[int, str]]:
@@ -27,19 +27,11 @@ def get_world_choices(worlds: list[World]) -> list[tuple[int, str]]:
 
 
 def find_active_worlds() -> list[World] | None:
-    session = db_session.create_session()
-    try:
-        return session.query(World).filter(World.archived == False).order_by(World.name.asc()).all()
-    finally:
-        session.close()
+    return find_all(World, 'name', archived=False)
 
 
 def find_visible_worlds() -> list[World] | None:
-    session = db_session.create_session()
-    try:
-        return session.query(World).filter(World.visible == True).order_by(World.name.asc()).all()
-    finally:
-        session.close()
+    return find_all(World, 'name', visible=True)
 
 
 # ----------- Edit functions -----------
@@ -91,4 +83,4 @@ def create_world(name: str, description: str, url: str, visible: bool, archived:
 
 # ----------- Delete functions -----------
 def delete_world(world_id: int) -> World | None:
-    return delete(World, world_id)
+    return delete(World, id=world_id)
