@@ -1,28 +1,22 @@
-import kringlecraft.data.db_session as db_session
-
 from kringlecraft.data.users import User
-from kringlecraft.services.__all_services import (get_count, find_all, find_one, delete, get_choices)
+from kringlecraft.services.__all_services import (get_count, find_one, find_all, create, edit, delete, get_choices)
 from kringlecraft.utils.misc_tools import (random_hash, hash_text, verify_hash)
 from kringlecraft.utils.constants import Role  # Import the constants
 
 
 # ----------- Login functions -----------
 def login_user(email: str, password: str) -> User | None:
-    session = db_session.create_session()
-    try:
-        user = session.query(User).filter(User.email == email).first()
-        if not user:
-            print(f"INFO: Login Failure for user {email}")
+    print(f"INFO: Try to LOGIN user {email} - ", end="")
+    if user := find_one(User, email=email):
+        if verify_hash(user.hashed_password, password):
+            print("SUCCESS")
+            return user
+        else:
+            print("FAILED")
             return None
-
-        if not verify_hash(user.hashed_password, password):
-            print(f"INFO: Login Failure for user {email}")
-            return None
-
-        print(f"INFO: Login Successful for user {email}")
-        return user
-    finally:
-        session.close()
+    else:
+        print("NOT FOUND")
+        return None
 
 
 # ----------- Count functions -----------
@@ -57,86 +51,28 @@ def find_active_user_by_id(user_id: int) -> User | None:
 
 # ----------- Edit functions -----------
 def edit_user(user_id: int, email: str = None, description: str = None, notification: bool = None) -> User | None:
-    session = db_session.create_session()
-    try:
-        user = session.query(User).filter(User.id == user_id).first()
-        if user:
-            user.email = email if email is not None else user.email
-            user.description = description if description is not None else user.description
-            user.notification = notification if notification is not None else user.notification
-
-            session.commit()
-
-            print(f"INFO: User information changed for user {user.email}")
-
-            return user
-    finally:
-        session.close()
+    return edit(User, user_id, email=email, description=description, notification=notification)
 
 
 def change_user_password(user_id: int, password: str) -> User | None:
-    session = db_session.create_session()
-    try:
-        user = session.query(User).filter(User.id == user_id).first()
-        if user:
-            user.hashed_password = hash_text(password)
-
-            session.commit()
-
-            print(f"INFO: User password changed for user {user.email}")
-
-            return user
-    finally:
-        session.close()
+    return edit(User, user_id, hashed_password=hash_text(password))
 
 
 def enable_user(user_id: int) -> User | None:
     # check a valid student account and enable an account
-    session = db_session.create_session()
-    try:
-        user = session.query(User).filter(User.active == 0).filter(User.id == user_id).first()
-        if user:
-            user.active = 1
-            session.commit()
-
-            print(f"INFO: Account enabled for user {user.email}")
-
-            return user
-    finally:
-        session.close()
+    return edit(User, user_id, active=1)
 
 
 def prepare_user(email: str) -> User | None:
     # check a valid student account and sent out password reset mail
-    session = db_session.create_session()
-    try:
-        user = session.query(User).filter(User.active == 1).filter(User.email == email).first()
-        if user:
-            user.reset_password = random_hash()
-            session.commit()
-
-            print(f"INFO: Reset password prepared for user {user.email}")
-
-            return user
-    finally:
-        session.close()
+    if user := find_one(User, active=1, email=email):
+        return edit(User, user.id, reset_password=random_hash())
 
 
 def reset_user(hash_value: str, password: str) -> User | None:
     # check valid student account and valid password reset link
-    session = db_session.create_session()
-    try:
-        user = session.query(User).filter(User.active == 1).filter(User.reset_password == hash_value).first()
-        if user:
-            user.hashed_password = hash_text(password)
-            user.reset_password = ""
-            session.commit()
-
-            print(f"INFO: Password reset performed for user {user.email}")
-
-            return user
-    finally:
-        session.close()
+    if user := find_one(User, active=1, reset_password=hash_value):
+        return edit(User, user.id, hashed_password=hash_text(password), reset_password="")
 
 
 # ----------- Create functions -----------
@@ -144,24 +80,7 @@ def create_user(name: str, email: str, password: str) -> User | None:
     if find_user_by_email(email):
         return None
 
-    user = User()
-    user.email = email
-    user.name = name
-    user.hashed_password = hash_text(password)
-    user.role = Role.USER.value
-    user.active = 0
-    user.notification = 0
-
-    session = db_session.create_session()
-    try:
-        session.add(user)
-        session.commit()
-
-        print(f"INFO: Register approval for user {user.email}")
-
-        return user
-    finally:
-        session.close()
+    return create(User, email=email, name=name, hashed_password=hash_text(password), role=Role.USER.value, active=0, notification=0)
 
 
 # ----------- Delete functions -----------
