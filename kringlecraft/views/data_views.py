@@ -679,7 +679,7 @@ def answer(objective_id):
 
     md_challenge = "" if my_objective.challenge is None else get_markdown(my_objective.challenge)
     all_solutions = solution_services.find_active_solutions(objective_id)
-    md_solution = None if len(all_solutions) != 1 else get_markdown(all_solutions[0].notes)
+    md_solution = None if len(all_solutions) != 1 or my_world.visible == False else get_markdown(all_solutions[0].notes)
     candidate_solutions = None if len(all_solutions) < 1 or my_world.visible == False else all_solutions
     user_list = {key: value for key, value in user_services.get_user_choices(user_services.find_all_users())}
 
