@@ -28,6 +28,10 @@ def find_room_objectives(room_id: int) -> list[Objective] | None:
     return find_all(Objective, 'name', room_id=room_id)
 
 
+def find_room_objectives_visible(room_id: int) -> list[Objective] | None:
+    return find_all(Objective, 'name', room_id=room_id, visible=True)
+
+
 def find_room_objective_by_name(room_id: int, name: str) -> Objective | None:
     return find_one(Objective, room_id=room_id, name=name)
 

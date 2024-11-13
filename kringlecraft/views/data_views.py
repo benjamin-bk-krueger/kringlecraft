@@ -453,7 +453,10 @@ def objectives(room_id):
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="Room does not exist.")
 
-    all_objectives = objective_services.find_room_objectives(my_room.id)
+    if current_user.is_authenticated and current_user.role in (Role.ADMIN.value, Role.USER.value):
+        all_objectives = objective_services.find_room_objectives(my_room.id)
+    else:
+        all_objectives = objective_services.find_room_objectives_visible(my_room.id)
     objective_images = read_all_files_recursive("objective/logo-*")
     my_world = world_services.find_world_by_id(my_room.world_id)
 
