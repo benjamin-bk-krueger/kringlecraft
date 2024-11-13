@@ -13,7 +13,7 @@ from kringlecraft.data.invitations import Invitation
 
 
 class SummaryForm(FlaskForm):
-    visible = BooleanField('Visible', default=True)
+    visible = BooleanField('Visible in Report', default=True)
 
     @property
     def visible_content(self):
@@ -29,7 +29,7 @@ class SummaryForm(FlaskForm):
 
 
 class SolutionForm(FlaskForm):
-    visible = BooleanField('Visible', default=True)
+    visible = BooleanField('Solution visible', default=True)
     completed = BooleanField('Completed', default=True)
     ctf_flag = StringField('CTF Flag', validators=[Length(max=100), space_ascii_validator])
 

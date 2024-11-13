@@ -101,7 +101,10 @@ def worlds():
 
     # (2) initialize form data
     highlight = flask.request.args.get('highlight', default=0, type=int)
-    all_worlds = world_services.find_all_worlds()
+    if current_user.is_authenticated and current_user.role in (Role.ADMIN.value, Role.USER.value):
+        all_worlds = world_services.find_all_worlds()
+    else:
+        all_worlds = world_services.find_all_worlds_enabled()
     world_images = read_all_files_recursive("world/logo-*")
 
     # (6a) show rendered page
@@ -206,7 +209,7 @@ def world_post(world_id):
         # (4a) perform operations
         my_world = world_services.edit_world(world_id, world_form.name_content, world_form.description_content,
                                              world_form.url_content, world_form.visible_content,
-                                             world_form.archived_content)
+                                             world_form.disabled_content, world_form.archived_content)
 
         if not my_world:
             # (6e) show dedicated error page
@@ -263,7 +266,10 @@ def rooms(world_id):
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="World does not exist.")
 
-    all_rooms = room_services.find_world_rooms(my_world.id)
+    if current_user.is_authenticated and current_user.role in (Role.ADMIN.value, Role.USER.value):
+        all_rooms = room_services.find_world_rooms(my_world.id)
+    else:
+        all_rooms = room_services.find_world_rooms_enabled(my_world.id)
     room_images = read_all_files_recursive("room/logo-*")
 
     # (6a) show rendered page
@@ -386,7 +392,7 @@ def room_post(room_id):
                                            my_room.name == room_form.name_content) and force_check == 0:
         # (4a) perform operations
         my_room = room_services.edit_room(room_id, room_form.world_content, room_form.name_content,
-                                          room_form.description_content)
+                                          room_form.description_content, room_form.disabled_content)
 
         if not my_room:
             # (6e) show dedicated error page
@@ -456,7 +462,7 @@ def objectives(room_id):
     if current_user.is_authenticated and current_user.role in (Role.ADMIN.value, Role.USER.value):
         all_objectives = objective_services.find_room_objectives(my_room.id)
     else:
-        all_objectives = objective_services.find_room_objectives_visible(my_room.id)
+        all_objectives = objective_services.find_room_objectives_enabled(my_room.id)
     objective_images = read_all_files_recursive("objective/logo-*")
     my_world = world_services.find_world_by_id(my_room.world_id)
 
@@ -602,7 +608,8 @@ def objective_post(objective_id):
                                                          objective_form.name_content,
                                                          objective_form.description_content,
                                                          objective_form.difficulty_content,
-                                                         objective_form.visible_content, objective_form.type_content)
+                                                         objective_form.visible_content,
+                                                         objective_form.disabled_content, objective_form.type_content)
 
         if not my_objective:
             # (6e) show dedicated error page
@@ -671,7 +678,10 @@ def answer(objective_id):
     import kringlecraft.services.user_services as user_services
 
     # (2) initialize form data
-    my_objective = objective_services.find_objective_by_id(objective_id)
+    if current_user.is_authenticated and current_user.role in (Role.ADMIN.value, Role.USER.value):
+        my_objective = objective_services.find_objective_by_id(objective_id)
+    else:
+        my_objective = objective_services.find_objective_by_id_enabled(objective_id)
     if not my_objective:
         # (6e) show dedicated error page
         return flask.render_template('home/error.html', error_message="Objective does not exist.")

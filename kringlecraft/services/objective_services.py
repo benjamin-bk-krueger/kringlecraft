@@ -16,6 +16,10 @@ def find_objective_by_id(objective_id: int) -> Objective | None:
     return find_one(Objective, id=objective_id)
 
 
+def find_objective_by_id_enabled(objective_id: int) -> Objective | None:
+    return find_one(Objective, id=objective_id, disabled=False)
+
+
 def find_objective_by_name(name: str) -> Objective | None:
     return find_one(Objective, name=name)
 
@@ -28,8 +32,8 @@ def find_room_objectives(room_id: int) -> list[Objective] | None:
     return find_all(Objective, 'name', room_id=room_id)
 
 
-def find_room_objectives_visible(room_id: int) -> list[Objective] | None:
-    return find_all(Objective, 'name', room_id=room_id, visible=True)
+def find_room_objectives_enabled(room_id: int) -> list[Objective] | None:
+    return find_all(Objective, 'name', room_id=room_id, disabled=False)
 
 
 def find_room_objective_by_name(room_id: int, name: str) -> Objective | None:
@@ -51,9 +55,9 @@ def get_objective_challenge(objective_id: int) -> str | None:
 
 # ----------- Edit functions -----------
 def edit_objective(objective_id: int, room_id: int, name: str = None, description: str = None, difficulty: int = None,
-                   visible: bool = None, objective_type: int = None) -> Objective | None:
+                   visible: bool = None, disabled: bool = None, objective_type: int = None) -> Objective | None:
     return edit(Objective, objective_id, room_id=room_id, name=name, description=description, difficulty=difficulty,
-                visible=visible, type=objective_type)
+                visible=visible, disabled=disabled, type=objective_type)
 
 
 def set_objective_challenge(objective_id: int, challenge: bytes) -> Objective | None:

@@ -12,6 +12,10 @@ def find_all_worlds() -> list[World] | None:
     return find_all(World, 'name')
 
 
+def find_all_worlds_enabled() -> list[World] | None:
+    return find_all(World, 'name', disabled=False)
+
+
 def find_world_by_id(world_id: int) -> World | None:
     return find_one(World, id=world_id)
 
@@ -34,8 +38,9 @@ def find_visible_worlds() -> list[World] | None:
 
 # ----------- Edit functions -----------
 def edit_world(world_id: int, name: str = None, description: str = None, url: str = None, visible: bool = None,
-               archived: bool = None) -> World | None:
-    return edit(World, world_id, name=name, description=description, url=url, visible=visible, archived=archived)
+               disabled: bool = None, archived: bool = None) -> World | None:
+    return edit(World, world_id, name=name, description=description, url=url, visible=visible, disabled=disabled,
+                archived=archived)
 
 
 # ----------- Create functions -----------

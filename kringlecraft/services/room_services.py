@@ -28,13 +28,17 @@ def find_world_rooms(world_id: int) -> list[Room] | None:
     return find_all(Room, 'name', world_id=world_id)
 
 
+def find_world_rooms_enabled(world_id: int) -> list[Room] | None:
+    return find_all(Room, 'name', world_id=world_id, disabled=False)
+
+
 def find_world_room_by_name(world_id: int, name: str) -> Room | None:
     return find_one(Room, world_id=world_id, name=name)
 
 
 # ----------- Edit functions -----------
-def edit_room(room_id: int, world_id: int, name: str = None, description: str = None) -> Room | None:
-    return edit(Room, room_id, world_id=world_id, name=name, description=description)
+def edit_room(room_id: int, world_id: int, name: str = None, description: str = None, disabled: bool = None) -> Room | None:
+    return edit(Room, room_id, world_id=world_id, name=name, description=description, disabled=disabled)
 
 
 # ----------- Create functions -----------

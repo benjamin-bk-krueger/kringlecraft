@@ -81,6 +81,13 @@
                 {% for error in room_form.description.errors %}
                     <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
                 {% endfor %}
+                <div class="form-check mt-2 mb-2">
+                    <label class="form-check-label" for="disabled">{{ room_form.disabled.label }}</label>
+                    {{ room_form.disabled(class="form-check-input") }}
+                </div>
+                {% for error in room_form.disabled.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
                 <div class="form-group mt-2 mb-2">
                     <label for="{{ room_form.world.name }}">{{ room_form.world.label }}</label>
                     {{ room_form.world(class="form-select") }}

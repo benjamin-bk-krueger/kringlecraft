@@ -95,6 +95,13 @@
                     <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
                 {% endfor %}
                 <div class="form-check mt-2 mb-2">
+                    <label class="form-check-label" for="disabled">{{ world_form.disabled.label }}</label>
+                    {{ world_form.disabled(class="form-check-input") }}
+                </div>
+                {% for error in world_form.disabled.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
+                <div class="form-check mt-2 mb-2">
                     <label class="form-check-label" for="archived">{{ world_form.archived.label }}</label>
                     {{ world_form.archived(class="form-check-input") }}
                 </div>

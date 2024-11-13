@@ -104,6 +104,13 @@
                 {% for error in objective_form.visible.errors %}
                     <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
                 {% endfor %}
+                <div class="form-check mt-2 mb-2">
+                    <label class="form-check-label" for="disabled">{{ objective_form.disabled.label }}</label>
+                    {{ objective_form.disabled(class="form-check-input") }}
+                </div>
+                {% for error in objective_form.disabled.errors %}
+                    <div class="alert alert-warning"><strong>Warning!</strong> {{ error }}</div>
+                {% endfor %}
             </form>
 
             <button type="submit" class="btn btn-primary mt-4 btn-space" form="form_edit"><i class="bi bi-check"></i> {% if page_mode == "edit" %}Update{% else %}Create{% endif %}</button>

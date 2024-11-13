@@ -18,6 +18,7 @@ class Room(SqlAlchemyBase):
     world_id: int = sa.Column(sa.Integer, sa.ForeignKey('worlds.id', ondelete='CASCADE'))
     name: str = sa.Column(sa.String, index=True, nullable=False)
     description: str = sa.Column(sa.String, nullable=True)
+    disabled: bool = sa.Column(sa.Boolean, nullable=False, default=False)
     created_date: datetime = sa.Column(sa.DateTime, default=datetime.now, index=True)
     modified_date: datetime = sa.Column(sa.DateTime, default=datetime.now, index=True)
 
