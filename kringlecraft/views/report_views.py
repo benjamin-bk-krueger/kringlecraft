@@ -37,13 +37,13 @@ def sitemap():
     all_urls.append(SitemapURL(www_server + flask.url_for("data.stats"), sitemap_date, WEEKLY))
 
     all_urls.append(SitemapURL(www_server + flask.url_for("data.worlds"), sitemap_date, WEEKLY))
-    all_worlds = world_services.find_all_worlds()
+    all_worlds = world_services.find_all_worlds_enabled()
     for world in all_worlds:
         all_urls.append(SitemapURL(www_server + flask.url_for("data.rooms", world_id=world.id), sitemap_date, WEEKLY))
-        all_rooms = room_services.find_world_rooms(world.id)
+        all_rooms = room_services.find_world_rooms_enabled(world.id)
         for room in all_rooms:
             all_urls.append(SitemapURL(www_server + flask.url_for("data.objectives", room_id=room.id), sitemap_date, WEEKLY))
-            all_objectives = objective_services.find_room_objectives(room.id)
+            all_objectives = objective_services.find_room_objectives_enabled(room.id)
             for objective in all_objectives:
                 all_urls.append(SitemapURL(www_server + flask.url_for("data.answer", objective_id=objective.id), sitemap_date, WEEKLY))
 
