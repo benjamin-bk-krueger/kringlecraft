@@ -2,7 +2,7 @@
 
 ## About this Report
 
-This report was created on [KringleCraft.com](https://www.kringlecraft.com), */ˈkrɪŋ.ɡəl krɑːft ˈkɑːm/*. An online CTF solution editor and report generator inspired by [SANS Holiday Hack Challenge & KringleCon](https://www.sans.org/mlp/holiday-hack-challenge/).
+This report was created on [KringleCraft](https://craft.kringle.info), */ˈkrɪŋ.ɡəl krɑːft/*. An online CTF solution editor and report generator inspired by [SANS Holiday Hack Challenge & KringleCon](https://www.sans.org/mlp/holiday-hack-challenge/).
 
 Makes creating solutions and reports easy and fun 😀
 

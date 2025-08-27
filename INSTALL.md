@@ -132,10 +132,10 @@ cat kringlecraft/cfg/kringle.json
     "release": "1.2.0",
     "date": "2024-07-10",
     "mail_enable": "true",
-    "mail_sender": "mail@www.kringlecraft.com",
-    "mail_admin": "admin-mailbox@kringlecraft.com",
+    "mail_sender": "mail@craft.kringle.info",
+    "mail_admin": "admin-mailbox@craft.kringle.info",
     "mail_server": "localhost",
-    "www_server": "https://www.kringlecraft.com"
+    "www_server": "https://craft.kringle.info"
   },
   "secret": {
     "key": "secret-key-goes-here"

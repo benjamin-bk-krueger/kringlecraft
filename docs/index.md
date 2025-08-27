@@ -2,7 +2,7 @@
 
 ## About
 
-KringleCraft.com is an online CTF solution editor and report generator inspired by the SANS Holiday Hack Challenge & KringleCon. 
+KringleCraft is an online CTF solution editor and report generator inspired by the SANS Holiday Hack Challenge & KringleCon. 
 The SANS Holiday Hack Challenge takes place every year during the Christmas holiday season and offers a lot of challenges, knowledge, fun and interaction with other players.
 You can even write a report with your solutions and win valuable prizes.  
 In 2021, I created a report in Markdown format (Markdown is the ideal format for documentation, in my opinion, as it is easy to learn and use and offers syntax highlighting out of the box).
@@ -13,7 +13,7 @@ The data is stored in an SQLite database and additional files, such as images, a
 This makes the application very portable and can run on any operating system with minimal dependencies.  
 It can be used directly on a client, and in combination with a web server (e.g., Apache) as a proxy and the WSGI middleware, it can also be easily made available on the Internet.  
 My application is, of course, inspired by Kringle Con, but is flexible enough to be used for any CTF scenario.   
-The instance available at [KringleCraft.com](https://www.kringlecraft.com) contains my reports for 2021, 2022 and 2023.
+The instance available at [KringleCraft](https://craft.kringle.info) contains my reports for 2021, 2022 and 2023.
 
 ![Index](./img/index.jpg)
 

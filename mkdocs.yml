@@ -1,5 +1,5 @@
-site_name: KringleCraft.com
-site_url: https://www.kringlecraft.com/static/doc/
+site_name: KringleCraft
+site_url: https://craft.kringle.info/static/doc/
 site_dir: ./kringlecraft/static/doc
 use_directory_urls: false
 nav:
@@ -10,7 +10,7 @@ nav:
     - Create Challenges and Solution: solution.md
     - Report Creation: report.md
     - Invitation Links: invitation.md
-    - Exit Help: 'https://www.kringlecraft.com/'
+    - Exit Help: 'https://craft.kringle.info/'
 theme: readthedocs
 markdown_extensions:
   - tables

@@ -99,7 +99,7 @@ def setup_mail_logger():
             mailhost=app.config["app.mail_server"],
             fromaddr=app.config["app.mail_sender"],
             toaddrs=[app.config["app.mail_admin"]],
-            subject='kringlecraft.com: Application Error'
+            subject='craft.kringle.info: Application Error'
         )
         mail_handler.setLevel(logging.ERROR)
         mail_handler.setFormatter(logging.Formatter(
