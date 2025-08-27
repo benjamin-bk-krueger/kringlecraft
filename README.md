@@ -13,7 +13,7 @@ I continued to work on it from late 2023 to mid-2024, and now I have a solution 
 The data is stored in an SQLite database and additional files, such as images, are stored in the local file system. 
 This makes the application very portable and can run on any operating system with minimal dependencies.  
 It can be used directly on a client, and in combination with a web server (e.g., Apache) as a proxy and the WSGI middleware, it can also be easily made available on the Internet.  
-My application is, of course, inspired by Kringle Con, but is flexible enough to be used for any CTF scenario.   
+My application is, of course, inspired by KringleCon, but is flexible enough to be used for any CTF scenario.   
 The instance available at [KringleCraft](https://craft.kringle.info) contains my reports for 2021, 2022 and 2023.
 
 ![Index](./docs/img/index.jpg)
@@ -22,7 +22,7 @@ The instance available at [KringleCraft](https://craft.kringle.info) contains my
 
 What can the application do?
 
-- The application supports any CTF scenario (also called *world*, based on the Kringle Cons). These can contain *rooms*, which can contain *objectives*
+- The application supports any CTF scenario (also called *world*, based on the KringleCons). These can contain *rooms*, which can contain *objectives*
 - There are different roles (admins, standard users and anonymous users)
     - An admin can design a whole world or a whole CTF scenario, including the rooms and challenges
     - A registered user can write a solution for each challenge, upload files for it, and generate reports
